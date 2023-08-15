@@ -1,6 +1,6 @@
 import random
-import playsound 
+import winsound as ws
 
-playsound.playsound("sound/dice.wav")
-for i in range(5):    
-    print (f"{random.randint(1,6)}")
+ws.PlaySound("sounds/dice.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+for i in range(5):
+    print(f"{random.randint(1,6)}")
