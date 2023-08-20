@@ -5,15 +5,11 @@ board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
 def display_board():
     """this function displays a board define in a single list"""
-    temp_board = board[:]
-    for i in range(len(temp_board)):
-        if temp_board[i] == " ":
-            temp_board[i] = i + 1
-    print(f"{temp_board[0]} | {temp_board[1]} | {temp_board[2]}")
-    print(f"--|---|--")
-    print(f"{temp_board[3]} | {temp_board[4]} | {temp_board[5]}")
-    print(f"--|---|--")
-    print(f"{temp_board[6]} | {temp_board[7]} | {temp_board[8]}")
+    print(f" {board[0]} | {board[1]} | {board[2]} ")
+    print(f"---|---|---")
+    print(f" {board[3]} | {board[4]} | {board[5]} ")
+    print(f"---|---|---")
+    print(f" {board[6]} | {board[7]} | {board[8]} ")
 
 
 def check_winner():
