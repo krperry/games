@@ -51,9 +51,9 @@ def main():
             print("It's a tie!")
             ties = ties + 1
         elif True in [
-        (player_move == "ROCK" and computer_move == "SCISSORS"),
+            (player_move == "ROCK" and computer_move == "SCISSORS"),
             (player_move == "PAPER" and computer_move == "ROCK"),
-            (player_move == "SCISSORS" and computer_move == "PAPER")
+            (player_move == "SCISSORS" and computer_move == "PAPER"),
         ]:
             print("You win!")
             wins = wins + 1
