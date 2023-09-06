@@ -12,7 +12,7 @@ def display_board():
     print(f" {board[6]} | {board[7]} | {board[8]} ")
 
 
-def check_winner():
+def check_winner(mark):
     """checks for a winner
     *  returns
       'X' for X wins
@@ -21,26 +21,25 @@ def check_winner():
       * 'D'  for draw
     """
     # first row check
-    for i in range(0, 9, 3):
-        if board[i : i + 3] == ["X"] * 3 or board[i : i + 3] == ["O"] * 3:
-            return board[i]
-
-    # now column check
-    for i in range(3):
-        if board[i::3] == ["X"] * 3 or board[i::3] == ["O"] * 3:
-            return board[i]
+    for i in [0,1,2,3,6]:
+        #row check
+        if i in [0,3,6] and board[i : i + 3] == [mark] * 3:
+            return mark
+    # Column check
+        if i <3 and board[i::3] == [mark] * 3:
+            return mark
 
     # now test         down slope
-    if board[0::4] == ["X"] * 3 or board[0::4] == ["O"] * 3:
-        return board[0]
+    if board[0::4] == [mark] * 3:
+        return mark
 
     # now test up slope
-    if board[2:7:2] == ["X"] * 3 or board[2:7:2] == ["O"] * 3:
-        return board[2]
+    if board[2:7:2] == ["mark"] * 3:
+        return mark
 
     # now test if there are more moves possible.
-    for i in range(9):
-        if isinstance(board[i], int):
+    for spot in board:
+        if isinstance(spot, int):
             return " "
 
     # now return a draw
@@ -83,18 +82,19 @@ def computer_turn():
             return True
     return False
 
-
-win = False
-while check_winner() == " ":
+turn = 'X'
+while check_winner('O') == " ":
     display_board()
     player_input()
     display_board()
-    if check_winner() != " ":
+    turn ='X'
+    if check_winner(turn) != " ":
         break
+    turn = 'O'
     computer_turn()
     display_board()
 
-winner = check_winner()
+winner = check_winner(turn)
 if winner == "X":
     print("'X' wins")
 elif winner == "O":
