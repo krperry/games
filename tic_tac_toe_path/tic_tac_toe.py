@@ -21,12 +21,12 @@ def check_winner(mark):
       * 'D'  for draw
     """
     # first row check
-    for i in [0,1,2,3,6]:
-        #row check
-        if i in [0,3,6] and board[i : i + 3] == [mark] * 3:
+    for i in [0, 1, 2, 3, 6]:
+        # row check
+        if i in [0, 3, 6] and board[i : i + 3] == [mark] * 3:
             return mark
-    # Column check
-        if i <3 and board[i::3] == [mark] * 3:
+        # Column check
+        if i < 3 and board[i::3] == [mark] * 3:
             return mark
 
     # now test         down slope
@@ -82,15 +82,16 @@ def computer_turn():
             return True
     return False
 
-turn = 'X'
-while check_winner('O') == " ":
+
+turn = "X"
+while check_winner("O") == " ":
     display_board()
     player_input()
     display_board()
-    turn ='X'
+    turn = "X"
     if check_winner(turn) != " ":
         break
-    turn = 'O'
+    turn = "O"
     computer_turn()
     display_board()
 
