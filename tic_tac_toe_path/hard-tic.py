@@ -8,6 +8,7 @@ import random
 # 10  difficulty
 # 11 number of players
 game_state = ["X", 1, 2, 3, 4, 5, 6, 7, 8, 9, "X", 0]
+test_moves =[1,2,3,5,6,7,8,9,4]
 
 
 def reset_board():
@@ -193,9 +194,13 @@ def difficult_pick(player_mark):
 def computer_choice(mark):
     """Computer chooses depending on difficulty"""
     if game_state[10] ==0:
-            position = [x for x in game_state[1:10] if x not in ["X", "O"]][0]
-            mark_spot(position, mark)
-            print(f"Computer picked {position} for '{mark}'")
+        while test_moves:   
+            position = test_moves.pop(0)
+            if mark_spot(position,mark):
+                break
+            #position = [x for x in game_state[1:10] if x not in ["X", "O"]][0]
+            #mark_spot(position, mark)
+        print(f"Computer picked {position} for '{mark}'")
     elif  game_state[10] ==1:
             spot_indexes = [x for x in game_state[1:10] if x not in ["X", "O"]]
             position = random.choice(spot_indexes)
@@ -254,7 +259,7 @@ def main():
         choose_difficulty()
         choose_xoro()
         while game_state[0] not in ["Q", "R"]:
-            display_board()
+            #display_board()
             play_turn()
             check_winner()
             restart_game()
