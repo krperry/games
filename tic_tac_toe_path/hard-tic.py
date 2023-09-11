@@ -259,7 +259,7 @@ def main():
         choose_difficulty()
         choose_xoro()
         while game_state[0] not in ["Q", "R"]:
-            #display_board()
+            display_board()
             play_turn()
             check_winner()
             restart_game()
