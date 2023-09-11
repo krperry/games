@@ -192,17 +192,16 @@ def difficult_pick(player_mark):
 
 def computer_choice(mark):
     """Computer chooses depending on difficulty"""
-    match game_state[10]:
-        case 0:
+    if game_state[10] ==0:
             position = [x for x in game_state[1:10] if x not in ["X", "O"]][0]
             mark_spot(position, mark)
             print(f"Computer picked {position} for '{mark}'")
-        case 1:
-            spot_indexes = [x for x in game[1:10] if x not in ["X", "O"]]
+    elif  game_state[10] ==1:
+            spot_indexes = [x for x in game_state[1:10] if x not in ["X", "O"]]
             position = random.choice(spot_indexes)
             mark_spot(position, mark)
             print(f"Computer picked {position} for '{mark}'")
-        case 2:
+    elif  game_state[10] ==2:
             position = difficult_pick(mark)
             print(f"Computer picked {position} for '{mark}'")
 
