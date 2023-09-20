@@ -8,7 +8,7 @@ import random
 # 10  difficulty
 # 11 number of players
 game_state = ["X", 1, 2, 3, 4, 5, 6, 7, 8, 9, "X", 0]
-test_moves =[1,2,3,5,6,7,8,9,4]
+test_moves = [1, 2, 3, 5, 6, 7, 8, 9, 4]
 
 
 def reset_board():
@@ -56,13 +56,13 @@ def check_winner():
             game_state[0] = "R"
             return
         # Column check
-        if i < 4 and game_state[i:10:3] == [mark] * 3:
+        if i < 4 and game_state[i:9:3] == [mark] * 3:
             print(f"'{mark}' wins!")
             game_state[0] = "R"
             return
 
     # now test         down slope
-    if game_state[1:10:4] == [mark] * 3:
+    if game_state[1:9:4] == [mark] * 3:
         print(f"'{mark}' wins!")
         game_state[0] = "R"
         return
@@ -139,26 +139,27 @@ def difficult_pick(player_mark):
         if len(row) == 1 and game_state[row[0]] not in ["X", "O"]:
             mark_spot(row[0], player_mark)
             return row[0]
+    # columns
     for i in [1, 2, 3]:
         # check to place winning piece
-        row = [game_state.index(x) for x in game_state[i:10:3] if x != player_mark]
+        row = [game_state.index(x) for x in game_state[i:9:3] if x != player_mark]
         if len(row) == 1 and game_state[row[0]] not in ["X", "O"]:
             mark_spot(row[0], player_mark)
             return row[0]
         # check to block
-        row = [game_state.index(x) for x in game_state[i:10:3] if x != oponent_mark]
+        row = [game_state.index(x) for x in game_state[i:9:3] if x != oponent_mark]
         if len(row) == 1 and game_state[row[0]] not in ["X", "O"]:
             mark_spot(row[0], player_mark)
             return row[0]
 
     # down slope
     # check to place winnning piece
-    row = [game_state.index(x) for x in game_state[1:10:4] if x != player_mark]
+    row = [game_state.index(x) for x in game_state[1:9:4] if x != player_mark]
     if len(row) == 1 and game_state[row[0]] not in ["X", "O"]:
         mark_spot(row[0], player_mark)
         return row[0]
     # check to block
-    row = [game_state.index(x) for x in game_state[1:10:4] if x != oponent_mark]
+    row = [game_state.index(x) for x in game_state[1:9:4] if x != oponent_mark]
     if len(row) == 1 and game_state[row[0]] not in ["X", "O"]:
         mark_spot(row[0], player_mark)
         return row[0]
@@ -193,22 +194,22 @@ def difficult_pick(player_mark):
 
 def computer_choice(mark):
     """Computer chooses depending on difficulty"""
-    if game_state[10] ==0:
-        while test_moves:   
+    if game_state[10] == 0:
+        while test_moves:
             position = test_moves.pop(0)
-            if mark_spot(position,mark):
+            if mark_spot(position, mark):
                 break
-            #position = [x for x in game_state[1:10] if x not in ["X", "O"]][0]
-            #mark_spot(position, mark)
+            # position = [x for x in game_state[1:10] if x not in ["X", "O"]][0]
+            # mark_spot(position, mark)
         print(f"Computer picked {position} for '{mark}'")
-    elif  game_state[10] ==1:
-            spot_indexes = [x for x in game_state[1:10] if x not in ["X", "O"]]
-            position = random.choice(spot_indexes)
-            mark_spot(position, mark)
-            print(f"Computer picked {position} for '{mark}'")
-    elif  game_state[10] ==2:
-            position = difficult_pick(mark)
-            print(f"Computer picked {position} for '{mark}'")
+    elif game_state[10] == 1:
+        spot_indexes = [x for x in game_state[1:10] if x not in ["X", "O"]]
+        position = random.choice(spot_indexes)
+        mark_spot(position, mark)
+        print(f"Computer picked {position} for '{mark}'")
+    elif game_state[10] == 2:
+        position = difficult_pick(mark)
+        print(f"Computer picked {position} for '{mark}'")
 
 
 def choose_one_or_two():

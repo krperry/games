@@ -5,12 +5,12 @@ import os
 import time
 import sys  # used to exit game
 
-#Paths for all sounds.  playsound requires full paths to work
-CURRENT_DIRECTORY = os.getcwd() # gets the scripts full working directory
-SHUFFLE_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","shuffle.wav")
-DEAL1_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal1.wav")
-DEAL2_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal2.wav")
-DEAL3_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal3.wav")
+# Paths for all sounds.  playsound requires full paths to work
+CURRENT_DIRECTORY = os.getcwd()  # gets the scripts full working directory
+SHUFFLE_SOUND = os.path.join(CURRENT_DIRECTORY, "SOUNDS", "shuffle.wav")
+DEAL1_SOUND = os.path.join(CURRENT_DIRECTORY, "SOUNDS", "deal1.wav")
+DEAL2_SOUND = os.path.join(CURRENT_DIRECTORY, "SOUNDS", "deal2.wav")
+DEAL3_SOUND = os.path.join(CURRENT_DIRECTORY, "SOUNDS", "deal3.wav")
 
 cards = [
     "Ace",
@@ -40,9 +40,7 @@ ps.playsound(SHUFFLE_SOUND)
 
 # deal first four cards 2 for player 2 for dealer
 for _ in range(4):
-    sound = random.choice(
-        [DEAL1_SOUND,DEAL2_SOUND,DEAL3_SOUND]
-    )
+    sound = random.choice([DEAL1_SOUND, DEAL2_SOUND, DEAL3_SOUND])
     ps.playsound(sound)
 
 player_hand = [deck.pop(), deck.pop()]

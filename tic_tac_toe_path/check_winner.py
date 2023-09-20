@@ -2,6 +2,7 @@
 
 board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
 
+
 def check_winner():
     """checks for a winner
     *  returns
@@ -36,17 +37,18 @@ def check_winner():
     # now return a draw
     return "d"
 
-#No winner test
+
+# No winner test
 print(f"No winner test {check_winner()}")
 
-#a virtical win test
-board = ['X', 2, 3, 'X', 5, 6, 'X', 8, 9]
+# a virtical win test
+board = ["X", 2, 3, "X", 5, 6, "X", 8, 9]
 print(f"Virtical test {check_winner()}")
 
-#a Horizontal win test
-board = [1, 2, 3, 'X', 'X', 'X', 7, 8, 9]
+# a Horizontal win test
+board = [1, 2, 3, "X", "X", "X", 7, 8, 9]
 print(f"Horzontal test {check_winner()}")
 
-#a Diagonal win test
-board = ['X', 2, 3, 4, 'X', 6, 7, 8, 'X']
+# a Diagonal win test
+board = ["X", 2, 3, 4, "X", 6, 7, 8, "X"]
 print(f"Diagonal test {check_winner()}")
