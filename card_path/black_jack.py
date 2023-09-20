@@ -1,8 +1,16 @@
 """Black jack game"""
 import random
-import winsound as ws
+import playsound as ps
+import os
 import time
 import sys  # used to exit game
+
+#Paths for all sounds.  playsound requires full paths to work
+CURRENT_DIRECTORY = os.getcwd() # gets the scripts full working directory
+SHUFFLE_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","shuffle.wav")
+DEAL1_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal1.wav")
+DEAL2_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal2.wav")
+DEAL3_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","deal3.wav")
 
 cards = [
     "Ace",
@@ -28,14 +36,14 @@ for card in cards:
 deck = clean_deck[:]  # copy a clean deck for use
 
 random.shuffle(deck)  # Shuffle the deck.
-ws.PlaySound("sounds\\shuffle.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+ps.playsound(SHUFFLE_SOUND)
 
 # deal first four cards 2 for player 2 for dealer
 for _ in range(4):
     sound = random.choice(
-        ["sounds\\deal1.wav", "sounds\\deal2.wav", "sounds\\deal3.wav"]
+        [DEAL1_SOUND,DEAL2_SOUND,DEAL3_SOUND]
     )
-    ws.PlaySound(sound, ws.SND_FILENAME | ws.SND_NOWAIT)
+    ps.playsound(sound)
 
 player_hand = [deck.pop(), deck.pop()]
 dealer_hand = [deck.pop(), deck.pop()]
@@ -108,7 +116,7 @@ while again.upper() != "S":
         continue
 
     print("You hit.")
-    ws.PlaySound("sounds\\deal1.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+    ps.playsound(DEAL1_SOUND)
     player_hand.append(deck.pop())
     display_table()
     time.sleep(1)
@@ -117,7 +125,7 @@ while again.upper() != "S":
 dealer_sum = sum_hand(dealer_hand)
 while dealer_sum < 17:
     print("Dealer hits.")
-    ws.PlaySound("sounds\\deal1.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+    ps.playsound(DEAL1_SOUND)
     dealer_hand.append(deck.pop())
     dealer_sum = sum_hand(dealer_hand)
     display_table()

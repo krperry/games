@@ -1,3 +1,27 @@
+Let’s first understand the game’s rules before writing the blackjack game.
 
-description found here:
-https://www.geeksforgeeks.org/blackjack-console-game-using-python/
+In blackjack, each player and dealer receives two cards.  The player
+can then choose to “play” (request another card) or “stop” (keep on
+hold until a new request is made). The goal in this game is to keep
+the sum of all card points equal to 21 without exceeding it. Face
+cards (i.e. Jack, Queen, and King) are worth 10 points, and Aces can
+be worth 11 points. If a player has more than 21 points then the
+player automatically loses the game.
+
+When playing at a Casino the dealer will hit if he has less than 17
+and stay if he has 17 or more. This doesn't matter as much when
+playing just one on one but it does when playing multiple players.  It
+gives the House a better chance of coming out on top.  We will code our dealer to do this.
+
+Now that we have a basic
+understanding of the rules of the game, let’s start building the game
+using Python. We will use the following steps to build the game:
+
+1) Set up the deck of cards 
+2) Shuffle the deck 
+3) Deal the initial cards 
+4) Allow the player to hit or stand 
+5) Deal the dealer’s cards 
+    A) Test card score dealer has if lower than 17 hit
+    B) If higher than or equal to 17 stay    
+6) Determine the winner
