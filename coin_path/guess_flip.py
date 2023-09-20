@@ -1,12 +1,19 @@
 import random
-import winsound as ws
+import playsound as ps
+import os
+
+#Paths for all sounds.  playsound requires full paths to work
+CURRENT_DIRECTORY = os.getcwd() # gets the scripts full working directory
+FLIP_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","flip.wav")
+
+
 
 guess = ""
 while guess not in ["H", "T"]:
     guess = input("Enter (H)eads, (T)ails")
     guess = guess.upper()
 
-ws.PlaySound("sounds\\flip.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+ps.playsound(FLIP_SOUND)
 coin = random.choice(["Head", "tail"])
 print(f"{coin}s up!")
 

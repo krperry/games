@@ -1,6 +1,11 @@
 import random
-import winsound as ws
+import playsound as ps
+import os
 
-ws.PlaySound("sounds\\flip.wav", ws.SND_FILENAME | ws.SND_NOWAIT)
+#Paths for all sounds.  playsound requires full paths to work
+CURRENT_DIRECTORY = os.getcwd() # gets the scripts full working directory
+FLIP_SOUND = os.path.join(CURRENT_DIRECTORY,"SOUNDS","flip.wav")
+
+ps.playsound(FLIP_SOUND)
 coin = ["Head", "tail"]
 print(f"{random.choice(coin)}")
