@@ -1,0 +1,14 @@
+Get how many players for the game.
+Change to the next Player.
+Roll dice for player
+Load the Random Module
+Add dice to current rolls total
+add current rolls total to players total score.
+Choose who the first player is rolling a dice to choose.
+Load the Audio module.
+display a winning message.
+Askplayer if they want to roll again.
+Get the names of the players.
+Display the players and scores.
+Check to see if someone wins.
+Load the time Module.
