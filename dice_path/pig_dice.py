@@ -3,11 +3,6 @@
 import random
 import time
 import playsound as ps
-import os
-
-# Paths for all sounds.  playsound requires full paths to work
-CURRENT_DIRECTORY = os.getcwd()  # gets the scripts full working directory
-DICE_SOUND = os.path.join(CURRENT_DIRECTORY, "SOUNDS", "dice.wav")
 
 number_players = 0
 while number_players < 2 or number_players > 10:
@@ -31,7 +26,7 @@ print(f"Rolling a {number_players} sided die to choose the player to start.")
 time.sleep(1.5)
 
 index = random.randint(0, number_players - 1)
-ps.playsound(DICE_SOUND)
+ps.playsound("sounds/dice.wav")
 
 time.sleep(1)
 print(f"{index +1 } was rolled.  {player_names[index]} rolls first.")
@@ -46,7 +41,7 @@ while not winner:
         roll = random.randint(1, 6)
         total_round += roll
         player_scores[index] += roll
-        ps.playsound(DICE_SOUND)
+        ps.playsound("sounds/dice.wav")
         print(f"{player_names[index]} rolls a: {roll}")
         time.sleep(1)
 
