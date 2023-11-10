@@ -52,9 +52,15 @@ def move_ball():
   ball_position[1]-=ball_velocity[1]*delta_time
   ball.center=ball_position
   if ball.left < 0 or ball.right > width:
+    bounce=pygame.mixer.Sound('sounds/bounce.wav')
+    channel=pygame.mixer.find_channel()
+    if ball.left < 0:
+      channel.set_volume(1.0, 0.0)
+    else:
+      channel.set_volume(0.0, 1.0)
+    channel.play(bounce)
     ball_velocity[0]*=-1
     ball_position[0]+=ball_velocity[0]*delta_time
-    pygame.mixer.Sound('sounds/bounce.wav').play()
   if ball.top < 0 or ball.bottom > height:
     ball_velocity[1]*=-1
     ball_position[1]-=ball_velocity[1]*delta_time
