@@ -1,52 +1,18 @@
-# tic-tac example
+"""Create functions to mark and display a spot by a player"""
 
-board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+game_state = ["X", 1, 2, 3, 4, 5, 6, 7, 8, 9, "X", 0]
 
 
 def display_board():
-    """this function displays a board define in a single list"""
-    print(f" {board[0]} | {board[1]} | {board[2]} ")
-    print(f"---|---|---")
-    print(f" {board[3]} | {board[4]} | {board[5]} ")
-    print(f"---|---|---")
-    print(f" {board[6]} | {board[7]} | {board[8]} ")
+    """this function displays the board"""
+    print(f" {game_state[1]} | {game_state[2]} | {game_state[3]} ")
+    print("---|---|---")
+    print(f" {game_state[4]} | {game_state[5]} | {game_state[6]} ")
+    print("---|---|---")
+    print(f" {game_state[7]} | {game_state[8]} | {game_state[9]} ")
 
 
-def check_winner(mark):
-    """checks for a winner
-    *  returns
-      'X' for X wins
-      *  'O' for O wins
-      *  ' ' for no winner yet
-      * 'D'  for draw
-    """
-    # first row check
-    for i in [0, 1, 2, 3, 6]:
-        # row check
-        if i in [0, 3, 6] and board[i : i + 3] == [mark] * 3:
-            return mark
-        # Column check
-        if i < 3 and board[i::3] == [mark] * 3:
-            return mark
-
-    # now test         down slope
-    if board[0::4] == [mark] * 3:
-        return mark
-
-    # now test up slope
-    if board[2:7:2] == ["mark"] * 3:
-        return mark
-
-    # now test if there are more moves possible.
-    for spot in board:
-        if isinstance(spot, int):
-            return " "
-
-    # now return a draw
-    return "d"
-
-
-def place_mark(position, mark):
+def mark_spot(position, mark):
     """a function to place a 'X' or 'O' and checkk if it is legal.
     *  argument s:
     *  position = Where you want to put the piece*
@@ -54,51 +20,76 @@ def place_mark(position, mark):
     *  returns
     *  True for placed False for fail
     """
-    if board[position - 1] != "X" and board[position - 1] != "O":
-        board[position - 1] = mark
+    if game_state[position] not in ["X", "O"]:
+        game_state[position] = mark
         return True
     return False
 
 
-def player_input():
-    """this asks player for a position and loops until it is legal
-    Use the place_mark function
+def player_input(mark):
+    """this asks a player for a position and loops until it is legal
+    Use the mark_spot function
     """
-    choice = int(input("Enter a position: "))
-    marked = place_mark(int(choice), "X")
-    while not marked:
+    choice = input(f"Enter a position for '{mark}': ")
+    while choice not in [str(x) for x in game_state[1:10] if x not in ["X", "O"]]:
         print("incorrect position")
-        choice = int(input("Enter a position: "))
-        marked = place_mark(int(choice), "X")
-
-    print(f"You placed an 'X'  in square {int(choice)}")
-
-
-def computer_turn():
-    """Computer simply chooses next position"""
-    for position in range(9):
-        if place_mark(position + 1, "O"):
-            print(f"Computer picked {position+1} for 'O'")
-            return True
-    return False
+        choice = input(f"Enter a position for '{mark}': ")
+    mark_spot(int(choice), mark)
+    print(f"You placed an '{mark}'  in square {int(choice)}")
 
 
-turn = "X"
-while check_winner("O") == " ":
+def check_winner():
+    """checks for a winner
+    prints who wins and set 'R' to restart game
+    """
+    # first row check
+    for i in [1, 2, 3, 4, 7]:
+        # row check
+        if i in [1, 4, 7] and game_state[i : i + 3] == [game_state[i]] * 3:
+            print(f"'{game_state[i]}' wins")
+            game_state[0] = "R"
+            return
+        # Column check
+        if i < 4 and game_state[i:10:3] == [game_state[i]] * 3:
+            print(f"'{game_state[i]}' wins!")
+            game_state[0] = "R"
+            return
+
+    # now test         down slope
+    if game_state[1:10:4] == [game_state[1]] * 3:
+        print(f"'{game_state[1]}' wins!")
+        game_state[0] = "R"
+        return
+
+    # now test up slope
+    if game_state[3:8:2] == [game_state[3]] * 3:
+        print(f"'{game_state[3]}' wins!")
+        game_state[0] = "R"
+        return
+
+    # If more moves return
+    if [x for x in game_state[1:10] if x not in ["X", "O"]]:
+        return
+
+    print("Cats game!")
+    game_state[0] = "R"
+    return
+
+
+def game():
+    player = "X"
     display_board()
-    player_input()
-    display_board()
-    turn = "X"
-    if check_winner(turn) != " ":
-        break
-    turn = "O"
-    computer_turn()
-    display_board()
+    while True:
+        player_input(player)
+        display_board()
+        check_winner()
+        if game_state[0] == "R":
+            quit()
+        if player == "X":
+            player = "O"
+        else:
+            player = "X"
 
-winner = check_winner(turn)
-if winner == "X":
-    print("'X' wins")
-elif winner == "O":
-    print("'O' wins")
-else:
-    print("Cats game")
+
+if __name__ == "__main__":
+    game()

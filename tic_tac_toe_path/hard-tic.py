@@ -42,34 +42,28 @@ def check_winner():
     """checks for a winner
     prints who wins and set 'R' to restart game
     """
-    mark = (
-        "X"
-        if len([x for x in game_state[1:10] if x not in ["X", "O"]]) % 2 == 0
-        else "O"
-    )
-
     # first row check
     for i in [1, 2, 3, 4, 7]:
         # row check
-        if i in [1, 4, 7] and game_state[i : i + 3] == [mark] * 3:
-            print(f"'{mark}' wins")
+        if i in [1, 4, 7] and game_state[i : i + 3] == [game_state[i]] * 3:
+            print(f"'{game_state[i]}' wins")
             game_state[0] = "R"
             return
         # Column check
-        if i < 4 and game_state[i:9:3] == [mark] * 3:
-            print(f"'{mark}' wins!")
+        if i < 4 and game_state[i:10:3] == [game_state[i]] * 3:
+            print(f"'{game_state[i]}' wins!")
             game_state[0] = "R"
             return
 
     # now test         down slope
-    if game_state[1:9:4] == [mark] * 3:
-        print(f"'{mark}' wins!")
+    if game_state[1:10:4] == [game_state[1]] * 3:
+        print(f"'{game_state[1]}' wins!")
         game_state[0] = "R"
         return
 
     # now test up slope
-    if game_state[3:8:2] == [mark] * 3:
-        print(f"'{mark}' wins!")
+    if game_state[3:8:2] == [game_state[3]] * 3:
+        print(f"'{game_state[3]}' wins!")
         game_state[0] = "R"
         return
 

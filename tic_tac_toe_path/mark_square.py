@@ -1,18 +1,18 @@
 """Create functions to mark and display a spot by a player"""
 
-board = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+game_state = ["X", 1, 2, 3, 4, 5, 6, 7, 8, 9, "X", 0]
 
 
 def display_board():
-    """this function displays a board define in a single list"""
-    print(f" {board[0]} | {board[1]} | {board[2]} ")
-    print(f"---|---|---")
-    print(f" {board[3]} | {board[4]} | {board[5]} ")
-    print(f"---|---|---")
-    print(f" {board[6]} | {board[7]} | {board[8]} ")
+    """this function displays the board"""
+    print(f" {game_state[1]} | {game_state[2]} | {game_state[3]} ")
+    print("---|---|---")
+    print(f" {game_state[4]} | {game_state[5]} | {game_state[6]} ")
+    print("---|---|---")
+    print(f" {game_state[7]} | {game_state[8]} | {game_state[9]} ")
 
 
-def place_mark(position, mark):
+def mark_spot(position, mark):
     """a function to place a 'X' or 'O' and checkk if it is legal.
     *  argument s:
     *  position = Where you want to put the piece*
@@ -20,28 +20,26 @@ def place_mark(position, mark):
     *  returns
     *  True for placed False for fail
     """
-    if board[position - 1] != "X" and board[position - 1] != "O":
-        board[position - 1] = mark
+    if game_state[position] not in ["X", "O"]:
+        game_state[position] = mark
         return True
     return False
 
 
-def player_input():
-    """this asks player for a position and loops until it is legal
-    Use the place_mark function
+def player_input(mark):
+    """this asks a player for a position and loops until it is legal
+    Use the mark_spot function
     """
-    choice = int(input("Enter a position: "))
-    marked = place_mark(int(choice), "X")
-    while not marked:
+    choice = input(f"Enter a position for '{mark}': ")
+    while choice not in [str(x) for x in game_state[1:10] if x not in ["X", "O"]]:
         print("incorrect position")
-        choice = int(input("Enter a position: "))
-        marked = place_mark(int(choice), "X")
+        choice = input(f"Enter a position for '{mark}': ")
+    mark_spot(int(choice), mark)
+    print(f"You placed an '{mark}'  in square {int(choice)}")
 
-    print(f"You placed an 'X'  in square {int(choice)}")
 
-
-player_input()
 display_board()
-
-player_input()
+player_input("X")
+display_board()
+player_input("O")
 display_board()
