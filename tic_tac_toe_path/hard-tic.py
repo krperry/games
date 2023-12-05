@@ -42,33 +42,25 @@ def check_winner():
     """checks for a winner
     prints who wins and set 'R' to restart game
     """
-    # first row check
-    for i in [1, 2, 3, 4, 7]:
-        # row check
-        if i in [1, 4, 7] and game_state[i : i + 3] == [game_state[i]] * 3:
-            print(f"'{game_state[i]}' wins")
-            game_state[0] = "R"
-            return
-        # Column check
-        if i < 4 and game_state[i:10:3] == [game_state[i]] * 3:
-            print(f"'{game_state[i]}' wins!")
-            game_state[0] = "R"
-            return
+    winning_sets = [
+        (1, 2, 3),
+        (4, 5, 6),
+        (7, 8, 9),
+        (1, 4, 7),
+        (2, 5, 8),
+        (3, 6, 9),
+        (1, 5, 9),
+        (3, 5, 7),
+    ]
 
-    # now test         down slope
-    if game_state[1:10:4] == [game_state[1]] * 3:
-        print(f"'{game_state[1]}' wins!")
-        game_state[0] = "R"
-        return
-
-    # now test up slope
-    if game_state[3:8:2] == [game_state[3]] * 3:
-        print(f"'{game_state[3]}' wins!")
-        game_state[0] = "R"
-        return
+    for check in winning_sets:
+        if game_state[check[0]] == game_state[check[1]] == game_state[check[2]]:
+            game_state[0] = "R"
+            print(f"'{game_state[check[0]]}' wins")
+            return
 
     # If more moves return
-    if [x for x in game_state[1:10] if x not in ["X", "O"]]:
+    if len(set(game_state[1:10])) > 2:
         return
 
     print("Cats game!")
