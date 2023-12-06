@@ -1,3 +1,4 @@
+"""pyside6 GUI of Tic Tac Toe"""
 import sys
 from PySide6.QtWidgets import (
     QApplication,
@@ -106,9 +107,7 @@ class TicTacToe(QMainWindow):
 
         # Set the modal property to make the dialog modal
         msg_box.setModal(True)
-
-        # Show the dialog and wait for the user's response
-        result = msg_box.exec_()
+        msg_box.exec_()
 
     def ask_play_again(self, title, message):
         msg_box = QMessageBox()
@@ -116,7 +115,6 @@ class TicTacToe(QMainWindow):
         msg_box.setText(message)
         msg_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         msg_box.setDefaultButton(QMessageBox.No)
-
         result = msg_box.exec()
         return result == QMessageBox.Yes
 
@@ -125,13 +123,9 @@ class TicTacToe(QMainWindow):
         msg_box = QMessageBox()
         msg_box.setWindowTitle("It's a draw!")
         msg_box.setText("Better luck next time!")
-        #        msg_box.setIcon(QMessageBox.Information)
-
         # Set the modal property to make the dialog modal
         msg_box.setModal(True)
-
-        # Show the dialog and wait for the user's response
-        result = msg_box.exec_()
+        msg_box.exec_()
 
     def reset_board(self):
         if not self.ask_play_again("Restart Game?", "do you want to play again?"):
