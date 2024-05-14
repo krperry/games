@@ -1,3 +1,4 @@
+"""Simplest coin flip"""
 import random
 
 coin = ["Head", "tail"]

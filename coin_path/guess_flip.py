@@ -1,3 +1,4 @@
+"""Simple guess the coin toss"""
 import random
 import playsound as ps
 
@@ -8,10 +9,10 @@ while guess not in ["H", "T"]:
     guess = guess.upper()
 
 ps.playsound("sounds/flip.wav")
-coin = random.choice(["Head", "tail"])
+coin = random.choice(["Head", "Tail"])
 print(f"{coin}s up!")
 
 if guess.upper() == coin[0]:
-    print(f"You guessed the toss! Congradulations!")
+    print("You guessed the toss! Congradulations!")
 else:
-    print(f"You did not guess the toss. Better luck next time.")
+    print("You did not guess the toss. Better luck next time.")
