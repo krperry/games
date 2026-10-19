@@ -1,0 +1,174 @@
+<h1 id="a-function-to-display-the-board">A Function to Display the
+Board</h1>
+<p>In the last lesson the same five lines that print the board were
+written out twice. In this lesson you will move those lines into a
+function named <code>display_board()</code>. Then, any time you want to
+show the board, you call the function with one short line.</p>
+<p>Turning repeated code into a function is one of the most important
+skills in programming.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Defining a function with <code>def</code></li>
+<li>Docstrings for functions</li>
+<li>Calling a function more than once</li>
+<li>Functions that use a global variable</li>
+<li>Defining a function before you call it</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code> 1 | 2 | 3
+---|---|---
+ 4 | 5 | 6
+---|---|---
+ 7 | 8 | 9
+ 1 | 2 | 3
+---|---|---
+ X | 5 | 6
+---|---|---
+ 7 | 8 | 9</code></pre>
+<p>It sounds exactly the same as <code>simple_display.py</code>. The
+difference is in the code.</p>
+<h2 id="the-source-code-for-display-board">The Source Code for Display
+Board</h2>
+<p>Type this program and save it as <code>display_board.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Start of tic tac toe just display the board&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_board():</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;this function displays the board&quot;&quot;&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<h2 id="defining-display_board">Defining display_board()</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_board():</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;this function displays the board&quot;&quot;&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    ...</span></code></pre></div>
+<p>The <code>def</code> line starts a function named
+<code>display_board</code>. The parentheses are empty, because this
+function does not need any arguments. The colon at the end means a block
+is coming.</p>
+<p>All the lines under it that are indented four spaces are the
+function’s body. Listen to the indentation: the docstring and the five
+<code>print()</code> lines are all at four spaces. The blank lines after
+them, and <code>display_board()</code> at zero spaces, are no longer
+part of the function.</p>
+<p>Defining a function does not run it. When Python reaches the
+<code>def</code> line, it just remembers the name
+<code>display_board</code> and the code in its body. Nothing is printed
+yet.</p>
+<h3 id="a-docstring-for-a-function">A Docstring for a Function</h3>
+<p>The first line of the body is a docstring:
+<code>"""this function displays the board"""</code>. A docstring right
+under a <code>def</code> line describes what that function does. Many
+code editors will read it to you when you use the function, and the
+<code>help()</code> function in the shell shows it too:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">help</span>(display_board)</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>Help on function display_board <span class="kw">in</span> module __main__:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    this function displays the board</span></code></pre></div>
+<h2 id="calling-the-function">Calling the Function</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<p>These four lines are the part of the program that actually runs. Each
+<code>display_board()</code> line <em>calls</em> the function. Python
+jumps into the function, runs its body from top to bottom, and then
+comes back to the line after the call.</p>
+<p>So the program prints the board, marks square 4, and prints the board
+again. The last line marks square 4 again. It does not hurt anything,
+since square 4 already has an X, but it does nothing useful. It is
+probably left over from copying and pasting. You can delete it.</p>
+<h2 id="the-function-uses-a-global-variable">The Function Uses a Global
+Variable</h2>
+<p><code>display_board()</code> reads <code>game_state</code>, but
+<code>game_state</code> is not made inside the function. It is made at
+the top of the file, outside any function. That makes it a <em>global
+variable</em>, and any function in the file can read it.</p>
+<p>Because the function reads the list each time it is called, it always
+prints the board as it is right now. When the second call happens,
+square 4 has changed, so the second board has an X.</p>
+<h2 id="order-matters-define-then-call">Order Matters: Define, Then
+Call</h2>
+<p>Python runs a file from top to bottom. The <code>def</code> must come
+before the first call. Try moving the first <code>display_board()</code>
+line above the <code>def</code> line and run the program. You will
+hear:</p>
+<pre><code>NameError: name &#39;display_board&#39; is not defined</code></pre>
+<p>At that point in the file, Python has not yet seen the
+definition.</p>
+<h2 id="why-functions-help">Why Functions Help</h2>
+<p>Compare this program with <code>simple_display.py</code>:</p>
+<ul>
+<li>The board-printing code is written once instead of twice.</li>
+<li>If you want to change how the board looks, such as the spoken
+version from the last lesson, you change it in one place, and every call
+uses the new look.</li>
+<li>The bottom of the program reads almost like plain English: display
+the board, mark a square, display the board.</li>
+<li>The function’s name says what the code does, which helps when you
+move through a file with a screen reader. You can jump from
+<code>def</code> to <code>def</code> to find your way around.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>You turned repeated code into a function. You learned that:</p>
+<ul>
+<li><code>def name():</code> defines a function. Its body is the
+indented lines under it.</li>
+<li>A docstring under the <code>def</code> line describes the
+function.</li>
+<li>Calling a function runs its body and then comes back.</li>
+<li>A function can read a global variable, and it sees its current
+value.</li>
+<li>A function must be defined before it is called.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Delete the last line, which marks square 4 a second time.</li>
+<li>Change <code>display_board()</code> so it prints the spoken board
+from the last lesson, with “Top row,” “Middle row,” and “Bottom row.”
+Notice that you only change it in one place.</li>
+<li>Mark squares 1, 5, and 9 with <code>"O"</code>, calling
+<code>display_board()</code> after each one.</li>
+<li>Write a second function named <code>say_square()</code> that prints
+the value of square 5, such as <code>Square 5 is X</code>. Call it after
+the board.</li>
+<li>Move one call above the <code>def</code> line, listen to the error,
+and then move it back.</li>
+</ol>

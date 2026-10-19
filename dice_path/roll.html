@@ -1,0 +1,120 @@
+<h1 id="rolling-a-die">Rolling a Die</h1>
+<p>In the coin lessons you picked a random item from a list. That works
+well when there are only a few choices. A die has six sides, and some
+games use dice with ten, twenty, or even a hundred sides. Typing every
+number into a list would get old fast.</p>
+<p>In this lesson you will roll a six-sided die with a function that
+picks a random <em>number</em> instead of a random list item.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Integers</li>
+<li><code>random.randint()</code></li>
+<li>Passing more than one argument to a function</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-runs">Sample Runs</h2>
+<p>The program prints one number from 1 to 6. Three runs might sound
+like this:</p>
+<pre><code>4</code></pre>
+<pre><code>1</code></pre>
+<pre><code>6</code></pre>
+<h2 id="the-source-code-for-roll">The Source Code for Roll</h2>
+<p>Type this program and save it as <code>roll.py</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Run it a few times with <code>python roll.py</code>.</p>
+<h2 id="numbers-in-python">Numbers in Python</h2>
+<p>So far, every value you have worked with has been a string or a list
+of strings. Python can also work with numbers. A whole number, with no
+decimal point, is called an <em>integer</em>. <code>1</code>,
+<code>6</code>, <code>0</code>, and <code>-25</code> are all
+integers.</p>
+<p>Numbers do not go in quotes. <code>6</code> is a number, and
+<code>"6"</code> is a string that happens to hold the character 6. That
+difference will matter later, when you do math with numbers. Try this in
+the shell:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">2</span> <span class="op">+</span> <span class="dv">3</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;2&quot;</span> <span class="op">+</span> <span class="st">&quot;3&quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;23&#39;</span></span></code></pre></div>
+<p>Adding two numbers gives you their sum. Adding two strings sticks
+them together.</p>
+<h2 id="random.randint">random.randint()</h2>
+<p>This line rolls the die and prints the result:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p><code>randint</code> is short for “random integer.” It returns a
+random whole number.</p>
+<h3 id="two-arguments">Two Arguments</h3>
+<p>This is the first function you have called with two arguments. They
+are separated by a comma. The first argument, <code>1</code>, is the
+smallest number you want. The second, <code>6</code>, is the largest.
+<code>randint()</code> returns a number between them, and both ends are
+included, so you can get a 1 or a 6.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> random</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.randint(<span class="dv">1</span>, <span class="dv">6</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.randint(<span class="dv">1</span>, <span class="dv">6</span>)</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dv">6</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.randint(<span class="dv">1</span>, <span class="dv">20</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="dv">17</span></span></code></pre></div>
+<p>The code in the program writes <code>randint(1,6)</code> with no
+space after the comma. Python does not care about that space. Most
+Python programmers put one in, as in <code>randint(1, 6)</code>, because
+it is a little easier to read. With a screen reader, the space makes the
+two numbers easier to hear as separate values.</p>
+<h3 id="order-matters">Order Matters</h3>
+<p>The smaller number must come first. Try it the other way around:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.randint(<span class="dv">6</span>, <span class="dv">1</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="pp">ValueError</span>: empty <span class="bu">range</span> <span class="kw">in</span> randint(<span class="dv">6</span>, <span class="dv">1</span>)</span></code></pre></div>
+<p>Python says the range is empty, because there are no numbers that are
+at least 6 and also at most 1.</p>
+<h2 id="summary">Summary</h2>
+<p>You rolled a die with one line of code. You learned that:</p>
+<ul>
+<li>An integer is a whole number. Numbers are not put in quotes.</li>
+<li><code>random.randint(low, high)</code> returns a random integer from
+<code>low</code> to <code>high</code>, including both.</li>
+<li>When a function takes more than one argument, you separate them with
+commas.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change the program to roll a twenty-sided die.</li>
+<li>Change the program so it prints a full sentence, such as
+<code>You rolled a 4.</code></li>
+<li>Add a second line that rolls a second die, so the program prints two
+numbers.</li>
+<li>In the shell, try <code>random.randint(1, 1)</code>. What do you get
+every time? Why?</li>
+<li>Rewrite the program to use <code>random.choice()</code> and a list
+of the numbers 1 through 6 instead of <code>randint()</code>. Which way
+do you like better?</li>
+</ol>

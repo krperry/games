@@ -1,0 +1,763 @@
+<h1 id="tic-tac-toe-in-a-window-with-pyside6">Tic Tac Toe in a Window
+with PySide6</h1>
+<p>Every program so far has run in the command prompt, reading and
+writing lines of text. Most programs people use every day run in windows
+instead, with buttons, menus, and dialog boxes. In this lesson you will
+build a two-player Tic Tac Toe game in a window, with one button for
+each square, using a toolkit called <em>PySide6</em>.</p>
+<p>Windowed programs work very differently from the programs you have
+written so far. Instead of running from top to bottom and asking
+questions with <code>input()</code>, they set up a window and then wait
+for the user to do something. This lesson also shows how to make those
+windows work with a screen reader, which takes some extra care.</p>
+<p>This is an advanced lesson. It introduces classes, which are covered
+in more depth in the adventure game lessons.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Graphical user interfaces (GUIs) and widgets</li>
+<li>Installing PySide6</li>
+<li>Importing names with <code>from ... import ...</code></li>
+<li>Classes, objects, <code>self</code>, and
+<code>__init__()</code></li>
+<li>Inheriting from a class and calling <code>super()</code></li>
+<li>Layouts: arranging buttons in a grid</li>
+<li>Event-driven programming: signals, slots, and the event loop</li>
+<li>Functions that make functions (closures)</li>
+<li>Turning a row and column into a list index</li>
+<li>Message boxes</li>
+<li>Accessible names and descriptions for screen readers</li>
+<li>Keyboard focus</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>PySide6 does not come with Python. Install it with:</p>
+<pre><code>pip install PySide6</code></pre>
+<p>It is a large download, so it may take a minute or two.</p>
+<p>PySide6 is the official Python version of <em>Qt</em>, a toolkit used
+to build programs on Windows, macOS, and Linux. Qt has good support for
+screen readers, because it connects to each system’s accessibility
+features: UI Automation and MSAA on Windows, and similar systems on Mac
+and Linux. That means NVDA, JAWS, Narrator, VoiceOver, and Orca can all
+read Qt windows, as long as the program gives them good information to
+read.</p>
+<h2 id="how-to-play">How to Play</h2>
+<p>When you run <code>python pyside_tic_tac_toe.py</code>, a window
+opens with the title “Tic Tac Toe.” It holds nine buttons in a
+three-by-three grid. Press Tab to move from button to button, and press
+Space or Enter to take a square. With a mouse, you can click instead. X
+goes first, and the players take turns.</p>
+<p>When someone wins, or the board fills up, a message box opens. After
+you close it, another asks whether you want to play again. If you choose
+No, the program ends.</p>
+<h2 id="what-it-sounds-like">What It Sounds Like</h2>
+<p>When the window opens, your screen reader reads its title, “Tic Tac
+Toe.” As you Tab through the squares, it reads each one as a button.
+After you take a square, it reads the button again with its new text,
+<code>X</code> or <code>O</code>.</p>
+<p>The empty buttons are harder to hear. Their text is only a space, so
+the screen reader has no name to read. Depending on your screen reader
+and its settings, you may hear the square number, which this program
+stores in each button’s <em>description</em>, or you may hear only
+“button.” Later in the lesson you will see how to make this much
+better.</p>
+<h2 id="the-source-code-for-pyside-tic-tac-toe">The Source Code for
+PySide Tic Tac Toe</h2>
+<p>Type this program and save it as
+<code>pyside_tic_tac_toe.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;pyside6 GUI of Tic Tac Toe&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PySide6.QtWidgets <span class="im">import</span> (</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    QApplication,</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    QMainWindow,</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    QPushButton,</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    QGridLayout,</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    QVBoxLayout,</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    QWidget,</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    QMessageBox,</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PySide6.QtGui <span class="im">import</span> QFont</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TicTacToe(QMainWindow):</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main class representing the Tic Tac Toe game window.&quot;&quot;&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">        Initialize the TicTacToe object.</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">        Sets up the game window, initializes the game state, and creates the game board.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setWindowTitle(<span class="st">&quot;Tic Tac Toe&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setGeometry(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">300</span>, <span class="dv">300</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.central_widget <span class="op">=</span> QWidget(<span class="va">self</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setCentralWidget(<span class="va">self</span>.central_widget)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        layout <span class="op">=</span> QVBoxLayout(<span class="va">self</span>.central_widget)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.buttons <span class="op">=</span> []</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        grid_layout <span class="op">=</span> QGridLayout()</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>            button_row <span class="op">=</span> []</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>                button <span class="op">=</span> QPushButton(<span class="st">&quot; &quot;</span>, <span class="va">self</span>)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>                button.setAccessibleDescription(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>                button.setMinimumSize(<span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>                button.setFont(QFont(<span class="st">&quot;Arial&quot;</span>, <span class="dv">20</span>))</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>                button.clicked.<span class="ex">connect</span>(<span class="va">self</span>.make_button_click_handler(row, col))</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>                button_row.append(button)</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>                grid_layout.addWidget(button, row, col)</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons.append(button_row)</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        layout.addLayout(grid_layout)</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_button_click_handler(<span class="va">self</span>, row, col):</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="co">        Create a button click handler function.</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">            row (int): The row index of the clicked button.</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">            col (int): The column index of the clicked button.</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="co">            function: The button click handler function.</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> handler():</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.on_button_click(row, col)</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> handler</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_button_click(<span class="va">self</span>, row, col):</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="co">        Handle button click events.</span></span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a><span class="co">        Updates the game state when a button is clicked.</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a><span class="co">            row (int): The row index of the clicked button.</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a><span class="co">            col (int): The column index of the clicked button.</span></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> row <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> col</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.board[index] <span class="op">==</span> <span class="st">&quot; &quot;</span>:</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.board[index] <span class="op">=</span> <span class="va">self</span>.current_player</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].setText(<span class="va">self</span>.current_player)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.central_widget.setFocus()</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].setFocus()</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.check_winner():</span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_winner()</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;before reset&quot;</span>)</span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="st">&quot; &quot;</span> <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.board:</span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_draw()</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;O&quot;</span> <span class="cf">if</span> <span class="va">self</span>.current_player <span class="op">==</span> <span class="st">&quot;X&quot;</span> <span class="cf">else</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> check_winner(<span class="va">self</span>):</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a><span class="co">        Check for a winning combination on the game board.</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="co">            bool: True if there is a winner, False otherwise.</span></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>        winning_combinations <span class="op">=</span> [</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>),</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>),  <span class="co"># Rows</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">6</span>),</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>),</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">8</span>),  <span class="co"># Columns</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">8</span>),</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>),  <span class="co"># Diagonals</span></span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> combo <span class="kw">in</span> winning_combinations:</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.board[combo[<span class="dv">0</span>]]</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">1</span>]]</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">2</span>]]</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>                <span class="op">!=</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>            ):</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_winner(<span class="va">self</span>):</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box announcing the winner.</span></span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> <span class="ss">f&quot;Player </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>current_player<span class="sc">}</span><span class="ss"> wins!&quot;</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create a QMessageBox</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>        msg_box <span class="op">=</span> QMessageBox()</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>        msg_box.setWindowTitle(<span class="st">&quot;Winner!&quot;</span>)</span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a>        msg_box.setText(winner)</span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>        <span class="co">#        msg_box.setIcon(QMessageBox.Information)</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Set the modal property to make the dialog modal</span></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>        msg_box.setModal(<span class="va">True</span>)</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>        msg_box.exec_()</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ask_play_again(<span class="va">self</span>, title, message):</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box asking if the players want to play again.</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a><span class="co">            title (str): Title of the message box.</span></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a><span class="co">            message (str): Message to be displayed in the message box.</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a><span class="co">            bool: True if the players want to play again, False otherwise.</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>    </span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>        msg_box <span class="op">=</span> QMessageBox()</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>        msg_box.setWindowTitle(title)</span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>        msg_box.setText(message)</span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>        msg_box.setStandardButtons(QMessageBox.Yes <span class="op">|</span> QMessageBox.No)</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>        msg_box.setDefaultButton(QMessageBox.No)</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> msg_box.<span class="bu">exec</span>()</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result <span class="op">==</span> QMessageBox.Yes</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_draw(<span class="va">self</span>):</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box announcing a draw.</span></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>        msg_box <span class="op">=</span> QMessageBox()</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>        msg_box.setWindowTitle(<span class="st">&quot;It&#39;s a draw!&quot;</span>)</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>        msg_box.setText(<span class="st">&quot;Better luck next time!&quot;</span>)</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Set the modal property to make the dialog modal</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a>        msg_box.setModal(<span class="va">True</span>)</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>        msg_box.exec_()</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> reset_board(<span class="va">self</span>):</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a><span class="co">        Reset the game board.</span></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a><span class="co">        Asks players if they want to play again. If yes, the game is reset; otherwise, the window is closed.</span></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.ask_play_again(<span class="st">&quot;Restart Game?&quot;</span>, <span class="st">&quot;do you want to play again?&quot;</span>):</span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>            sys.exit()</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].setText(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].setAccessibleDescription(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setWindowTitle(<span class="st">&quot;Tic Tac Toe&quot;</span>)</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    app <span class="op">=</span> QApplication(sys.argv)</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    window <span class="op">=</span> TicTacToe()</span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    window.show()</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    sys.exit(app.<span class="bu">exec</span>())</span></code></pre></div>
+<h2 id="windows-widgets-and-the-event-loop">Windows, Widgets, and the
+Event Loop</h2>
+<p>A program with windows, buttons, and other controls is said to have a
+<em>graphical user interface</em>, or <em>GUI</em>, which people
+pronounce “gooey.” Each control, such as a button, a text box, or the
+window itself, is called a <em>widget</em>.</p>
+<p>The biggest difference from your earlier programs is who is in
+charge. A command-prompt program decides what happens next. It asks a
+question with <code>input()</code> and waits for exactly that answer. A
+GUI program sets up its window and then hands control to the user. The
+user might click any button, press any key, move the window, or close
+it. The program waits, and <em>reacts</em> to whatever happens.</p>
+<p>Each thing the user does is called an <em>event</em>. A GUI program
+has an <em>event loop</em>, a loop inside the toolkit that waits for
+events and calls your code when one happens. This style is called
+<em>event-driven programming</em>.</p>
+<p>So instead of a <code>while</code> loop that runs the game, this
+program has functions that say, “when this button is pressed, do this.”
+The toolkit calls them for you.</p>
+<h2 id="importing-names-directly">Importing Names Directly</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PySide6.QtWidgets <span class="im">import</span> (</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    QApplication,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    QMainWindow,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    QPushButton,</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    QGridLayout,</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    QVBoxLayout,</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    QWidget,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    QMessageBox,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> PySide6.QtGui <span class="im">import</span> QFont</span></code></pre></div>
+<p><code>from ... import ...</code> brings specific names out of a
+module, so you can use them without the module name in front. After
+this, the program can write <code>QPushButton</code> instead of
+<code>PySide6.QtWidgets.QPushButton</code>.</p>
+<p>PySide6 is a <em>package</em>, a module that contains other modules.
+<code>QtWidgets</code> is the part with windows and buttons, and
+<code>QtGui</code> has fonts, colors, and images.</p>
+<p>The list of names is in parentheses, one per line, which is easy to
+move through with a screen reader. All Qt names start with
+<code>Q</code>.</p>
+<h2 id="classes-and-objects">Classes and Objects</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TicTacToe(QMainWindow):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main class representing the Tic Tac Toe game window.&quot;&quot;&quot;</span></span></code></pre></div>
+<p>This line starts a <em>class</em>. A class is a blueprint for making
+<em>objects</em>. An object bundles together data, called
+<em>attributes</em>, and functions that work on that data, called
+<em>methods</em>.</p>
+<p>You have used objects all along. Every string is an object of the
+<code>str</code> class, and <code>upper()</code> is one of its methods.
+Every list is an object of the <code>list</code> class, with methods
+such as <code>append()</code> and <code>pop()</code>. Now you are making
+your own class.</p>
+<p>The <code>TicTacToe</code> class describes the game window. It holds
+the board, the current player, and the buttons, and it has methods for
+handling clicks, checking for a winner, and resetting the game.</p>
+<h3 id="inheriting-from-qmainwindow">Inheriting from QMainWindow</h3>
+<p>The <code>(QMainWindow)</code> after the class name means
+<code>TicTacToe</code> <em>inherits</em> from <code>QMainWindow</code>.
+<code>QMainWindow</code> is Qt’s class for a program’s main window. It
+already knows how to have a title bar, be moved and resized, and be
+closed. By inheriting from it, <code>TicTacToe</code> gets all of that
+for free, and only adds what is special about this game.</p>
+<h2 id="the-init-method">The <strong>init</strong>() Method</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>()</span></code></pre></div>
+<p><code>__init__()</code>, with two underscores on each side, is a
+special method that runs automatically when a new object is made. It
+sets the object up. It is often called the <em>constructor</em>.</p>
+<h3 id="self">self</h3>
+<p>Every method’s first parameter is <code>self</code>. When a method is
+called, <code>self</code> is the object it was called on. Inside the
+class, <code>self.current_player</code> means “this window’s current
+player.” You do not pass <code>self</code> yourself. Python does it for
+you. When you write <code>window.show()</code>, Python calls
+<code>show()</code> with <code>self</code> set to
+<code>window</code>.</p>
+<h3 id="super">super()</h3>
+<p><code>super().__init__()</code> calls the <code>__init__()</code>
+method of the class you inherited from, <code>QMainWindow</code>. That
+lets Qt set up the window part of the object before this class adds its
+own setup. Forgetting this line is a common mistake, and Qt will give an
+error if you leave it out.</p>
+<h2 id="setting-up-the-window">Setting Up the Window</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setWindowTitle(<span class="st">&quot;Tic Tac Toe&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setGeometry(<span class="dv">100</span>, <span class="dv">100</span>, <span class="dv">300</span>, <span class="dv">300</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span></code></pre></div>
+<p><code>setWindowTitle()</code> sets the title that the screen reader
+reads when the window gets focus. <code>setGeometry()</code> places the
+window 100 pixels from the left and top of the screen, and makes it 300
+pixels wide and 300 tall.</p>
+<p>The next two lines make <em>attributes</em>. Any variable that starts
+with <code>self.</code> is stored in the object and can be used by every
+method. <code>self.board</code> is a list of nine strings, one per
+square, and a space means empty.</p>
+<p>Notice that this board is different from the <code>game_state</code>
+list in the command-prompt games. It has only nine items, at indexes 0
+through 8, and empty squares hold a space, not their own number.</p>
+<h2 id="layouts-arranging-the-buttons">Layouts: Arranging the
+Buttons</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.central_widget <span class="op">=</span> QWidget(<span class="va">self</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setCentralWidget(<span class="va">self</span>.central_widget)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        layout <span class="op">=</span> QVBoxLayout(<span class="va">self</span>.central_widget)</span></code></pre></div>
+<p>A <code>QMainWindow</code> needs one <em>central widget</em> that
+holds everything else. Here it is a plain <code>QWidget</code>, which is
+like an empty panel.</p>
+<p>A <em>layout</em> arranges widgets for you. You do not have to work
+out where each button goes in pixels. <code>QVBoxLayout</code> stacks
+things vertically, one above the other. This program only puts one thing
+in it, the grid, but it makes it easy to add more later, such as a
+status line under the board.</p>
+<p>Layouts also matter for people with low vision. Because the layout
+sizes everything for you, the window can grow and the buttons will grow
+with it. That works better with screen magnifiers and large-text
+settings than fixed sizes do.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.buttons <span class="op">=</span> []</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        grid_layout <span class="op">=</span> QGridLayout()</span></code></pre></div>
+<p><code>QGridLayout</code> arranges widgets in rows and columns, which
+is perfect for a game board.</p>
+<h2 id="making-the-buttons">Making the Buttons</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>            button_row <span class="op">=</span> []</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>                button <span class="op">=</span> QPushButton(<span class="st">&quot; &quot;</span>, <span class="va">self</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                button.setAccessibleDescription(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>                button.setMinimumSize(<span class="dv">100</span>, <span class="dv">100</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>                button.setFont(QFont(<span class="st">&quot;Arial&quot;</span>, <span class="dv">20</span>))</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>                button.clicked.<span class="ex">connect</span>(<span class="va">self</span>.make_button_click_handler(row, col))</span>
+<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>                button_row.append(button)</span>
+<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>                grid_layout.addWidget(button, row, col)</span>
+<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons.append(button_row)</span>
+<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        layout.addLayout(grid_layout)</span></code></pre></div>
+<p>Two nested loops make nine buttons, three rows of three. For each
+button, the program:</p>
+<ol type="1">
+<li>Makes a <code>QPushButton</code> whose text is a single space.</li>
+<li>Sets its <em>accessible description</em> to the square number, 1
+through 9.</li>
+<li>Makes it at least 100 by 100 pixels, with a large 20-point font. Big
+buttons with big text are easier to see and easier to hit with the
+mouse.</li>
+<li>Connects its <code>clicked</code> signal to a handler. This is
+explained below.</li>
+<li>Adds it to a list for the row, and places it in the grid at its row
+and column.</li>
+</ol>
+<p>After each row, the row’s list is added to <code>self.buttons</code>,
+so <code>self.buttons</code> is a list of lists, like the deck of cards
+in the card lessons. <code>self.buttons[1][2]</code> is the button in
+row 1, column 2, which is the middle row, right side.</p>
+<p>The variable <code>i</code> counts from 1 to 9 as the buttons are
+made, the same order the squares are numbered in the console games.</p>
+<h2 id="signals-and-slots">Signals and Slots</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>                button.clicked.<span class="ex">connect</span>(<span class="va">self</span>.make_button_click_handler(row, col))</span></code></pre></div>
+<p>In Qt, when something happens to a widget, it sends out a
+<em>signal</em>. A button sends its <code>clicked</code> signal when it
+is pressed, by mouse or keyboard. You <em>connect</em> a signal to a
+function, and Qt calls that function every time the signal is sent. A
+function connected to a signal is called a <em>slot</em>, or a
+<em>handler</em>.</p>
+<p>This is how event-driven programming works in Qt. The program never
+waits for a click. It just says, “when this button is clicked, call this
+function,” and the event loop takes care of the rest.</p>
+<h2 id="functions-that-make-functions">Functions That Make
+Functions</h2>
+<p>The handler needs to know <em>which</em> button was clicked. But
+<code>clicked</code> does not tell it the row and column. So the program
+uses a method that <em>makes</em> a handler for each button:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_button_click_handler(<span class="va">self</span>, row, col):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> handler():</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.on_button_click(row, col)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> handler</span></code></pre></div>
+<p>This method defines a function <em>inside</em> itself, called
+<code>handler()</code>, and returns it. It does not call
+<code>handler()</code>. Notice there are no parentheses after
+<code>handler</code> in the <code>return</code> line. It returns the
+function itself, so Qt can call it later.</p>
+<p>The inner function remembers the <code>row</code> and
+<code>col</code> it was made with, even after
+<code>make_button_click_handler()</code> has finished. A function that
+remembers variables from the place it was made is called a
+<em>closure</em>. So each button gets its own handler, and each handler
+remembers its own button’s row and column. When the button is clicked,
+its handler calls <code>on_button_click()</code> with the right row and
+column.</p>
+<h3 id="why-not-just-use-the-loop-variables">Why Not Just Use the Loop
+Variables?</h3>
+<p>You might wonder why the program does not just write a function right
+inside the loop that uses <code>row</code> and <code>col</code>. The
+problem is that such a function would look up <code>row</code> and
+<code>col</code> when it is <em>called</em>, not when it is made. By the
+time anyone clicks, the loops have finished, and <code>row</code> and
+<code>col</code> are both 2. Every button would act like the bottom
+right square. Making the handler in a separate method gives each one its
+own copy of the values. This is a classic trap in GUI programming, so it
+is worth remembering.</p>
+<h2 id="handling-a-click">Handling a Click</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_button_click(<span class="va">self</span>, row, col):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> row <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> col</span></code></pre></div>
+<h3 id="row-and-column-to-index">Row and Column to Index</h3>
+<p>The board is a flat list of nine, but the buttons are in rows and
+columns. This formula turns a row and column into a list index. Each row
+has three squares, so row 1 starts at index 3, and row 2 starts at index
+6. Add the column to get the square:</p>
+<ul>
+<li>Row 0, column 0 is index 0.</li>
+<li>Row 1, column 2 is 1 times 3 plus 2, which is index 5.</li>
+<li>Row 2, column 1 is 2 times 3 plus 1, which is index 7.</li>
+</ul>
+<p>This is a very common trick whenever a grid is stored in a list.</p>
+<h3 id="making-the-move">Making the Move</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.board[index] <span class="op">==</span> <span class="st">&quot; &quot;</span>:</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.board[index] <span class="op">=</span> <span class="va">self</span>.current_player</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].setText(<span class="va">self</span>.current_player)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.central_widget.setFocus()</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].setFocus()</span></code></pre></div>
+<p>If the square is empty, the program puts the player’s mark in the
+board list and sets the button’s text to <code>X</code> or
+<code>O</code>. Changing the text is what the screen reader will read
+from now on. If the square is taken, nothing happens at all. That is a
+problem for screen reader users, who get no feedback. You will improve
+it in an exercise.</p>
+<p>The two <code>setFocus()</code> lines move keyboard focus away from
+the button and then back to it. This is a trick to make the screen
+reader announce the button again, so the player hears the new
+<code>X</code> or <code>O</code> right away. Screen readers usually only
+announce a widget when focus moves to it, so changing the text alone
+might be silent.</p>
+<h3 id="win-draw-or-next-player">Win, Draw, or Next Player</h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.check_winner():</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_winner()</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;before reset&quot;</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="st">&quot; &quot;</span> <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.board:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_draw()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb14-8"><a href="#cb14-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb14-9"><a href="#cb14-9" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;O&quot;</span> <span class="cf">if</span> <span class="va">self</span>.current_player <span class="op">==</span> <span class="st">&quot;X&quot;</span> <span class="cf">else</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<p>If the move won, the program announces the winner and offers a new
+game. If no empty squares are left, it is a draw. Otherwise, the turn
+passes to the other player, using a conditional expression, which you
+met in <code>hard-tic.py</code>.</p>
+<p>The <code>print("before reset")</code> line prints to the command
+prompt, not the window. It was used while the program was being written,
+to check that this part of the code ran. Leftover debugging lines like
+this are common. They are harmless, but they should be removed when the
+program is done.</p>
+<h2 id="checking-for-a-winner">Checking for a Winner</h2>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> check_winner(<span class="va">self</span>):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        winning_combinations <span class="op">=</span> [</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>),</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>),  <span class="co"># Rows</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>            ...</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> combo <span class="kw">in</span> winning_combinations:</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.board[combo[<span class="dv">0</span>]]</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">1</span>]]</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">2</span>]]</span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>                <span class="op">!=</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a>            ):</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb15-17"><a href="#cb15-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-18"><a href="#cb15-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+<p>This is the same idea as <code>easy_check.py</code>: a list of the
+eight winning lines and a loop that checks each one. The square numbers
+are 0 to 8 here, because this board starts at index 0.</p>
+<p>There is one important difference. In this board, empty squares all
+hold a space, so three empty squares <em>are</em> equal to each other.
+The chained comparison ends with <code>!= " "</code> to make sure the
+three matching squares are not all empty.
+<code>a == b == c != " "</code> means all three are the same, and they
+are not spaces.</p>
+<p>The long condition is split over several lines inside parentheses,
+one part per line. That is much easier to follow with a screen reader
+than one long line.</p>
+<h2 id="message-boxes">Message Boxes</h2>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_winner(<span class="va">self</span>):</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> <span class="ss">f&quot;Player </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>current_player<span class="sc">}</span><span class="ss"> wins!&quot;</span></span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Create a QMessageBox</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>        msg_box <span class="op">=</span> QMessageBox()</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>        msg_box.setWindowTitle(<span class="st">&quot;Winner!&quot;</span>)</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        msg_box.setText(winner)</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        <span class="co">#        msg_box.setIcon(QMessageBox.Information)</span></span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Set the modal property to make the dialog modal</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>        msg_box.setModal(<span class="va">True</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" aria-hidden="true" tabindex="-1"></a>        msg_box.exec_()</span></code></pre></div>
+<p>A <code>QMessageBox</code> is a small dialog window with a message
+and an OK button. Screen readers read message boxes automatically when
+they open, title first and then the text, so they are a reliable way to
+tell the player something important.</p>
+<p><em>Modal</em> means the player must close the dialog before they can
+use the main window again. <code>exec_()</code> shows the dialog and
+waits until it is closed. In newer versions of PySide6, the preferred
+name is <code>exec()</code>, without the underscore. The old name still
+works.</p>
+<p>The line that sets an icon is commented out. A comment can be used to
+turn off a line of code without deleting it.</p>
+<h3 id="asking-a-yes-or-no-question">Asking a Yes or No Question</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ask_play_again(<span class="va">self</span>, title, message):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>        msg_box <span class="op">=</span> QMessageBox()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        msg_box.setWindowTitle(title)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>        msg_box.setText(message)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        msg_box.setStandardButtons(QMessageBox.Yes <span class="op">|</span> QMessageBox.No)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>        msg_box.setDefaultButton(QMessageBox.No)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> msg_box.<span class="bu">exec</span>()</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result <span class="op">==</span> QMessageBox.Yes</span></code></pre></div>
+<p>This message box has Yes and No buttons. The <code>|</code> symbol, a
+vertical bar, combines the two options. You will hear it called “bar” or
+“pipe.”</p>
+<p><code>exec()</code> returns which button was pressed. The method
+compares it with <code>QMessageBox.Yes</code> and returns
+<code>True</code> or <code>False</code>. The default button is No, so if
+the player just presses Enter, the answer is no.</p>
+<h2 id="resetting-the-board">Resetting the Board</h2>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> reset_board(<span class="va">self</span>):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.ask_play_again(<span class="st">&quot;Restart Game?&quot;</span>, <span class="st">&quot;do you want to play again?&quot;</span>):</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>            sys.exit()</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].setText(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].setAccessibleDescription(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb18-11"><a href="#cb18-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb18-12"><a href="#cb18-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.setWindowTitle(<span class="st">&quot;Tic Tac Toe&quot;</span>)</span></code></pre></div>
+<p>If the players do not want to play again, <code>sys.exit()</code>
+ends the program right away. A gentler way in a Qt program is
+<code>QApplication.quit()</code> or <code>self.close()</code>, which let
+Qt close its windows and clean up first.</p>
+<p>Otherwise, it blanks every button, empties the board, and makes it
+X’s turn again.</p>
+<h2 id="starting-the-program">Starting the Program</h2>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    app <span class="op">=</span> QApplication(sys.argv)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    window <span class="op">=</span> TicTacToe()</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    window.show()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    sys.exit(app.<span class="bu">exec</span>())</span></code></pre></div>
+<ol type="1">
+<li>Every Qt program needs exactly one <code>QApplication</code> object.
+It is passed <code>sys.argv</code>, the list of words typed on the
+command line, so Qt can read any options meant for it.</li>
+<li><code>TicTacToe()</code> makes a new game window. This runs
+<code>__init__()</code>.</li>
+<li><code>window.show()</code> makes the window appear.</li>
+<li><code>app.exec()</code> starts the event loop. It runs until the
+last window is closed, and returns a number that says whether the
+program ended normally. <code>sys.exit()</code> passes that number back
+to the command prompt.</li>
+</ol>
+<h2 id="making-it-better-for-screen-readers">Making It Better for Screen
+Readers</h2>
+<p>The program does a few good things for accessibility: buttons work
+from the keyboard, results are shown in message boxes that screen
+readers announce, and focus is moved to make the new mark heard. But the
+empty buttons are a real problem. Their text is a single space, so their
+<em>accessible name</em> is blank.</p>
+<p>A screen reader identifies a widget mainly by its <em>name</em>. The
+<em>description</em> is extra information that some screen readers read
+after a pause, and others only read on request. Putting the square
+number in the description means many players will only hear
+“button.”</p>
+<p>A much better approach is to give each button a full accessible name
+that includes both its position and what is in it, and to update the
+name whenever the square changes:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>button.setAccessibleName(<span class="ss">f&quot;Square </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">, empty&quot;</span>)</span></code></pre></div>
+<p>and after a move:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="va">self</span>.buttons[row][col].setAccessibleName(<span class="ss">f&quot;Square </span><span class="sc">{</span>index <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">, </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>current_player<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Now the player hears “Square 5, empty, button” or “Square 5, X,
+button.” You could even name the squares by position, such as “Top left,
+empty.”</p>
+<p>Here are some other improvements:</p>
+<ul>
+<li>When a square is already taken, tell the player. A short message
+box, or better, a status label under the board that says
+<code>Square 5 is taken</code>, keeps the player informed.</li>
+<li>Put the current player in the window title, such as
+<code>Tic Tac Toe - O's turn</code>, so the player can hear it with
+their screen reader’s “read title” command.</li>
+<li>Put the empty squares’ numbers on the buttons themselves, as the
+console games do. That helps sighted and low-vision players, too.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>You built a windowed game with PySide6. You learned that:</p>
+<ul>
+<li>GUI programs are event-driven. They set up widgets and then react to
+events.</li>
+<li>A class is a blueprint for objects. <code>__init__()</code> sets up
+a new object, and <code>self</code> is the object a method was called
+on.</li>
+<li>Inheriting from a class, such as <code>QMainWindow</code>, gives you
+all of its abilities. <code>super().__init__()</code> sets up that
+part.</li>
+<li>Layouts arrange widgets for you and resize them with the
+window.</li>
+<li>A signal, such as <code>clicked</code>, can be connected to a
+handler function.</li>
+<li>A function defined inside another function can remember its
+variables. This is called a closure, and it gives each button its own
+handler.</li>
+<li><code>row * 3 + col</code> turns a grid position into a list
+index.</li>
+<li>Message boxes are read automatically by screen readers.</li>
+<li>Screen readers rely on a widget’s accessible name. Set it, and keep
+it up to date.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Remove the <code>print("before reset")</code> line.</li>
+<li>Give every button an accessible name like
+<code>Square 1, empty</code>, and update it after each move and in
+<code>reset_board()</code>. Test it with your screen reader.</li>
+<li>Add a <code>QLabel</code> under the grid that says whose turn it is.
+Add it to <code>layout</code> with <code>layout.addWidget()</code>.
+Update its text after every move. Hint: import <code>QLabel</code> from
+<code>PySide6.QtWidgets</code>.</li>
+<li>When a player presses a taken square, set the label to say which
+square is taken.</li>
+<li>Replace <code>sys.exit()</code> in <code>reset_board()</code> with
+<code>self.close()</code>. Does the program still end when you choose
+No?</li>
+<li>Add a keyboard shortcut so that pressing the number keys 1 through 9
+takes that square. Hint: look up <code>QShortcut</code> and
+<code>QKeySequence</code> in the Qt documentation.</li>
+</ol>

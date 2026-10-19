@@ -1,0 +1,182 @@
+<h1 id="your-first-program-hello-world">Your First Program: Hello
+World</h1>
+<p>Almost every programmer’s first program does one thing: it makes the
+computer say hello. In this lesson you will write that program, save it,
+and run it. It is only one line long, but it teaches you the steps you
+will use for every program you ever write.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>What a program is</li>
+<li>Making a file for your program</li>
+<li>Running a program from the command line</li>
+<li>The <code>print()</code> function</li>
+<li>Strings</li>
+<li>Reading error messages</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="what-is-a-program">What Is a Program?</h2>
+<p>A program is a list of instructions for the computer. You write the
+instructions in a language the computer understands. In these lessons
+that language is Python.</p>
+<p>The computer follows your instructions exactly, in order, from the
+top of the file to the bottom. It does not guess what you meant. If you
+spell something wrong, it will not fix it for you. That can feel strict
+at first, but it also means the computer always does exactly what you
+told it to.</p>
+<h2 id="the-source-code-for-hello-world">The Source Code for Hello
+World</h2>
+<p>Here is the whole program:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hellow World!&quot;</span>)</span></code></pre></div>
+<p>That is all. One line. Open your code editor, make a new file, and
+type that line. Save the file as <code>hello_world.py</code>. The
+<code>.py</code> at the end of the name tells the computer that this is
+a Python program.</p>
+<h2 id="running-the-program">Running the Program</h2>
+<p>Open a command prompt or terminal and go to the folder where you
+saved the file. Then type this and press Enter:</p>
+<pre><code>python hello_world.py</code></pre>
+<p>You should hear your screen reader read:</p>
+<pre><code>Hellow World!</code></pre>
+<p>Congratulations. You just wrote and ran a program.</p>
+<p>If you hear an error that says Python was not found, Python might not
+be installed, or it might use a different name on your computer. On
+Windows, try <code>py hello_world.py</code>. On a Mac or Linux, try
+<code>python3 hello_world.py</code>.</p>
+<h2 id="how-the-program-works">How the Program Works</h2>
+<p>The program has one instruction:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hellow World!&quot;</span>)</span></code></pre></div>
+<p>Let’s take it apart piece by piece.</p>
+<h3 id="the-print-function">The print() Function</h3>
+<p><code>print</code> is the name of a <em>function</em>. A function is
+a small, ready-made program with a name. When you use the name, Python
+runs that small program. Using a function is called <em>calling</em>
+it.</p>
+<p>The <code>print()</code> function shows text on the screen. Because a
+screen reader reads what is on the screen, <code>print()</code> is also
+how your program talks out loud to the person using it.</p>
+<p>To call a function, you type its name followed by a pair of
+parentheses. Inside the parentheses you put the thing you want the
+function to work on. This is called the <em>argument</em>. Here the
+argument is the text <code>"Hellow World!"</code>.</p>
+<h3 id="strings">Strings</h3>
+<p>Text in a program is called a <em>string</em>. You make a string by
+putting quotation marks around the text. Python needs the quotes so it
+can tell your text apart from its own instructions.</p>
+<p>The quotes are not printed. Only the letters between them are. Notice
+that the output was <code>Hellow World!</code> and not
+<code>"Hellow World!"</code>.</p>
+<p>You can use double quotes or single quotes. These two lines do the
+same thing:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Hello World!&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&#39;Hello World!&#39;</span>)</span></code></pre></div>
+<p>Just make sure each string starts and ends with the same kind of
+quote.</p>
+<h3 id="python-prints-exactly-what-you-type">Python Prints Exactly What
+You Type</h3>
+<p>Did you notice that the program says <code>Hellow</code> with a W at
+the end? That is a typo in the program. Python does not know English, so
+it cannot tell that <code>Hellow</code> is misspelled. It prints exactly
+the letters inside the string.</p>
+<p>This is your first lesson about computers: they do what you say, not
+what you mean. Go ahead and fix the typo. Change <code>Hellow</code> to
+<code>Hello</code>, save the file, and run it again.</p>
+<h2 id="trying-python-in-the-interactive-shell">Trying Python in the
+Interactive Shell</h2>
+<p>Python also has an <em>interactive shell</em>. In the shell you type
+one instruction at a time and hear the answer right away. It is a great
+place to experiment.</p>
+<p>To start the shell, type <code>python</code> at the command prompt
+with no file name and press Enter. You will hear some version
+information and then the prompt, <code>&gt;&gt;&gt;</code>. Try
+this:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="st">&quot;Hello World!&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>Hello World<span class="op">!</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="st">&quot;My name is Sam.&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>My name <span class="kw">is</span> Sam.</span></code></pre></div>
+<p>When you are done, type <code>exit()</code> and press Enter to leave
+the shell.</p>
+<h2 id="when-something-goes-wrong">When Something Goes Wrong</h2>
+<p>Everyone makes mistakes when they type code. Python tells you about a
+mistake with an <em>error message</em>. Error messages can sound scary,
+but they are there to help. Try making some mistakes on purpose in the
+shell so you know what they sound like.</p>
+<p>Leave off the closing quote:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="st">&quot;Hello World!)</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="er">  File &quot;&lt;stdin&gt;&quot;, line 1</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Hello World!)</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="er">          ^</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="pp">SyntaxError</span>: unterminated string literal (detected at line <span class="dv">1</span>)</span></code></pre></div>
+<p>The important part is the last line. It says
+<code>SyntaxError</code>, which means Python could not understand how
+the line was written, and then it says what is wrong: the string was
+never ended. The line with the caret, <code>^</code>, points to where
+the problem starts. With a screen reader it is often easier to just read
+the last line of the error and then look at your code.</p>
+<p>Now spell <code>print</code> with a capital P:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> Print(<span class="st">&quot;Hello World!&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  File <span class="st">&quot;&lt;stdin&gt;&quot;</span>, line <span class="dv">1</span>, <span class="kw">in</span> <span class="op">&lt;</span>module<span class="op">&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="pp">NameError</span>: name <span class="st">&#39;Print&#39;</span> <span class="kw">is</span> <span class="kw">not</span> defined. Did you mean: <span class="st">&#39;print&#39;</span>?</span></code></pre></div>
+<p>Python cares about capital letters. <code>Print</code> and
+<code>print</code> are two different names, and Python only knows
+<code>print</code>. Python even suggests the fix.</p>
+<p>When you get an error while running a file, Python tells you the line
+number. Go to that line in your editor and compare it carefully with the
+lesson.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote, saved, and ran your first Python program. You learned
+that:</p>
+<ul>
+<li>A program is a list of instructions that the computer follows in
+order.</li>
+<li>Python programs are saved in files that end in
+<code>.py</code>.</li>
+<li>You run a program by typing <code>python</code> and the file name at
+the command prompt.</li>
+<li><code>print()</code> is a function that shows text, which your
+screen reader then reads.</li>
+<li>Text in quotes is called a string.</li>
+<li>Python prints exactly what is in the string, typos and all.</li>
+<li>Error messages tell you what went wrong. Read the last line
+first.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Fix the typo so the program says <code>Hello World!</code>.</li>
+<li>Change the program so it says hello to you by name, such as
+<code>Hello Maria!</code>.</li>
+<li>Add a second <code>print()</code> line under the first one that says
+something else, such as <code>I am learning Python.</code> Run the
+program. Which line is spoken first?</li>
+<li>Use single quotes instead of double quotes in your
+<code>print()</code> line. Does anything change when you run it?</li>
+<li>Remove the closing parenthesis from the <code>print()</code> line
+and run the program. Listen to the error message. What line does Python
+say the problem is on? Put the parenthesis back.</li>
+</ol>

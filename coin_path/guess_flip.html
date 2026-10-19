@@ -1,0 +1,299 @@
+<h1 id="guess-the-coin-flip">Guess the Coin Flip</h1>
+<p>So far your programs have talked, but they have not listened. In this
+lesson you will write your first real game. The program asks the player
+to guess heads or tails, flips the coin, and tells the player whether
+they guessed right.</p>
+<p>To build it you will learn how to get input from the player, how to
+repeat something until the player gets it right, and how to make a
+decision.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Getting input with <code>input()</code></li>
+<li>The <code>upper()</code> string method</li>
+<li><code>while</code> loops</li>
+<li>The <code>not in</code> operator</li>
+<li>Getting one character of a string by its index</li>
+<li>Comparing values with <code>==</code></li>
+<li><code>if</code> and <code>else</code> statements</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play">How to Play</h2>
+<p>The program asks you to type <code>H</code> for heads or
+<code>T</code> for tails. It flips the coin, plays a sound, and says
+which side landed up. If you guessed that side, you win.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>What you type is shown right after the prompt. Because the prompt
+does not end with a space, your typing runs into the word
+<code>Tails</code>. Here the player types <code>x</code> by mistake, and
+the program asks again:</p>
+<pre><code>Enter (H)eads, (T)ailsx
+Enter (H)eads, (T)ailsh
+Heads up!
+You guessed the toss! Congradulations!</code></pre>
+<p>And here is a game the player loses:</p>
+<pre><code>Enter (H)eads, (T)ailst
+Heads up!
+You did not guess the toss. Better luck next time.</code></pre>
+<h2 id="the-source-code-for-guess-flip">The Source Code for Guess
+Flip</h2>
+<p>Type this program and save it as <code>guess_flip.py</code> in the
+same folder as <code>sound_flip.py</code>, so it can find the
+<code>sounds</code> folder:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Simple guess the coin toss&quot;&quot;&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>guess <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> guess <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;T&quot;</span>]:</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    guess <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Enter (H)eads, (T)ails&quot;</span>)</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    guess <span class="op">=</span> guess.upper()</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>coin <span class="op">=</span> random.choice([<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;Tail&quot;</span>])</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>coin<span class="sc">}</span><span class="ss">s up!&quot;</span>)</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> guess.upper() <span class="op">==</span> coin[<span class="dv">0</span>]:</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You guessed the toss! Congradulations!&quot;</span>)</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You did not guess the toss. Better luck next time.&quot;</span>)</span></code></pre></div>
+<h2 id="the-plan">The Plan</h2>
+<p>Before looking at each line, here is what the program does, in
+order:</p>
+<ol type="1">
+<li>Ask the player for a guess.</li>
+<li>If the guess is not <code>H</code> or <code>T</code>, go back to
+step 1.</li>
+<li>Play the flip sound.</li>
+<li>Pick <code>Head</code> or <code>Tail</code> at random and say
+it.</li>
+<li>If the guess matches, say the player won. Otherwise, say they
+lost.</li>
+</ol>
+<p>Writing a plan like this before you code is a good habit. Each step
+turns into a few lines of Python.</p>
+<h2 id="getting-input-from-the-player">Getting Input from the
+Player</h2>
+<p>The <code>input()</code> function lets the player type something:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>guess <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Enter (H)eads, (T)ails&quot;</span>)</span></code></pre></div>
+<p><code>input()</code> prints its argument as a <em>prompt</em>, then
+waits. The player types an answer and presses Enter.
+<code>input()</code> returns what they typed, as a string, and the
+program stores it in the <code>guess</code> variable.</p>
+<p>Try it in the shell:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> answer <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;What is your name? &quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>What <span class="kw">is</span> your name? Lee</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> answer</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Lee&#39;</span></span></code></pre></div>
+<h3 id="prompts-the-player-can-hear">Prompts the Player Can Hear</h3>
+<p>Notice the space at the end of <code>"What is your name? "</code>.
+Without it, the player’s typing runs right up against the prompt. The
+prompt in this game, <code>"Enter (H)eads, (T)ails"</code>, has no space
+at the end, so when the player types <code>h</code> the line reads
+<code>Enter (H)eads, (T)ailsh</code>. A screen reader may read that as
+one strange word. One of the exercises asks you to fix it.</p>
+<p>A good prompt tells the player exactly what to type. The parentheses
+around <code>H</code> and <code>T</code> are a common way to show which
+letter to press. Your screen reader will say “left paren H right paren
+eds” if punctuation is on, which is a bit awkward. A prompt such as
+<code>Type H for heads or T for tails:</code> is clearer by ear.</p>
+<h2 id="making-the-guess-uppercase">Making the Guess Uppercase</h2>
+<p>The next line changes the guess to capital letters:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>guess <span class="op">=</span> guess.upper()</span></code></pre></div>
+<p><code>upper()</code> is a <em>method</em>. A method is a function
+that belongs to a value. You call it by typing the value, a period, and
+the method name. Every string has an <code>upper()</code> method. It
+returns a copy of the string with all letters made uppercase.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;h&quot;</span>.upper()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;H&#39;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;Heads&quot;</span>.upper()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;HEADS&#39;</span></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;T&quot;</span>.upper()</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;T&#39;</span></span></code></pre></div>
+<p>Notice that the line puts the result back into <code>guess</code>.
+<code>upper()</code> does not change the string it belongs to. It makes
+a new one. If you want to keep the new one, you must store it.</p>
+<p>Why make the guess uppercase? So the player can type either
+<code>h</code> or <code>H</code>. The rest of the program only has to
+check for capital letters.</p>
+<h2 id="asking-until-the-answer-is-good">Asking Until the Answer Is
+Good</h2>
+<p>What if the player types <code>x</code>, or <code>heads</code>, or
+just presses Enter? The program needs a good answer before it can go on.
+So it keeps asking until it gets one. Here is the code that does
+that:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>guess <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> guess <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;T&quot;</span>]:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    guess <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Enter (H)eads, (T)ails&quot;</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    guess <span class="op">=</span> guess.upper()</span></code></pre></div>
+<h3 id="while-loops">while Loops</h3>
+<p>A <code>while</code> loop repeats a block of code as long as a
+condition is true. The condition is the part between <code>while</code>
+and the colon. The block is the indented lines under it.</p>
+<p>Each time the loop starts over, Python checks the condition. If the
+condition is true, it runs the block again. If it is false, it skips
+past the block and goes on with the rest of the program. Each trip
+through the block is called an <em>iteration</em>.</p>
+<p>Listen for the indentation. The two lines under <code>while</code>
+are indented four spaces. That is how Python knows they belong to the
+loop. The blank lines and the <code>ps.playsound()</code> line after
+them are back at zero indentation, so they are not part of the loop.
+They run after the loop is finished.</p>
+<h3 id="the-in-and-not-in-operators">The in and not in Operators</h3>
+<p>The condition is <code>guess not in ["H", "T"]</code>. The
+<code>in</code> operator checks whether a value is one of the items in a
+list. <code>not in</code> checks whether it is <em>not</em> one of them.
+Each gives you <code>True</code> or <code>False</code>.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;H&quot;</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;T&quot;</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;X&quot;</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;T&quot;</span>]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;X&quot;</span> <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;T&quot;</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p><code>True</code> and <code>False</code> are special values called
+<em>Booleans</em>. They are not strings, so they do not have quotes.
+Note the capital T and F.</p>
+<p>So the loop means: while the guess is not <code>H</code> and not
+<code>T</code>, ask again.</p>
+<h3 id="why-guess-starts-empty">Why guess Starts Empty</h3>
+<p>Look at the line just before the loop:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>guess <span class="op">=</span> <span class="st">&quot;&quot;</span></span></code></pre></div>
+<p>Two quotes with nothing between them make an <em>empty string</em>.
+The loop checks <code>guess</code> the very first time, before the
+player has typed anything. If <code>guess</code> did not exist yet,
+Python would give an error. So the program puts an empty string in
+<code>guess</code>. An empty string is not <code>H</code> or
+<code>T</code>, so the loop runs at least once.</p>
+<h2 id="flipping-the-coin">Flipping the Coin</h2>
+<p>After the loop, the program plays the sound and flips the coin:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>coin <span class="op">=</span> random.choice([<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;Tail&quot;</span>])</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>coin<span class="sc">}</span><span class="ss">s up!&quot;</span>)</span></code></pre></div>
+<p>This time the result is stored in a variable named <code>coin</code>,
+because the program needs it twice: once to print and once to compare
+with the guess.</p>
+<p>The list is written right inside the call to
+<code>random.choice()</code>, instead of being stored in a variable
+first. Both ways work.</p>
+<p>The f-string adds an <code>s</code> after the coin, so
+<code>Head</code> becomes <code>Heads up!</code> and <code>Tail</code>
+becomes <code>Tails up!</code>.</p>
+<h2 id="getting-one-character-by-index">Getting One Character by
+Index</h2>
+<p>The guess is one letter, <code>H</code> or <code>T</code>. The coin
+is a whole word, <code>Head</code> or <code>Tail</code>. To compare
+them, the program needs just the first letter of the coin. It gets it
+like this:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>coin[<span class="dv">0</span>]</span></code></pre></div>
+<p>Every character in a string has a number, called its <em>index</em>,
+that tells where it is. The first character’s index is 0, not 1. The
+second is 1, and so on. To get a character, put its index in square
+brackets after the string.</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin <span class="op">=</span> <span class="st">&quot;Tail&quot;</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin[<span class="dv">0</span>]</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;T&#39;</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin[<span class="dv">1</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;a&#39;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin[<span class="dv">3</span>]</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;l&#39;</span></span></code></pre></div>
+<p>Counting from zero takes some getting used to. Almost every
+programming language does it, so it is worth learning now.</p>
+<h2 id="making-a-decision-with-if-and-else">Making a Decision with if
+and else</h2>
+<p>The end of the program decides who won:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> guess.upper() <span class="op">==</span> coin[<span class="dv">0</span>]:</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You guessed the toss! Congradulations!&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You did not guess the toss. Better luck next time.&quot;</span>)</span></code></pre></div>
+<h3 id="comparing-with">Comparing with ==</h3>
+<p>Two equal signs, <code>==</code>, ask the question “are these the
+same?” The answer is <code>True</code> or <code>False</code>.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;H&quot;</span> <span class="op">==</span> <span class="st">&quot;H&quot;</span></span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;H&quot;</span> <span class="op">==</span> <span class="st">&quot;T&quot;</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;h&quot;</span> <span class="op">==</span> <span class="st">&quot;H&quot;</span></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<p>Be careful not to mix up <code>=</code> and <code>==</code>. One
+equal sign puts a value in a variable. Two equal signs compare. When you
+hear “equals equals” from your screen reader, think “is the same
+as.”</p>
+<p>The last example shows why the program uses <code>upper()</code>.
+Uppercase and lowercase letters are different characters, so
+<code>"h"</code> is not equal to <code>"H"</code>. The program already
+made the guess uppercase inside the loop, so calling
+<code>upper()</code> again here is not needed, but it does no harm.</p>
+<h3 id="if-and-else">if and else</h3>
+<p>An <code>if</code> statement runs its block only when its condition
+is <code>True</code>. An <code>else</code> statement right after it runs
+its own block only when the condition is <code>False</code>. Exactly one
+of the two blocks runs, never both.</p>
+<p>Listen for the indentation again. The <code>if</code> and
+<code>else</code> lines are at the same level, and each has one indented
+<code>print()</code> line under it.</p>
+<h2 id="summary">Summary</h2>
+<p>This was your first real game. You learned that:</p>
+<ul>
+<li><code>input()</code> shows a prompt and returns what the player
+types, as a string.</li>
+<li><code>upper()</code> is a string method that returns an uppercase
+copy of the string.</li>
+<li>A <code>while</code> loop repeats its block as long as its condition
+is <code>True</code>.</li>
+<li><code>in</code> and <code>not in</code> check whether a value is in
+a list.</li>
+<li><code>True</code> and <code>False</code> are Boolean values.</li>
+<li>A string’s first character is at index 0.</li>
+<li><code>==</code> compares two values. <code>=</code> stores a
+value.</li>
+<li><code>if</code> runs a block when a condition is <code>True</code>.
+<code>else</code> runs a block when it is <code>False</code>.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Add a space after <code>(T)ails</code> at the end of the prompt. Run
+the program and listen to the difference when you type your guess.</li>
+<li>Change the prompt to
+<code>Type H for heads or T for tails:</code>.</li>
+<li>Fix the spelling of <code>Congradulations</code>.</li>
+<li>Change the program so the player can also type the whole word, such
+as <code>heads</code> or <code>tails</code>. Hint: compare only the
+first letter of the guess, <code>guess[0]</code>. What happens if the
+player just presses Enter?</li>
+<li>Add a sound that plays only when the player wins.</li>
+<li>Change the program so it says what the player guessed before it
+flips the coin, such as <code>You guessed tails.</code></li>
+</ol>

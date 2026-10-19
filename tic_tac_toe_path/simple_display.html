@@ -1,0 +1,146 @@
+<h1 id="printing-the-tic-tac-toe-board">Printing the Tic Tac Toe
+Board</h1>
+<p>You have a list that holds the board. Now you need to show it to the
+player. In this lesson you will print the board as three rows, mark a
+square, and print it again so you can hear the change.</p>
+<p>You will also notice something important: the same five lines of code
+appear twice. That repetition is a problem you will solve in the next
+lesson.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Printing a board with f-strings</li>
+<li>Getting list items by index inside an f-string</li>
+<li>Changing a list item</li>
+<li>How a board sounds with a screen reader</li>
+<li>Noticing repeated code</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code> 1 | 2 | 3
+---|---|---
+ 4 | 5 | 6
+---|---|---
+ 7 | 8 | 9
+ 1 | 2 | 3
+---|---|---
+ X | 5 | 6
+---|---|---
+ 7 | 8 | 9</code></pre>
+<p>The first board is empty. In the second, square 4 has an X.</p>
+<h2 id="the-source-code-for-simple-display">The Source Code for Simple
+Display</h2>
+<p>Type this program and save it as <code>simple_display.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span></code></pre></div>
+<h2 id="printing-one-row">Printing One Row</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span></code></pre></div>
+<p>This f-string has three sets of curly braces. Each one holds a list
+item by its index. Python fills in the value of each square, so for an
+empty board it prints <code>1 | 2 | 3</code>.</p>
+<p>The vertical bar, <code>|</code>, draws a line between the squares on
+screen. There is a space on each side of every square so the board is
+easier to read.</p>
+<h2 id="printing-the-lines-between-rows">Printing the Lines Between
+Rows</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span></code></pre></div>
+<p>This is a plain string with no f, because there is nothing to fill
+in. It draws a line under the row.</p>
+<h2 id="how-the-board-sounds">How the Board Sounds</h2>
+<p>On a screen, these lines draw a grid. With a screen reader, the
+experience is different. Depending on your settings, a row may be read
+as “1 bar 2 bar 3,” and the line between rows may be read as “dash dash
+dash bar dash dash dash bar dash dash dash,” or skipped completely.</p>
+<p>The row lines are useful. As you move up and down by line, each row
+is one line, and you can hear the three squares in order. The dividing
+lines are not useful by ear. They make you press the down arrow an extra
+time for each row.</p>
+<p>Here is a board that is easier to hear. Each row is one line, and
+there are no divider lines:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Top row: </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Middle row: </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Bottom row: </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss">, </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>With commas between the squares, your screen reader pauses a little
+between each one. Saying “Top row,” “Middle row,” and “Bottom row” tells
+the player where they are. You will try this in the exercises.</p>
+<p>A good game might offer both: a drawn board for players who look at
+the screen, and a spoken board for players who listen.</p>
+<h2 id="marking-a-square">Marking a Square</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>game_state[<span class="dv">4</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<p>This puts an <code>"X"</code> in square 4, replacing the number 4.
+Then the program prints the board again with the exact same five lines,
+and you can hear the X in the middle row.</p>
+<h2 id="repeated-code">Repeated Code</h2>
+<p>The five <code>print()</code> lines that draw the board appear twice
+in this program. That works, but it causes problems:</p>
+<ul>
+<li>If you want to change how the board looks, you must change it in two
+places. It is easy to forget one.</li>
+<li>A real game prints the board after every move. You would need those
+five lines nine times or more.</li>
+<li>The program is longer and harder to move through with a screen
+reader.</li>
+</ul>
+<p>Whenever you notice yourself copying the same lines, that is a sign
+that they should be a function. In the next lesson,
+<code>display_board.py</code>, you will do exactly that.</p>
+<h2 id="summary">Summary</h2>
+<p>You printed a Tic Tac Toe board and changed a square. You learned
+that:</p>
+<ul>
+<li>An f-string can hold several list items, each in its own curly
+braces.</li>
+<li>A board drawn with lines and bars works on screen but can be noisy
+by ear.</li>
+<li>Labels and commas make a board easier to hear.</li>
+<li>Code that is repeated is a sign you need a function.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change the program to mark square 5 with an <code>"O"</code> instead
+of square 4 with an <code>"X"</code>.</li>
+<li>Mark two squares between the first and second boards.</li>
+<li>Write the spoken version of the board, with “Top row,” “Middle row,”
+and “Bottom row.” Which version do you prefer with your screen
+reader?</li>
+<li>Count how many lines in the program are exactly the same as another
+line.</li>
+</ol>

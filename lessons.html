@@ -1,0 +1,392 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Python Game Lessons</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --text: #111111;
+    --muted: #3d3d3d;
+    --link: #0645ad;
+    --link-visited: #5a2a91;
+    --focus: #ffbf47;
+    --rule: #cccccc;
+    --panel: #f3f3f3;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #121212;
+      --text: #f2f2f2;
+      --muted: #cfcfcf;
+      --link: #8ab4ff;
+      --link-visited: #d0a8ff;
+      --focus: #ffbf47;
+      --rule: #444444;
+      --panel: #1e1e1e;
+    }
+  }
+  body {
+    margin: 0 auto;
+    max-width: 50rem;
+    padding: 1rem;
+    background: var(--bg);
+    color: var(--text);
+    font-family: Verdana, Arial, sans-serif;
+    font-size: 1.15rem;
+    line-height: 1.6;
+  }
+  a { color: var(--link); }
+  a:visited { color: var(--link-visited); }
+  a:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  .skip {
+    position: absolute;
+    left: -10000px;
+  }
+  .skip:focus {
+    position: static;
+  }
+  h2 {
+    margin-top: 2.5rem;
+    border-top: 2px solid var(--rule);
+    padding-top: 1rem;
+  }
+  li { margin-bottom: 1rem; }
+  .level {
+    color: var(--muted);
+    font-style: italic;
+  }
+  .note {
+    background: var(--panel);
+    padding: 0.75rem 1rem;
+    border-left: 4px solid var(--rule);
+  }
+  code {
+    font-family: Consolas, "Courier New", monospace;
+    font-size: 1.05em;
+  }
+</style>
+</head>
+<body>
+<a class="skip" href="#part1">Skip to the first lesson</a>
+
+<h1>Python Game Lessons</h1>
+
+<p>These lessons teach Python by building games that are played by ear. Every
+game talks to the player in plain words that a screen reader can read, and many
+use sound. The lessons are written for people who are blind or have low vision,
+and for anyone who wants to learn to make games that everyone can play.</p>
+
+<p>There are 38 lessons in nine parts. They are listed in the best order to
+take them. Each lesson builds on the ones before it, so start at lesson 1 and
+work down the list. Every lesson teaches one Python program, and every program
+is in the same folder as its lesson.</p>
+
+<h2 id="how-to-use">How to Use These Lessons</h2>
+
+<ul>
+<li>Each part is a heading, so you can jump from part to part with your screen
+reader's heading keys. The lessons in each part are a numbered list of
+links.</li>
+<li>Each lesson has a short description and a level: Beginner, Intermediate, or
+Advanced.</li>
+<li>In each lesson, type the program yourself, run it, and then do the exercises
+at the end. Typing the code is the best way to learn it.</li>
+<li>Run each program from inside its own folder, so it can find its sound
+files.</li>
+<li>Turn on indentation reporting and set punctuation to "all" in your screen
+reader while you work with code. Each lesson explains why.</li>
+</ul>
+
+<h2 id="setup">What You Need</h2>
+
+<p>You need Python 3 and a code editor that works well with your screen reader.
+Some lessons also need extra modules. Install them from the command prompt when
+you get to the lesson that uses them:</p>
+
+<ul>
+<li><code>pip install playsound</code> for the lessons with sound, starting at
+lesson 4. If it gives errors, try <code>pip install playsound==1.2.2</code>.</li>
+<li><code>pip install PySide6</code> for lesson 35.</li>
+<li><code>pip install wxPython</code> for lesson 36.</li>
+<li><code>pip install pygame accessible_output2</code> for lesson 37.</li>
+</ul>
+
+<p class="note">Many of these programs have bugs. That is on purpose for
+learning, not an accident in the lessons. Several lessons have a section on
+finding and fixing bugs, because reading and fixing code is one of the most
+important skills a programmer can have.</p>
+
+<h2 id="part1">Part 1: Your First Programs</h2>
+
+<p>Write and run your first programs, store values in variables, and let the
+computer pick at random. Add sound.</p>
+
+<ol start="1">
+<li><a href="coin_path/hello_world.html">Your First Program: Hello World</a>
+<span class="level">Beginner.</span>
+Make the computer say hello. Learn to save and run a program, use
+<code>print()</code>, and read error messages.</li>
+
+<li><a href="coin_path/hello_variable.html">Saying Hello with a Variable</a>
+<span class="level">Beginner.</span>
+Store a name in a variable and put it in a message with an f-string. Also
+covers comments and docstrings.</li>
+
+<li><a href="coin_path/flip.html">Flipping a Coin</a>
+<span class="level">Beginner.</span>
+Import the <code>random</code> module, make your first list, and pick heads or
+tails at random.</li>
+
+<li><a href="coin_path/sound_flip.html">Adding Sound to the Coin Flip</a>
+<span class="level">Beginner.</span>
+Install a module with <code>pip</code> and play a sound file before the
+result.</li>
+
+<li><a href="dice_path/roll.html">Rolling a Die</a>
+<span class="level">Beginner.</span>
+Pick a random number with <code>random.randint()</code>, and learn the
+difference between numbers and strings.</li>
+
+<li><a href="dice_path/sound_roll.html">Rolling a Die with Sound</a>
+<span class="level">Beginner.</span>
+Reuse what you know to add sound, and think about the order players hear
+things in.</li>
+</ol>
+
+<h2 id="part2">Part 2: Loops and Decisions</h2>
+
+<p>Listen to the player, check their answers, make decisions, and repeat
+things. The part ends with Pig, your first big game.</p>
+
+<ol start="7">
+<li><a href="coin_path/guess_flip.html">Guess the Coin Flip</a>
+<span class="level">Beginner.</span>
+Your first real game. Get input from the player, ask again until the answer is
+good with a <code>while</code> loop, and decide with <code>if</code> and
+<code>else</code>.</li>
+
+<li><a href="misc/input_choice.html">Checking the Player's Choice</a>
+<span class="level">Beginner.</span>
+Check a menu choice with <code>in</code>, and learn a mistake that is very
+easy to miss by ear: a missing <code>f</code>.</li>
+
+<li><a href="dice_path/multi_roll.html">Rolling Many Dice</a>
+<span class="level">Beginner.</span>
+Repeat code with a <code>for</code> loop and <code>range()</code>, use
+constants, and build file paths with the <code>os</code> module.</li>
+
+<li><a href="misc/print_choices.html">Printing a List of Choices</a>
+<span class="level">Beginner.</span>
+Read a list out loud two ways: by item, and by index with
+<code>len()</code>.</li>
+
+<li><a href="rps_path/random_item.html">Picking a Random Rock, Paper, or
+Scissors</a>
+<span class="level">Beginner.</span>
+Build the computer's half of a game, and learn why you store a random result in
+a variable.</li>
+
+<li><a href="dice_path/pig_dice.html">Pig: A Dice Game for Many Players</a>
+<span class="level">Beginner to Intermediate.</span>
+A push-your-luck game for 2 to 10 players. Plan a program in plain English, use
+loops inside loops, take turns with <code>%</code>, use <code>continue</code>
+and <code>break</code>, pause with <code>time.sleep()</code>, and find a bug
+that stops player 1 from ever winning.</li>
+</ol>
+
+<h2 id="part3">Part 3: Functions and a Complete Game</h2>
+
+<p>Learn the shape of a well-organized Python program, then use it to write a
+complete game.</p>
+
+<ol start="13">
+<li><a href="misc/main.html">A Starting Point for Every Program</a>
+<span class="level">Beginner.</span>
+Define your own function with <code>def</code>, and learn what
+<code>if __name__ == "__main__":</code> means.</li>
+
+<li><a href="rps_path/rps.html">Rock, Paper, Scissors</a>
+<span class="level">Intermediate.</span>
+A complete game with a score. Covers <code>while True:</code>,
+<code>sys.exit()</code>, <code>elif</code>, <code>and</code>, and designing
+menus that are quick to hear.</li>
+</ol>
+
+<h2 id="part4">Part 4: Card Games</h2>
+
+<p>Build a deck of cards, then build Blackjack one tested piece at a time.</p>
+
+<ol start="15">
+<li><a href="card_path/cards.html">Building and Shuffling a Deck of Cards</a>
+<span class="level">Intermediate.</span>
+Make 52 cards with nested loops and a list of lists. Copy and shuffle a list,
+and turn a card into words with <code>join()</code>.</li>
+
+<li><a href="card_path/sound_cards.html">Dealing Cards with Sound</a>
+<span class="level">Intermediate.</span>
+Deal with a random sound for each card, and track down an off-by-one
+error.</li>
+
+<li><a href="card_path/sum_hand.html">Adding Up a Blackjack Hand</a>
+<span class="level">Intermediate.</span>
+Write a function that takes an argument and returns a value. Handle Aces, trace
+code by hand, and test your function with known answers.</li>
+
+<li><a href="card_path/display_table.html">Showing the Blackjack Table</a>
+<span class="level">Intermediate.</span>
+Combine small functions, build a string in a loop, and make a hand of cards
+easier to hear.</li>
+
+<li><a href="card_path/black_jack.html">Blackjack</a>
+<span class="level">Intermediate.</span>
+Put the pieces together into a full game against the dealer. Learn why the
+order of your checks matters.</li>
+</ol>
+
+<h2 id="part5">Part 5: Hangman</h2>
+
+<p>Plan a bigger game before you write it, and design it to be played entirely
+by ear.</p>
+
+<ol start="20">
+<li><a href="Hangman_path/hangman.html">Designing and Writing an Accessible
+Hangman</a>
+<span class="level">Intermediate.</span>
+Plan with a flowchart in words, read words from a file, use many string and
+list methods, and organize a big program into small functions.</li>
+</ol>
+
+<h2 id="part6">Part 6: Tic Tac Toe</h2>
+
+<p>Build Tic Tac Toe step by step, from storing the board to a computer
+opponent with three difficulty levels.</p>
+
+<ol start="21">
+<li><a href="tic_tac_toe_path/tester.html">Planning the Tic Tac Toe Board</a>
+<span class="level">Intermediate.</span>
+Design how a game stores its information, and explore it with
+<code>python -i</code>.</li>
+
+<li><a href="tic_tac_toe_path/simple_display.html">Printing the Tic Tac Toe
+Board</a>
+<span class="level">Intermediate.</span>
+Print the board, compare how it sounds with a screen reader, and notice
+repeated code.</li>
+
+<li><a href="tic_tac_toe_path/display_board.html">A Function to Display the
+Board</a>
+<span class="level">Intermediate.</span>
+Turn repeated code into a function.</li>
+
+<li><a href="tic_tac_toe_path/mark_square.html">Letting Players Mark a
+Square</a>
+<span class="level">Intermediate.</span>
+Functions that return <code>True</code> or <code>False</code>, slices, and list
+comprehensions that check every kind of bad input at once.</li>
+
+<li><a href="tic_tac_toe_path/no_functions.html">A Whole Game of Tic Tac Toe
+Without Functions</a>
+<span class="level">Intermediate.</span>
+Check rows, columns, and diagonals with slices, and find the bugs caused by
+<code>continue</code> in nested loops.</li>
+
+<li><a href="tic_tac_toe_path/check_winner.html">A Function to Check for a
+Winner</a>
+<span class="level">Intermediate.</span>
+Use <code>return</code> to fix those bugs, and test every way to win.</li>
+
+<li><a href="tic_tac_toe_path/easy_check.html">An Easier Way to Check for a
+Winner</a>
+<span class="level">Intermediate.</span>
+Rewrite the check with tuples, chained comparisons, and sets, and re-run your
+tests to prove it still works.</li>
+
+<li><a href="tic_tac_toe_path/tic_tac_toe.html">Tic Tac Toe with
+Functions</a>
+<span class="level">Intermediate.</span>
+Put the tested functions together into a complete two-player game.</li>
+
+<li><a href="tic_tac_toe_path/hard-tic.html">Tic Tac Toe Against the
+Computer</a>
+<span class="level">Intermediate to Advanced.</span>
+Menus, a computer player that tries to win and block, and a guided hunt for
+four real bugs.</li>
+</ol>
+
+<h2 id="part7">Part 7: Classes and a Text Adventure</h2>
+
+<p>Make your own types with classes, and build a cave adventure game out of
+rooms, items, and a player.</p>
+
+<ol start="30">
+<li><a href="adventure_path/cave/unit.html">Classes: The Unit Blueprint</a>
+<span class="level">Intermediate.</span>
+Your first class. Learn about objects, <code>__init__()</code>,
+<code>self</code>, attributes, and methods.</li>
+
+<li><a href="adventure_path/cave/item.html">Inheritance: The Item Class</a>
+<span class="level">Intermediate.</span>
+Build one class on top of another with inheritance and
+<code>super()</code>.</li>
+
+<li><a href="adventure_path/cave/player.html">The Player Class</a>
+<span class="level">Intermediate.</span>
+<code>None</code>, getters and setters, and objects that refer to other
+objects.</li>
+
+<li><a href="adventure_path/cave/room.html">The Room Class</a>
+<span class="level">Intermediate to Advanced.</span>
+Dictionaries, describing a room for the ear, tracing code to see what it
+assumes, and reading a linter report.</li>
+
+<li><a href="adventure_path/cave/cave.html">The Cave of the Golden Box</a>
+<span class="level">Advanced.</span>
+A complete text adventure. Build a map, understand typed commands with a
+dictionary of functions, handle errors with <code>try</code> and
+<code>except</code>, and find bugs by playing.</li>
+</ol>
+
+<h2 id="part8">Part 8: Games in a Window</h2>
+
+<p>Move from the command prompt to windows and buttons, and make them work well
+with screen readers.</p>
+
+<ol start="35">
+<li><a href="tic_tac_toe_path/pyside_tic_tac_toe.html">Tic Tac Toe in a Window
+with PySide6</a>
+<span class="level">Advanced.</span>
+Event-driven programming, signals and slots, closures, message boxes, and
+accessible names for screen readers.</li>
+
+<li><a href="tic_tac_toe_path/wx_tic_tac_toe.html">Tic Tac Toe in a Window
+with wxPython</a>
+<span class="level">Advanced.</span>
+The same game with a second toolkit. Compare the two, and learn how native
+controls get their names for screen readers.</li>
+</ol>
+
+<h2 id="part9">Part 9: Real-Time Audio Games</h2>
+
+<p>Make a fast action game that you play by listening, with sound that moves
+around your head.</p>
+
+<ol start="37">
+<li><a href="rebound/rebound.html">Rebound: An Audio Breakout Game</a>
+<span class="level">Advanced.</span>
+A game loop, delta time, collision detection, stereo panning, 3D sound, pitch
+that tells you height, and speech through your screen reader.</li>
+
+<li><a href="rebound/openal.html">Inside openal.py: Reading a Library You Did
+Not Write</a>
+<span class="level">Advanced.</span>
+Find your way around a 4,000-line file, call C code with <code>ctypes</code>,
+use properties, and learn how 3D sound works.</li>
+</ol>
+
+</body>
+</html>

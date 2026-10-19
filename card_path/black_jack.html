@@ -1,0 +1,466 @@
+<h1 id="blackjack">Blackjack</h1>
+<p>In this lesson you will put together everything from the card lessons
+into a complete game of Blackjack. You built and shuffled a deck in
+<code>cards.py</code>. You dealt with sound in
+<code>sound_cards.py</code>. You added up hands in
+<code>sum_hand.py</code> and read the table in
+<code>display_table.py</code>. Now those pieces become one game, where
+you play against the dealer.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Planning a game in steps</li>
+<li>Dealing with <code>pop()</code></li>
+<li>Reusing functions from earlier programs</li>
+<li>Ending a game early with <code>sys.exit()</code></li>
+<li>A player loop with <code>continue</code></li>
+<li>A dealer that follows fixed rules</li>
+<li>Choosing a winner with <code>if</code>, <code>elif</code>, and
+<code>else</code></li>
+<li>The order of checks</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play-blackjack">How to Play Blackjack</h2>
+<p>The <code>black_jack.txt</code> file in this folder explains the
+rules. Here they are in short:</p>
+<ul>
+<li>You and the dealer each get two cards.</li>
+<li>Cards 2 through 10 are worth their number. Jack, Queen, and King are
+worth 10. An Ace is worth 11, or 1 if 11 would put you over 21.</li>
+<li>If either of you has exactly 21 with the first two cards, that is a
+<em>blackjack</em>, and the game is over right away.</li>
+<li>On your turn, you can <em>hit</em>, which means take another card,
+or <em>stay</em>, which means stop.</li>
+<li>If your total goes over 21, you <em>bust</em> and lose.</li>
+<li>When you stay, the dealer plays. The dealer must hit while they have
+less than 17, and stay at 17 or more. This is the rule in casinos.</li>
+<li>If the dealer busts, you win. Otherwise, the higher total wins. In
+this game, a tie goes to the dealer, which is called “the house.”</li>
+</ul>
+<h2 id="sample-run">Sample Run</h2>
+<p>You hear the shuffle sound and four deal sounds. Then the table is
+read. Here the player hits once and then stays. What the player types
+comes right after the prompt, because the prompt has no space at the
+end.</p>
+<pre><code>Dealer: King Clubs 2 Clubs  Total: 12
+Player: 3 Clubs 10 Clubs    Total: 13
+Do you want to (H)it or (S)tayh
+You hit.
+Dealer: King Clubs 2 Clubs  Total: 12
+Player: 3 Clubs 10 Clubs 5 Clubs    Total: 18
+Do you want to (H)it or (S)tays
+You stay.  Now it is the dealers turn.
+Dealer hits.
+Dealer: King Clubs 2 Clubs 2 Spades     Total: 14
+Player: 3 Clubs 10 Clubs 5 Clubs    Total: 18
+Dealer hits.
+Dealer: King Clubs 2 Clubs 2 Spades 8 Spades    Total: 22
+Player: 3 Clubs 10 Clubs 5 Clubs    Total: 18
+Dealer has 22.  Dealer busts.  Player wins.</code></pre>
+<p>And here the player hits once too often:</p>
+<pre><code>Dealer: Queen Spades 6 Hearts   Total: 16
+Player: 10 Spades 5 Clubs   Total: 15
+Do you want to (H)it or (S)tayh
+You hit.
+Dealer: Queen Spades 6 Hearts   Total: 16
+Player: 10 Spades 5 Clubs Queen Clubs   Total: 25
+You have 25. You bust!  Dealer wins.</code></pre>
+<h2 id="the-plan">The Plan</h2>
+<p>The <code>black_jack.txt</code> file also has the plan the program
+follows:</p>
+<ol type="1">
+<li>Set up the deck of cards.</li>
+<li>Shuffle the deck.</li>
+<li>Deal the first cards.</li>
+<li>Let the player hit or stay.</li>
+<li>Let the dealer play. If the dealer has less than 17, hit. At 17 or
+more, stay.</li>
+<li>Decide the winner.</li>
+</ol>
+<p>The code follows these steps in this order, from top to bottom. As
+you read it, listen for the comments that mark each step.</p>
+<h2 id="the-source-code-for-blackjack">The Source Code for
+Blackjack</h2>
+<p>This program plays sounds, so install <code>playsound</code> with
+<code>pip install playsound</code> if you have not already. Type it in
+and save it as <code>black_jack.py</code> in the folder that holds the
+<code>sounds</code> folder.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Black jack game&quot;&quot;&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys  <span class="co"># used to exit game</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>cards <span class="op">=</span> [</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Ace&quot;</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2&quot;</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;3&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;4&quot;</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;5&quot;</span>,</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;6&quot;</span>,</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;7&quot;</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;8&quot;</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;9&quot;</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;10&quot;</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Jack&quot;</span>,</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Queen&quot;</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;King&quot;</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>clean_deck <span class="op">=</span> []</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> card <span class="kw">in</span> cards:</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> suit <span class="kw">in</span> [<span class="st">&quot;Clubs&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>, <span class="st">&quot;Hearts&quot;</span>, <span class="st">&quot;Spades&quot;</span>]:</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        clean_deck.append([card, suit])</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>deck <span class="op">=</span> clean_deck[:]  <span class="co"># copy a clean deck for use</span></span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>random.shuffle(deck)  <span class="co"># Shuffle the deck.</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/shuffle.wav&quot;</span>)</span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="co"># deal first four cards 2 for player 2 for dealer</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a>    sound <span class="op">=</span> random.choice([<span class="st">&quot;sounds/deal1.wav&quot;</span>, <span class="st">&quot;sounds/deal2.wav&quot;</span>, <span class="st">&quot;sounds/deal3.wav&quot;</span>])</span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a>    ps.playsound(sound)</span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [deck.pop(), deck.pop()]</span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [deck.pop(), deck.pop()]</span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sum_hand(hand):</span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a>    <span class="bu">sum</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a>    aces <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>]:</span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="bu">int</span>(card[<span class="dv">0</span>])</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>]:</span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">10</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a>            aces <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">11</span></span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="bu">sum</span> <span class="op">&gt;</span> <span class="dv">21</span> <span class="kw">and</span> aces:</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sum</span> <span class="op">-=</span> <span class="dv">10</span></span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>        aces <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span></span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hand_string(hand):</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a>        s <span class="op">+=</span> <span class="st">&quot; &quot;</span>.join(card) <span class="op">+</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> s</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_table():</span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(dealer_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(dealer_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Player:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(player_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(player_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a>display_table()</span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a>dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>player_sum <span class="op">=</span> sum_hand(player_hand)</span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> <span class="dv">21</span> <span class="kw">and</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer and Player both have black jack its a Tie and the House wins.&quot;</span>)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer has a black jack.  Dealer wins.&quot;</span>)</span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Player has a black jack.  Player wins.&quot;</span>)</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a><span class="co"># player plays</span></span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> again.upper() <span class="op">!=</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb3-89"><a href="#cb3-89" aria-hidden="true" tabindex="-1"></a>    player_sum <span class="op">=</span> sum_hand(player_hand)</span>
+<span id="cb3-90"><a href="#cb3-90" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player_sum <span class="op">&gt;</span> <span class="dv">21</span>:</span>
+<span id="cb3-91"><a href="#cb3-91" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;You have </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">. You bust!  Dealer wins.&quot;</span>)</span>
+<span id="cb3-92"><a href="#cb3-92" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb3-93"><a href="#cb3-93" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-94"><a href="#cb3-94" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb3-95"><a href="#cb3-95" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You have 21. Now its the Dealers turn.&quot;</span>)</span>
+<span id="cb3-96"><a href="#cb3-96" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb3-97"><a href="#cb3-97" aria-hidden="true" tabindex="-1"></a>        again <span class="op">=</span> <span class="st">&quot;S&quot;</span></span>
+<span id="cb3-98"><a href="#cb3-98" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb3-99"><a href="#cb3-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-100"><a href="#cb3-100" aria-hidden="true" tabindex="-1"></a>    again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb3-101"><a href="#cb3-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> again.upper() <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;S&quot;</span>]:</span>
+<span id="cb3-102"><a href="#cb3-102" aria-hidden="true" tabindex="-1"></a>        again <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Do you want to (H)it or (S)tay&quot;</span>)</span>
+<span id="cb3-103"><a href="#cb3-103" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> again.upper() <span class="op">==</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb3-104"><a href="#cb3-104" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You stay.  Now it is the dealers turn.&quot;</span>)</span>
+<span id="cb3-105"><a href="#cb3-105" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb3-106"><a href="#cb3-106" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb3-107"><a href="#cb3-107" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-108"><a href="#cb3-108" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You hit.&quot;</span>)</span>
+<span id="cb3-109"><a href="#cb3-109" aria-hidden="true" tabindex="-1"></a>    ps.playsound(<span class="st">&quot;sounds/deal1.wav&quot;</span>)</span>
+<span id="cb3-110"><a href="#cb3-110" aria-hidden="true" tabindex="-1"></a>    player_hand.append(deck.pop())</span>
+<span id="cb3-111"><a href="#cb3-111" aria-hidden="true" tabindex="-1"></a>    display_table()</span>
+<span id="cb3-112"><a href="#cb3-112" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span>
+<span id="cb3-113"><a href="#cb3-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-114"><a href="#cb3-114" aria-hidden="true" tabindex="-1"></a><span class="co"># dealer plays</span></span>
+<span id="cb3-115"><a href="#cb3-115" aria-hidden="true" tabindex="-1"></a>dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb3-116"><a href="#cb3-116" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> dealer_sum <span class="op">&lt;</span> <span class="dv">17</span>:</span>
+<span id="cb3-117"><a href="#cb3-117" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer hits.&quot;</span>)</span>
+<span id="cb3-118"><a href="#cb3-118" aria-hidden="true" tabindex="-1"></a>    ps.playsound(<span class="st">&quot;sounds/deal1.wav&quot;</span>)</span>
+<span id="cb3-119"><a href="#cb3-119" aria-hidden="true" tabindex="-1"></a>    dealer_hand.append(deck.pop())</span>
+<span id="cb3-120"><a href="#cb3-120" aria-hidden="true" tabindex="-1"></a>    dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb3-121"><a href="#cb3-121" aria-hidden="true" tabindex="-1"></a>    display_table()</span>
+<span id="cb3-122"><a href="#cb3-122" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span>
+<span id="cb3-123"><a href="#cb3-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-124"><a href="#cb3-124" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> player_sum:</span>
+<span id="cb3-125"><a href="#cb3-125" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  It is a tie and the Dealer wins&quot;</span>)</span>
+<span id="cb3-126"><a href="#cb3-126" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> dealer_sum <span class="op">&gt;</span> <span class="dv">21</span>:</span>
+<span id="cb3-127"><a href="#cb3-127" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss">.  Dealer busts.  Player wins.&quot;</span>)</span>
+<span id="cb3-128"><a href="#cb3-128" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> dealer_sum <span class="op">&gt;</span> player_sum:</span>
+<span id="cb3-129"><a href="#cb3-129" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss"> and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  Dealer wins!&quot;</span>)</span>
+<span id="cb3-130"><a href="#cb3-130" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-131"><a href="#cb3-131" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss"> and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  Player  wins!&quot;</span>)</span></code></pre></div>
+<h2 id="steps-1-and-2-the-deck">Steps 1 and 2: The Deck</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>cards <span class="op">=</span> [</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;Ace&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;2&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;King&quot;</span>,</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p>This is the same list of ranks as in <code>cards.py</code>, but
+written with one rank per line. Python allows line breaks inside
+brackets. This style is much easier to move through with a screen
+reader, because each line holds just one item. The comma after the last
+item, <code>"King",</code>, is allowed too. It makes it easy to add
+another item later.</p>
+<p>The deck is built with the same nested loops as before, copied with
+<code>[:]</code>, and shuffled. Then the shuffle sound plays.</p>
+<h2 id="step-3-dealing">Step 3: Dealing</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">4</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sound <span class="op">=</span> random.choice([<span class="st">&quot;sounds/deal1.wav&quot;</span>, <span class="st">&quot;sounds/deal2.wav&quot;</span>, <span class="st">&quot;sounds/deal3.wav&quot;</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    ps.playsound(sound)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [deck.pop(), deck.pop()]</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [deck.pop(), deck.pop()]</span></code></pre></div>
+<p>The loop plays four random deal sounds, one for each card. The loop
+variable is <code>_</code> because the loop only needs to repeat. It
+never uses the number.</p>
+<h3 id="taking-cards-with-pop">Taking Cards with pop()</h3>
+<p><code>pop()</code> removes the last item from a list and returns it.
+Each call takes one card off the deck. So after these lines, the player
+has two cards, the dealer has two cards, and the deck has 48 cards left.
+No card can be dealt twice.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck <span class="op">=</span> [<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck.pop()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;c&#39;</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;a&#39;</span>, <span class="st">&#39;b&#39;</span>]</span></code></pre></div>
+<p>Each hand is made with two <code>pop()</code> calls inside square
+brackets, which makes a new list of the two cards.</p>
+<p>Notice that the sounds are played first and the cards are dealt
+after. The player cannot tell the difference, since nothing is said
+until the table is read. Sounds and code do not always have to happen in
+the same order, as long as the player hears things in the right
+order.</p>
+<h2 id="the-functions">The Functions</h2>
+<p>The program defines three functions: <code>sum_hand()</code>,
+<code>hand_string()</code>, and <code>display_table()</code>. They are
+the same functions you wrote in the last two lessons, copied into this
+program. You tested them there, so you can trust them here. That is one
+of the best reasons to build a program in small, tested pieces.</p>
+<p>The functions are defined after the deal, in the middle of the
+program. That works, because Python only needs a function to be defined
+before it is called. Most programmers put all their functions near the
+top, after the imports, so they are easy to find.</p>
+<h2 id="checking-for-blackjack">Checking for Blackjack</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>display_table()</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>player_sum <span class="op">=</span> sum_hand(player_hand)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> <span class="dv">21</span> <span class="kw">and</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer and Player both have black jack its a Tie and the House wins.&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer has a black jack.  Dealer wins.&quot;</span>)</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Player has a black jack.  Player wins.&quot;</span>)</span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    sys.exit()</span></code></pre></div>
+<p>After reading the table, the program checks for a blackjack. These
+are three separate <code>if</code> statements, not <code>if</code> and
+<code>elif</code>. That is fine here, because each one ends the program
+with <code>sys.exit()</code> if it is true. Nothing after it runs.</p>
+<h3 id="the-order-of-checks-matters">The Order of Checks Matters</h3>
+<p>The program checks for both players having 21 <em>first</em>. Think
+about what would happen if it checked <code>dealer_sum == 21</code>
+first. When both had 21, the dealer check would be true, and the program
+would say the dealer wins and exit. It would never get to the “both”
+check. When one condition is part of another, check the more specific
+one first.</p>
+<h2 id="step-4-the-players-turn">Step 4: The Player’s Turn</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="co"># player plays</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> again.upper() <span class="op">!=</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    player_sum <span class="op">=</span> sum_hand(player_hand)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player_sum <span class="op">&gt;</span> <span class="dv">21</span>:</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;You have </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">. You bust!  Dealer wins.&quot;</span>)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player_sum <span class="op">==</span> <span class="dv">21</span>:</span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You have 21. Now its the Dealers turn.&quot;</span>)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>        again <span class="op">=</span> <span class="st">&quot;S&quot;</span></span>
+<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>    again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> again.upper() <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;H&quot;</span>, <span class="st">&quot;S&quot;</span>]:</span>
+<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>        again <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Do you want to (H)it or (S)tay&quot;</span>)</span>
+<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> again.upper() <span class="op">==</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You stay.  Now it is the dealers turn.&quot;</span>)</span>
+<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You hit.&quot;</span>)</span>
+<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>    ps.playsound(<span class="st">&quot;sounds/deal1.wav&quot;</span>)</span>
+<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>    player_hand.append(deck.pop())</span>
+<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>    display_table()</span>
+<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>The loop keeps going until <code>again</code> is <code>"S"</code>,
+for stay. Each time through, it does these things in order:</p>
+<ol type="1">
+<li>Add up the player’s hand. If it is over 21, the player busts, and
+the game ends.</li>
+<li>If it is exactly 21, there is no reason to hit again. The program
+sets <code>again</code> to <code>"S"</code> for the player and uses
+<code>continue</code> to jump to the top of the loop. The loop condition
+is now false, so the loop ends.</li>
+<li>Otherwise, ask “hit or stay?” until the answer is <code>H</code> or
+<code>S</code>.</li>
+<li>If the answer is <code>S</code>, say so and <code>continue</code>.
+Again, the loop ends.</li>
+<li>If the answer is <code>H</code>, play a deal sound,
+<code>pop()</code> a card from the deck, <code>append()</code> it to the
+player’s hand, and read the table again.</li>
+</ol>
+<p>Notice how <code>continue</code> is used here. It skips the rest of
+the loop and goes back to the <code>while</code> line, where the
+condition is checked again. Since <code>again</code> is
+<code>"S"</code>, the loop ends. It is a way of saying “this turn is
+done.”</p>
+<p>Notice also that after a hit, the program goes back to the top of the
+loop, where it checks for a bust <em>before</em> asking again. So a
+player who busts is told right away and is never asked to hit or stay
+with more than 21.</p>
+<h2 id="step-5-the-dealers-turn">Step 5: The Dealer’s Turn</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co"># dealer plays</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> dealer_sum <span class="op">&lt;</span> <span class="dv">17</span>:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Dealer hits.&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    ps.playsound(<span class="st">&quot;sounds/deal1.wav&quot;</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    dealer_hand.append(deck.pop())</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    dealer_sum <span class="op">=</span> sum_hand(dealer_hand)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>    display_table()</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>The dealer does not make choices. The dealer follows a fixed rule:
+hit while under 17. That fits perfectly in a <code>while</code> loop.
+Each time through, the dealer takes a card, the total is added up again,
+and the table is read.</p>
+<p>It is important that <code>dealer_sum</code> is updated inside the
+loop. If it were not, the condition would never change, and the dealer
+would keep hitting forever.</p>
+<h2 id="step-6-who-won">Step 6: Who Won?</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> dealer_sum <span class="op">==</span> player_sum:</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  It is a tie and the Dealer wins&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> dealer_sum <span class="op">&gt;</span> <span class="dv">21</span>:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss">.  Dealer busts.  Player wins.&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> dealer_sum <span class="op">&gt;</span> player_sum:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss"> and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  Dealer wins!&quot;</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>dealer_sum<span class="sc">}</span><span class="ss"> and Player has </span><span class="sc">{</span>player_sum<span class="sc">}</span><span class="ss">.  Player  wins!&quot;</span>)</span></code></pre></div>
+<p>By the time the program gets here, the player has not busted. That
+was checked during the player’s turn. So there are four possibilities,
+checked in order:</p>
+<ol type="1">
+<li>A tie. The dealer wins ties in this game.</li>
+<li>The dealer busted. The player wins.</li>
+<li>The dealer has more. The dealer wins.</li>
+<li>Otherwise, the player has more. The player wins.</li>
+</ol>
+<p>The order matters here, too. The bust check must come before the
+“dealer has more” check. A dealer with 24 has more than a player with
+18, but the dealer has busted and should lose.</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p>The game reads the whole table after every card, which keeps the
+player informed. Here are some things that could make it even better by
+ear:</p>
+<ul>
+<li>The prompt <code>Do you want to (H)it or (S)tay</code> has no space
+at the end, so the answer runs into the word <code>Stay</code>.</li>
+<li><code>Now its the Dealers turn</code> should be
+<code>Now it's the dealer's turn</code>.</li>
+<li>In real Blackjack, one of the dealer’s first two cards is hidden
+until the dealer’s turn. This game shows both, which makes it a little
+easier for the player.</li>
+<li>Saying <code>King of Clubs, 2 of Clubs</code> would be clearer than
+<code>King Clubs 2 Clubs</code>. You did this in the
+<code>display_table.py</code> exercises.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>You built a complete Blackjack game from smaller pieces. You learned
+that:</p>
+<ul>
+<li>A plan in plain steps becomes the outline of your code.</li>
+<li><code>pop()</code> takes a card off the deck so it cannot be dealt
+twice.</li>
+<li>Functions that you tested in small programs can be reused in big
+ones.</li>
+<li><code>sys.exit()</code> ends the game as soon as the result is
+known.</li>
+<li><code>continue</code> jumps back to the loop’s condition.</li>
+<li>A computer player that follows fixed rules fits in a
+<code>while</code> loop.</li>
+<li>When conditions overlap, the order you check them in changes the
+result.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Add a space at the end of the hit or stay prompt, and fix the
+apostrophes in the messages.</li>
+<li>Hide the dealer’s second card until the player stays. Hint: write a
+version of <code>display_table()</code> that only reads
+<code>dealer_hand[0]</code> for the dealer.</li>
+<li>Let the player type <code>T</code> for total to hear the table again
+without hitting or staying.</li>
+<li>Move the three functions to the top of the program, right after the
+imports. Does it still work?</li>
+<li>Put the whole game inside a <code>main()</code> function, and add a
+loop that asks <code>Play again?</code> after each game. You will need
+to take out the <code>sys.exit()</code> calls and use something else to
+end a game. Hint: put the game in its own function and use
+<code>return</code>.</li>
+<li>Keep a score of games won and lost across games, and read it before
+each new game.</li>
+</ol>

@@ -1,0 +1,153 @@
+<h1 id="printing-a-list-of-choices">Printing a List of Choices</h1>
+<p>Games often read a list of choices to the player. In this lesson you
+will print every item in a list two ways: first by itself, and then with
+a number in front. Along the way you will see two ways to write a
+<code>for</code> loop over a list.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Looping over the items in a list</li>
+<li>Looping over the indexes of a list with <code>range()</code> and
+<code>len()</code></li>
+<li>Getting a list item by its index</li>
+<li>Variable naming styles</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code>Rock
+Paper
+scissors
+0. Rock
+1. Paper
+2. scissors</code></pre>
+<h2 id="the-source-code-for-print-choices">The Source Code for Print
+Choices</h2>
+<p>Type this program and save it as <code>print_choices.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>objectList <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;scissors&quot;</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item <span class="kw">in</span> objectList:</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(item)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(objectList)):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>objectList[i]<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="the-list">The List</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>objectList <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;scissors&quot;</span>]</span></code></pre></div>
+<p>This makes a list of three strings and stores it in the variable
+<code>objectList</code>.</p>
+<h3 id="a-note-on-names">A Note on Names</h3>
+<p>This variable name joins two words by making the second word start
+with a capital letter: <code>objectList</code>. This style is called
+<em>camel case</em>, because the capital letter sticks up like a camel’s
+hump. Other languages, such as JavaScript and Java, use it a lot.</p>
+<p>Python programmers usually join words with an underscore instead, as
+in <code>object_list</code>. This style is called <em>snake case</em>.
+Both work. Python does not care. But using the same style everywhere
+makes your code easier to read, and underscores are often easier to hear
+with a screen reader, since the screen reader says “underline” or
+“underscore” between the words. The other programs in these lessons use
+snake case.</p>
+<p>Also notice that <code>"scissors"</code> starts with a lowercase
+letter while the others are capitalized. Small differences like that are
+easy to miss in code but stand out to players.</p>
+<h2 id="looping-over-items">Looping over Items</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> item <span class="kw">in</span> objectList:</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(item)</span></code></pre></div>
+<p>When you put a list after <code>in</code> in a <code>for</code> loop,
+the loop runs once for each item. Each time, the loop variable,
+<code>item</code>, holds the next item. The first time it is
+<code>"Rock"</code>, then <code>"Paper"</code>, then
+<code>"scissors"</code>.</p>
+<p>This is the simplest and most common way to go through a list. Use it
+whenever you only need the items themselves.</p>
+<h2 id="looping-over-indexes">Looping over Indexes</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(objectList)):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>objectList[i]<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This loop does something a little different. Let’s take the first
+line apart from the inside out.</p>
+<h3 id="len">len()</h3>
+<p><code>len()</code> returns the length of a list, which is how many
+items are in it.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> objectList <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;scissors&quot;</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">len</span>(objectList)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="dv">3</span></span></code></pre></div>
+<p>It also works on strings, where it counts the characters:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">len</span>(<span class="st">&quot;Rock&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span></span></code></pre></div>
+<h3 id="rangelen">range(len(…))</h3>
+<p><code>range(3)</code> gives the numbers 0, 1, and 2. Those are
+exactly the indexes of a three-item list. So
+<code>range(len(objectList))</code> gives you every index in the list,
+no matter how long the list is.</p>
+<h3 id="getting-an-item-by-index">Getting an Item by Index</h3>
+<p>Inside the loop, <code>i</code> is an index. To get the item at that
+index, put the index in square brackets after the list:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> objectList[<span class="dv">0</span>]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Rock&#39;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> objectList[<span class="dv">2</span>]</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;scissors&#39;</span></span></code></pre></div>
+<p>So the f-string <code>f"{i}. {objectList[i]}"</code> prints the
+index, a period, a space, and the item.</p>
+<h2 id="counting-from-one">Counting from One</h2>
+<p>The second loop prints <code>0. Rock</code>. People expect a list to
+start at 1. Because the loop has the index in <code>i</code>, you can
+add 1 when you print it:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>i <span class="op">+</span> <span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>objectList[i]<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Now the list reads <code>1. Rock</code>, <code>2. Paper</code>,
+<code>3. scissors</code>. That is much more natural to hear. It also
+matches what you would ask a player to type.</p>
+<p>There is another way to get both the index and the item at once,
+called <code>enumerate()</code>. You will see it in the Pig dice
+game.</p>
+<h2 id="summary">Summary</h2>
+<p>You printed a list two ways. You learned that:</p>
+<ul>
+<li><code>for item in some_list:</code> loops over the items.</li>
+<li><code>len()</code> returns the number of items in a list or
+characters in a string.</li>
+<li><code>for i in range(len(some_list)):</code> loops over the
+indexes.</li>
+<li><code>some_list[i]</code> gets the item at index
+<code>i</code>.</li>
+<li>Add 1 to an index when you show it to people.</li>
+<li>Python programmers usually name variables with underscores, like
+<code>object_list</code>.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Rename <code>objectList</code> to <code>object_list</code>
+everywhere in the program. Make sure you change all three places.</li>
+<li>Capitalize <code>"Scissors"</code>.</li>
+<li>Change the second loop so the numbers start at 1.</li>
+<li>Add <code>"Lizard"</code> and <code>"Spock"</code> to the list. Do
+you need to change either loop? Why or why not?</li>
+<li>After the loops, print how many choices there are, using
+<code>len()</code>, as in <code>There are 3 choices.</code></li>
+</ol>

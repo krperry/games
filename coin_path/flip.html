@@ -1,0 +1,164 @@
+<h1 id="flipping-a-coin">Flipping a Coin</h1>
+<p>Games need surprises. If a game did the same thing every time, it
+would not be much fun to play. In this lesson you will write a program
+that flips a coin. Each time you run it, you will hear either
+<code>Head</code> or <code>tail</code>, and you will not know which
+until it happens.</p>
+<p>To do this you will use a <em>module</em>, which is a collection of
+ready-made code, and a <em>list</em>, which holds more than one
+value.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Importing a module with <code>import</code></li>
+<li>The <code>random</code> module</li>
+<li>Lists</li>
+<li><code>random.choice()</code></li>
+<li>Calling a function inside an f-string</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-runs">Sample Runs</h2>
+<p>The program prints one word. Here is what it might say if you run it
+three times:</p>
+<pre><code>Head</code></pre>
+<pre><code>tail</code></pre>
+<pre><code>Head</code></pre>
+<h2 id="the-source-code-for-flip">The Source Code for Flip</h2>
+<p>Type this program and save it as <code>flip.py</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Simplest coin flip&quot;&quot;&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>coin <span class="op">=</span> [<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>choice(coin)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Run it several times with <code>python flip.py</code>. Listen to how
+the answer changes.</p>
+<h2 id="importing-a-module">Importing a Module</h2>
+<p>The second line of the program is:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span></code></pre></div>
+<p>Python comes with many extra tools, but it does not load all of them
+every time a program starts. That would be slow. Instead, the tools are
+grouped into <em>modules</em>, and your program asks for the ones it
+needs. Asking for a module is called <em>importing</em> it.</p>
+<p>The <code>random</code> module has functions for picking things by
+chance. After the <code>import random</code> line, your program can use
+any of them by typing <code>random</code>, a period, and the function’s
+name.</p>
+<p>Put your <code>import</code> lines at the top of the program, right
+after the docstring. That way anyone reading your code knows right away
+which modules it uses.</p>
+<h2 id="lists">Lists</h2>
+<p>The next line makes a list:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>coin <span class="op">=</span> [<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>]</span></code></pre></div>
+<p>A <em>list</em> is a value that holds other values, in order. You
+make a list with square brackets, <code>[</code> and <code>]</code>, and
+you put commas between the items. This list holds two strings,
+<code>"Head"</code> and <code>"tail"</code>. The list is stored in a
+variable named <code>coin</code>.</p>
+<p>When you read a list with a screen reader, listen for the commas.
+Each comma separates one item from the next. A missing comma is a common
+mistake that can be hard to hear.</p>
+<p>Try lists in the interactive shell:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin <span class="op">=</span> [<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;Head&#39;</span>, <span class="st">&#39;tail&#39;</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> colors <span class="op">=</span> [<span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> colors</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;red&#39;</span>, <span class="st">&#39;green&#39;</span>, <span class="st">&#39;blue&#39;</span>]</span></code></pre></div>
+<h2 id="picking-a-random-item">Picking a Random Item</h2>
+<p>The last line does all the work:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>choice(coin)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p><code>random.choice()</code> is a function from the
+<code>random</code> module. You give it a list, and it gives you back
+one item from the list, picked at random. Each item has the same chance
+of being picked. With two items, that is a fifty-fifty chance, just like
+a real coin.</p>
+<p>When a function gives you a value back, we say it <em>returns</em>
+that value. Here, <code>random.choice(coin)</code> returns either
+<code>"Head"</code> or <code>"tail"</code>.</p>
+<p>Try it in the shell a few times:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> random</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice([<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>])</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;tail&#39;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice([<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>])</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;tail&#39;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice([<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>])</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Head&#39;</span></span></code></pre></div>
+<p>Your answers will probably be different. That is the point.</p>
+<h3 id="functions-inside-f-strings">Functions Inside f-strings</h3>
+<p>In the last lesson you put a variable inside the curly braces of an
+f-string. You can also put a function call there. Python calls the
+function and puts whatever it returns into the string.</p>
+<p>In this program, the f-string holds nothing else, so these two lines
+would print the same thing:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>choice(coin)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(random.choice(coin))</span></code></pre></div>
+<p>The f-string becomes more useful when you add words around the
+braces, such as
+<code>print(f"The coin landed on {random.choice(coin)}.")</code>. Try
+that in the exercises.</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p>Listen to the two answers again: <code>Head</code> and
+<code>tail</code>. One starts with a capital letter and one does not.
+Most screen readers say them the same way, so you might not notice. But
+if your screen reader is set to announce capital letters, or if someone
+reads the output in braille, the difference stands out. It is also a
+little odd that it says <code>Head</code> and not
+<code>Heads</code>.</p>
+<p>When you write output for people to hear, make it clear, complete,
+and consistent. A short sentence such as
+<code>The coin landed on heads.</code> is easier to understand than one
+word, especially if the person was not paying attention when the program
+started.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote a program that does something different each time it runs.
+You learned that:</p>
+<ul>
+<li><code>import</code> loads a module so your program can use its
+functions.</li>
+<li>The <code>random</code> module has functions for picking things by
+chance.</li>
+<li>A list holds several values in order, inside square brackets,
+separated by commas.</li>
+<li><code>random.choice()</code> returns one item from a list, picked at
+random.</li>
+<li>You can call a function inside the curly braces of an f-string.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change the list so the two items are <code>"Heads"</code> and
+<code>"Tails"</code>, both with capital letters.</li>
+<li>Change the <code>print()</code> line so it says a full sentence,
+such as <code>The coin landed on Heads.</code></li>
+<li>Make a list of three colors and print a random one.</li>
+<li>Add a third item to the coin list: <code>"the edge"</code>. Run the
+program many times. Does the coin ever land on its edge? About how
+often?</li>
+<li>Remove the <code>import random</code> line and run the program.
+Listen to the error message. What does Python say is not defined?</li>
+</ol>

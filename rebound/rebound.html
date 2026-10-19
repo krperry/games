@@ -1,0 +1,660 @@
+<h1 id="rebound-an-audio-breakout-game">Rebound: An Audio Breakout
+Game</h1>
+<p>Rebound is a real-time action game designed to be played by ear. A
+ball bounces around the screen, and you move a paddle left and right to
+keep it in play and knock out a wall of blocks at the top. You never
+need to see the screen. You <em>hear</em> where the ball is: its sound
+moves left and right as it travels across, and its pitch rises as it
+climbs toward the top. A beep tells you when there are blocks above your
+paddle, and your screen reader tells you how many are left.</p>
+<p>Rebound was written by Blindgoofball from Nibble Nerds, at
+nibblenerds.com.</p>
+<p>Every game so far has waited for the player to type something.
+Rebound does not wait. It runs sixty times a second, moving the ball,
+checking for collisions, and updating the sound, whether you press a key
+or not. In this lesson you will learn how real-time games work, and how
+to design sound so a player can track a moving object without seeing
+it.</p>
+<p>This is an advanced lesson. It uses several modules you have to
+install, and ideas from math such as coordinates and velocity.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>The game loop, frames, and frame rate</li>
+<li>Delta time: moving at the same speed on any computer</li>
+<li>Screen coordinates</li>
+<li>Velocity and bouncing</li>
+<li><code>pygame</code>: windows, events, keys, rectangles, and
+sounds</li>
+<li>Collision detection with rectangles</li>
+<li>Stereo panning with <code>pygame</code></li>
+<li>3D positional audio with OpenAL</li>
+<li>Pitch as a way to hear height</li>
+<li>Speaking through the screen reader with
+<code>accessible_output2</code></li>
+<li>Environment variables</li>
+<li>Finding bugs in a real-time game</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<p>This program is indented with two spaces per level, not four. Python
+allows any number of spaces, as long as each block is consistent. If
+your screen reader reports indentation in spaces, you will hear 2, 4, 6,
+and so on. Most Python programs use four, which is what the style guide
+recommends.</p>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>Rebound needs three things that do not come with Python:</p>
+<ul>
+<li><em>pygame</em>, a popular module for making games. Install it with
+<code>pip install pygame</code>. If that fails on a very new version of
+Python, try <code>pip install pygame-ce</code>, a community edition that
+works the same way and is imported with the same name.</li>
+<li><em>accessible_output2</em>, which sends speech to your screen
+reader. Install it with
+<code>pip install accessible_output2</code>.</li>
+<li><em>OpenAL</em>, a library for 3D sound. The <code>rebound</code>
+folder already has what you need: <code>openal.py</code>, which is a
+Python wrapper for OpenAL, and <code>OpenAL32.dll</code>, the OpenAL
+library for Windows. Both must stay in the same folder as
+<code>rebound.py</code>. The next lesson, on <code>openal.py</code>,
+explains how it works.</li>
+</ul>
+<p>Run the game from the <code>rebound</code> folder with
+<code>python rebound.py</code>. As written, it works on Windows, because
+<code>OpenAL32.dll</code> is a Windows file.</p>
+<h2 id="how-to-play">How to Play</h2>
+<ul>
+<li>Press Space to launch the ball from your paddle.</li>
+<li>Hold the Left and Right Arrow keys to move the paddle.</li>
+<li>Listen to the ball. When it sounds to your left, move left. When it
+is to your right, move right. When it is centered between your ears, it
+is right above you. Its pitch gets higher as it rises and lower as it
+falls toward you.</li>
+<li>When the ball touches a block, the block breaks with a crash
+sound.</li>
+<li>A steady beep means there are blocks right above your paddle. Line
+up with the beep to aim at blocks.</li>
+<li>Press B to hear how many blocks are left.</li>
+<li>Press C to hear how many blocks are above your paddle.</li>
+</ul>
+<p>Headphones make a big difference. They let you hear left and right
+clearly.</p>
+<h2 id="the-source-code-for-rebound">The Source Code for Rebound</h2>
+<p>Type this program and save it as <code>rebound.py</code> in the
+<code>rebound</code> folder:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="co">Rebound</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co">A simple breakout style game</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="co">Written by Blindgoofball from Nibble Nerds</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="co">https://nibblenerds.com</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openal</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> accessible_output2.outputs.auto</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> random <span class="im">import</span> randint</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">&#39;PYGAME_HIDE_SUPPORT_PROMPT&#39;</span>] <span class="op">=</span> <span class="st">&quot;hide&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygame</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>o<span class="op">=</span>accessible_output2.outputs.auto.Auto()</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>pygame.init()</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>pygame.mixer.init()</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>width<span class="op">=</span><span class="dv">800</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>height<span class="op">=</span><span class="dv">600</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>paddle_position<span class="op">=</span>[width<span class="op">/</span><span class="dv">2</span><span class="op">-</span><span class="dv">20</span>, height<span class="op">-</span><span class="dv">40</span>]</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>ball_position<span class="op">=</span>[width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">70</span>]</span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>ball_velocity<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>]</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>listener<span class="op">=</span>openal.Listener()</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>listener.distance_model<span class="op">=</span><span class="dv">5</span></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>listener.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">40</span>, <span class="dv">0</span>)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>front_sound<span class="op">=</span>pygame.mixer.Sound(<span class="st">&#39;sounds/beep.wav&#39;</span>)</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>ball_sound<span class="op">=</span>openal.LoadSound(<span class="st">&#39;sounds/ball.wav&#39;</span>)</span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>ball_source<span class="op">=</span>openal.Player()</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>ball_source.add(ball_sound)</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>ball_source.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">50</span>, <span class="dv">0</span>)</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a>ball_source.loop<span class="op">=</span><span class="va">True</span></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>ball_source.rolloff<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>ball_source.reference_distance<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>paddle<span class="op">=</span>pygame.rect.Rect(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">40</span>, <span class="dv">40</span>)</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>ball<span class="op">=</span>pygame.rect.Rect(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>ball.center<span class="op">=</span>ball_position</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>blocks<span class="op">=</span>[]</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(width<span class="op">//</span><span class="dv">40</span>):</span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>((height<span class="op">-</span><span class="dv">200</span>)<span class="op">//</span><span class="dv">40</span>):</span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>    blocks.append(pygame.rect.Rect(i<span class="op">*</span><span class="dv">40</span>, j<span class="op">*</span><span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>))</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_pitch(y):</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fl">1.0</span><span class="op">+</span>((height<span class="op">-</span>y)<span class="op">/</span>height)<span class="op">*</span>(<span class="fl">2.0</span>)</span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> move_ball():</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>  ball_position[<span class="dv">0</span>]<span class="op">+=</span>ball_velocity[<span class="dv">0</span>]<span class="op">*</span>delta_time</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>  ball_position[<span class="dv">1</span>]<span class="op">-=</span>ball_velocity[<span class="dv">1</span>]<span class="op">*</span>delta_time</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>  ball.center<span class="op">=</span>ball_position</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ball.left <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> ball.right <span class="op">&gt;</span> width:</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    bounce<span class="op">=</span>pygame.mixer.Sound(<span class="st">&#39;sounds/bounce.wav&#39;</span>)</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>    channel<span class="op">=</span>pygame.mixer.find_channel()</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ball.left <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>      channel.set_volume(<span class="fl">1.0</span>, <span class="fl">0.0</span>)</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>      channel.set_volume(<span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a>    channel.play(bounce)</span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>    ball_position[<span class="dv">0</span>]<span class="op">+=</span>ball_velocity[<span class="dv">0</span>]<span class="op">*</span>delta_time</span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ball.top <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> ball.bottom <span class="op">&gt;</span> height:</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>    ball_position[<span class="dv">1</span>]<span class="op">-=</span>ball_velocity[<span class="dv">1</span>]<span class="op">*</span>delta_time</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/bounce.wav&#39;</span>).play()</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>  ball_source.position<span class="op">=</span>(ball_position[<span class="dv">0</span>], ball_position[<span class="dv">1</span>], <span class="dv">0</span>)</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>  ball_source.pitch<span class="op">=</span>get_pitch(ball_position[<span class="dv">1</span>])</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>screen<span class="op">=</span>pygame.display.set_mode((width, height))</span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>pygame.display.set_caption(<span class="st">&#39;Rebound&#39;</span>)</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>started<span class="op">=</span><span class="va">False</span></span>
+<span id="cb1-74"><a href="#cb1-74" aria-hidden="true" tabindex="-1"></a>clock<span class="op">=</span>pygame.time.Clock()</span>
+<span id="cb1-75"><a href="#cb1-75" aria-hidden="true" tabindex="-1"></a>delta_time<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb1-76"><a href="#cb1-76" aria-hidden="true" tabindex="-1"></a>ball_source.play()</span>
+<span id="cb1-77"><a href="#cb1-77" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb1-78"><a href="#cb1-78" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> event <span class="kw">in</span> pygame.event.get():</span>
+<span id="cb1-79"><a href="#cb1-79" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> event.<span class="bu">type</span> <span class="op">==</span> pygame.QUIT:</span>
+<span id="cb1-80"><a href="#cb1-80" aria-hidden="true" tabindex="-1"></a>      pygame.quit()</span>
+<span id="cb1-81"><a href="#cb1-81" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb1-82"><a href="#cb1-82" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> event.<span class="bu">type</span> <span class="op">==</span> pygame.KEYDOWN:</span>
+<span id="cb1-83"><a href="#cb1-83" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> event.key <span class="op">==</span> pygame.K_b:</span>
+<span id="cb1-84"><a href="#cb1-84" aria-hidden="true" tabindex="-1"></a>        o.speak(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(blocks)<span class="sc">}</span><span class="ss"> blocks remaining.&quot;</span>)</span>
+<span id="cb1-85"><a href="#cb1-85" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> event.key <span class="op">==</span> pygame.K_c:</span>
+<span id="cb1-86"><a href="#cb1-86" aria-hidden="true" tabindex="-1"></a>        o.speak(<span class="bu">str</span>(<span class="bu">len</span>(in_front)))</span>
+<span id="cb1-87"><a href="#cb1-87" aria-hidden="true" tabindex="-1"></a>  keys<span class="op">=</span>pygame.key.get_pressed()</span>
+<span id="cb1-88"><a href="#cb1-88" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_SPACE] <span class="kw">and</span> <span class="kw">not</span> started:</span>
+<span id="cb1-89"><a href="#cb1-89" aria-hidden="true" tabindex="-1"></a>    ball_position<span class="op">=</span>[paddle_position[<span class="dv">0</span>]<span class="op">+</span><span class="dv">20</span>, paddle_position[<span class="dv">1</span>]<span class="op">-</span><span class="dv">30</span>]</span>
+<span id="cb1-90"><a href="#cb1-90" aria-hidden="true" tabindex="-1"></a>    ball_velocity<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">150</span>]</span>
+<span id="cb1-91"><a href="#cb1-91" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_LEFT] <span class="kw">and</span> paddle.left <span class="op">&gt;=</span> <span class="dv">5</span>:</span>
+<span id="cb1-92"><a href="#cb1-92" aria-hidden="true" tabindex="-1"></a>    paddle_position[<span class="dv">0</span>]<span class="op">-=</span><span class="dv">5</span></span>
+<span id="cb1-93"><a href="#cb1-93" aria-hidden="true" tabindex="-1"></a>    listener.position<span class="op">=</span>(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">0</span>)</span>
+<span id="cb1-94"><a href="#cb1-94" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_RIGHT] <span class="kw">and</span> paddle.right <span class="op">&lt;=</span> width<span class="op">-</span><span class="dv">5</span>:</span>
+<span id="cb1-95"><a href="#cb1-95" aria-hidden="true" tabindex="-1"></a>    paddle_position[<span class="dv">0</span>]<span class="op">+=</span><span class="dv">5</span></span>
+<span id="cb1-96"><a href="#cb1-96" aria-hidden="true" tabindex="-1"></a>    listener.position<span class="op">=</span>(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">0</span>)</span>
+<span id="cb1-97"><a href="#cb1-97" aria-hidden="true" tabindex="-1"></a>  move_ball()</span>
+<span id="cb1-98"><a href="#cb1-98" aria-hidden="true" tabindex="-1"></a>  paddle.center<span class="op">=</span>paddle_position</span>
+<span id="cb1-99"><a href="#cb1-99" aria-hidden="true" tabindex="-1"></a>  screen.fill((<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb1-100"><a href="#cb1-100" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> block <span class="kw">in</span> blocks:</span>
+<span id="cb1-101"><a href="#cb1-101" aria-hidden="true" tabindex="-1"></a>    pygame.draw.rect(screen, (<span class="dv">255</span>, <span class="dv">255</span>, <span class="dv">255</span>), block, <span class="dv">1</span>)</span>
+<span id="cb1-102"><a href="#cb1-102" aria-hidden="true" tabindex="-1"></a>  pygame.draw.rect(screen, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), paddle)</span>
+<span id="cb1-103"><a href="#cb1-103" aria-hidden="true" tabindex="-1"></a>  pygame.draw.rect(screen, (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">255</span>), ball)</span>
+<span id="cb1-104"><a href="#cb1-104" aria-hidden="true" tabindex="-1"></a>  pygame.display.update()</span>
+<span id="cb1-105"><a href="#cb1-105" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> pygame.Rect.colliderect(ball, paddle) <span class="kw">and</span> ball_position[<span class="dv">0</span>] <span class="op">&lt;=</span> paddle_position[<span class="dv">0</span>]:</span>
+<span id="cb1-106"><a href="#cb1-106" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb1-107"><a href="#cb1-107" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">=</span>randint(<span class="op">-</span><span class="dv">75</span>, <span class="dv">0</span>)</span>
+<span id="cb1-108"><a href="#cb1-108" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/deflect.wav&#39;</span>).play()</span>
+<span id="cb1-109"><a href="#cb1-109" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elif</span> pygame.Rect.colliderect(ball, paddle) <span class="kw">and</span> ball_position[<span class="dv">0</span>] <span class="op">&gt;</span> paddle_position[<span class="dv">0</span>]:</span>
+<span id="cb1-110"><a href="#cb1-110" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb1-111"><a href="#cb1-111" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">=</span>randint(<span class="dv">0</span>, <span class="dv">75</span>)</span>
+<span id="cb1-112"><a href="#cb1-112" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/deflect.wav&#39;</span>).play()</span>
+<span id="cb1-113"><a href="#cb1-113" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> block <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(blocks)):</span>
+<span id="cb1-114"><a href="#cb1-114" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pygame.Rect.colliderect(ball, blocks[block]):</span>
+<span id="cb1-115"><a href="#cb1-115" aria-hidden="true" tabindex="-1"></a>      <span class="kw">del</span> blocks[block]</span>
+<span id="cb1-116"><a href="#cb1-116" aria-hidden="true" tabindex="-1"></a>      pygame.mixer.Sound(<span class="st">&#39;sounds/collide.wav&#39;</span>).play()</span>
+<span id="cb1-117"><a href="#cb1-117" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb1-118"><a href="#cb1-118" aria-hidden="true" tabindex="-1"></a>  in_front<span class="op">=</span>[block <span class="cf">for</span> block <span class="kw">in</span> blocks <span class="cf">if</span> block.left <span class="op">&gt;=</span> paddle.left <span class="kw">and</span> block.right <span class="op">&lt;=</span> paddle.right]</span>
+<span id="cb1-119"><a href="#cb1-119" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> in_front:</span>
+<span id="cb1-120"><a href="#cb1-120" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> front_sound.get_num_channels():</span>
+<span id="cb1-121"><a href="#cb1-121" aria-hidden="true" tabindex="-1"></a>      front_sound.play(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb1-122"><a href="#cb1-122" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span>:</span>
+<span id="cb1-123"><a href="#cb1-123" aria-hidden="true" tabindex="-1"></a>    front_sound.stop()</span>
+<span id="cb1-124"><a href="#cb1-124" aria-hidden="true" tabindex="-1"></a>  delta_time<span class="op">=</span>clock.tick(<span class="dv">60</span>)<span class="op">/</span><span class="dv">1000</span></span>
+<span id="cb1-125"><a href="#cb1-125" aria-hidden="true" tabindex="-1"></a>ball_source.delete()</span>
+<span id="cb1-126"><a href="#cb1-126" aria-hidden="true" tabindex="-1"></a>ball_sound.delete()</span>
+<span id="cb1-127"><a href="#cb1-127" aria-hidden="true" tabindex="-1"></a>listener.delete()</span></code></pre></div>
+<h2 id="how-the-program-is-organized">How the Program Is Organized</h2>
+<p>The program is written from top to bottom with only two functions of
+its own:</p>
+<ol type="1">
+<li>Import the modules and set up speech, pygame, and the screen
+size.</li>
+<li>Set up the paddle, the ball, the OpenAL listener, and the ball’s
+sound.</li>
+<li>Build the wall of blocks.</li>
+<li>Define <code>get_pitch()</code> and <code>move_ball()</code>.</li>
+<li>Open the window and run the game loop forever.</li>
+</ol>
+<h2 id="importing-and-setting-up">Importing and Setting Up</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> openal</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> accessible_output2.outputs.auto</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> random <span class="im">import</span> randint</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>os.environ[<span class="st">&#39;PYGAME_HIDE_SUPPORT_PROMPT&#39;</span>] <span class="op">=</span> <span class="st">&quot;hide&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> pygame</span></code></pre></div>
+<p><code>import accessible_output2.outputs.auto</code> imports a module
+that is three levels deep inside a package. The periods separate the
+levels, like folders.</p>
+<p><code>from random import randint</code> brings in just the
+<code>randint</code> function, so the program can write
+<code>randint()</code> instead of <code>random.randint()</code>.</p>
+<h3 id="environment-variables">Environment Variables</h3>
+<p><code>os.environ</code> is a dictionary of <em>environment
+variables</em>, settings that the operating system gives to every
+program. pygame normally prints a hello message when it is imported.
+Setting <code>PYGAME_HIDE_SUPPORT_PROMPT</code> before the import turns
+that off. That matters for screen reader users, who would otherwise hear
+it every time the game starts. This is why <code>import pygame</code>
+comes after this line, instead of at the top with the others.</p>
+<h3 id="speech-and-sound">Speech and Sound</h3>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>o<span class="op">=</span>accessible_output2.outputs.auto.Auto()</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>pygame.init()</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>pygame.mixer.init()</span></code></pre></div>
+<p><code>Auto()</code> makes an object that finds whatever screen reader
+is running, such as NVDA or JAWS, and speaks through it. If none is
+running, it uses the computer’s built-in speech. Later,
+<code>o.speak("text")</code> says the text. This is better than
+<code>print()</code> for a game, because a game window is not a text
+console, and the screen reader would not read printed text there.</p>
+<p>The name <code>o</code> is very short. A name like
+<code>speech</code> would be easier to understand when you hear it.</p>
+<p><code>pygame.init()</code> starts all of pygame’s parts.
+<code>pygame.mixer.init()</code> starts its sound system.</p>
+<h2 id="coordinates">Coordinates</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>width<span class="op">=</span><span class="dv">800</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>height<span class="op">=</span><span class="dv">600</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>paddle_position<span class="op">=</span>[width<span class="op">/</span><span class="dv">2</span><span class="op">-</span><span class="dv">20</span>, height<span class="op">-</span><span class="dv">40</span>]</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>ball_position<span class="op">=</span>[width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">70</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>ball_velocity<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">0</span>]</span></code></pre></div>
+<p>The game takes place on a screen 800 pixels wide and 600 tall. A
+position is written as two numbers, x and y. x is how far from the left
+edge. y is how far from the <em>top</em> edge. In screen coordinates, y
+gets bigger as you go <em>down</em>, which is the opposite of what you
+may know from math class.</p>
+<p>So the paddle starts near the middle, at x of 380, and near the
+bottom, at y of 560. The ball starts just above it.</p>
+<p>Positions are stored as lists of two numbers, so they can be changed:
+<code>ball_position[0]</code> is x and <code>ball_position[1]</code> is
+y.</p>
+<h3 id="velocity">Velocity</h3>
+<p><code>ball_velocity</code> is how fast the ball moves, and in which
+direction, in pixels per second. The first number is the speed left or
+right, and the second is the speed up or down. It starts at zero,
+because the ball does not move until the player presses Space.</p>
+<h2 id="the-listener-and-the-balls-sound">The Listener and the Ball’s
+Sound</h2>
+<p>This is the part that makes Rebound playable by ear. OpenAL places
+sounds in a 3D space and figures out how they would sound to a
+<em>listener</em> standing somewhere in that space. A sound to the
+listener’s left plays more in the left ear. A sound far away is
+quieter.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>listener<span class="op">=</span>openal.Listener()</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>listener.distance_model<span class="op">=</span><span class="dv">5</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>listener.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">40</span>, <span class="dv">0</span>)</span></code></pre></div>
+<p>The listener is your ears. It is placed at the paddle. A position in
+OpenAL has three numbers, x, y, and z. This game is flat, so z is always
+0. The <code>distance_model</code> setting tells OpenAL how sounds get
+quieter with distance. Model 5 is the <em>exponential</em> model, which
+you can learn about in the <code>openal.py</code> lesson.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>front_sound<span class="op">=</span>pygame.mixer.Sound(<span class="st">&#39;sounds/beep.wav&#39;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>ball_sound<span class="op">=</span>openal.LoadSound(<span class="st">&#39;sounds/ball.wav&#39;</span>)</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>ball_source<span class="op">=</span>openal.Player()</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>ball_source.add(ball_sound)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>ball_source.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">50</span>, <span class="dv">0</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>ball_source.loop<span class="op">=</span><span class="va">True</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>ball_source.rolloff<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>ball_source.reference_distance<span class="op">=</span><span class="fl">0.1</span></span></code></pre></div>
+<p>The beep that plays when blocks are above the paddle is an ordinary
+pygame sound. The ball’s sound uses OpenAL:</p>
+<ul>
+<li><code>LoadSound()</code> loads the sound file into memory.</li>
+<li><code>Player()</code> makes a <em>source</em>, a point in space that
+makes sound. The sound is added to it.</li>
+<li>The source is placed where the ball is.</li>
+<li><code>loop=True</code> makes the sound repeat forever, so the ball
+always makes a sound you can follow.</li>
+<li><code>rolloff</code> and <code>reference_distance</code> control how
+fast the sound gets quieter as it moves away.</li>
+</ul>
+<p>Notice that lines like <code>ball_source.loop=True</code> look like
+they just set an attribute, but they actually change how OpenAL plays
+the sound. That is done with <em>properties</em>, which are explained in
+the <code>openal.py</code> lesson.</p>
+<h2 id="rectangles">Rectangles</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>paddle<span class="op">=</span>pygame.rect.Rect(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">40</span>, <span class="dv">40</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ball<span class="op">=</span>pygame.rect.Rect(<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">10</span>, <span class="dv">10</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>ball.center<span class="op">=</span>ball_position</span></code></pre></div>
+<p>pygame uses <code>Rect</code> objects, short for rectangles, for
+things on the screen. A <code>Rect</code> knows its position and size,
+and has handy attributes like <code>left</code>, <code>right</code>,
+<code>top</code>, <code>bottom</code>, and <code>center</code>. The
+paddle is a 40 by 40 square, and the ball is a 10 by 10 square. Setting
+<code>ball.center</code> moves the ball so its center is at that
+position.</p>
+<p>Rectangles make it easy to check whether two things are touching,
+which you will see below.</p>
+<h2 id="building-the-wall">Building the Wall</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>blocks<span class="op">=</span>[]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(width<span class="op">//</span><span class="dv">40</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> j <span class="kw">in</span> <span class="bu">range</span>((height<span class="op">-</span><span class="dv">200</span>)<span class="op">//</span><span class="dv">40</span>):</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>    blocks.append(pygame.rect.Rect(i<span class="op">*</span><span class="dv">40</span>, j<span class="op">*</span><span class="dv">40</span>, <span class="dv">40</span>, <span class="dv">40</span>))</span></code></pre></div>
+<p><code>//</code> is <em>floor division</em>. It divides and throws
+away any remainder, giving a whole number. <code>800 // 40</code> is 20,
+and <code>(600 - 200) // 40</code> is 10.</p>
+<p>So the nested loops make 20 columns and 10 rows of 40 by 40 blocks,
+which is 200 blocks, filling the top 400 pixels of the screen. Each
+block’s position is its column times 40 and its row times 40.</p>
+<h2 id="hearing-height-with-pitch">Hearing Height with Pitch</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_pitch(y):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">return</span> <span class="fl">1.0</span><span class="op">+</span>((height<span class="op">-</span>y)<span class="op">/</span>height)<span class="op">*</span>(<span class="fl">2.0</span>)</span></code></pre></div>
+<p>Left and right are easy to hear with stereo sound. Up and down are
+much harder. So Rebound uses <em>pitch</em> to tell you how high the
+ball is.</p>
+<p>When the ball is at the bottom, y is 600, so <code>height - y</code>
+is 0, and the pitch is 1.0, which is normal. When the ball is at the
+top, y is 0, so <code>(height - y) / height</code> is 1, and the pitch
+is 3.0, much higher. In between, the pitch slides smoothly. A high,
+squeaky ball is far away at the top. A low ball is coming down toward
+you.</p>
+<p>Turning a number you cannot hear, like height, into one you can, like
+pitch, is called <em>sonification</em>. It is one of the most useful
+tools for making games and data accessible.</p>
+<h2 id="moving-the-ball">Moving the Ball</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> move_ball():</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>  ball_position[<span class="dv">0</span>]<span class="op">+=</span>ball_velocity[<span class="dv">0</span>]<span class="op">*</span>delta_time</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>  ball_position[<span class="dv">1</span>]<span class="op">-=</span>ball_velocity[<span class="dv">1</span>]<span class="op">*</span>delta_time</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>  ball.center<span class="op">=</span>ball_position</span></code></pre></div>
+<h3 id="delta-time">Delta Time</h3>
+<p>Each time through the game loop is called a <em>frame</em>.
+<code>delta_time</code> is how many seconds passed since the last frame,
+usually about one sixtieth of a second.</p>
+<p>Velocity is in pixels per second. Multiplying by the seconds that
+passed gives how many pixels to move this frame. This keeps the ball
+moving at the same speed on a fast computer and a slow one. If the game
+just moved the ball 3 pixels every frame, it would move twice as fast on
+a computer that runs twice as many frames.</p>
+<p>Notice the minus sign for y. Since y gets bigger going down, the
+program subtracts so that a positive y velocity moves the ball
+<em>up</em>.</p>
+<h3 id="bouncing-off-the-side-walls">Bouncing off the Side Walls</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ball.left <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> ball.right <span class="op">&gt;</span> width:</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    bounce<span class="op">=</span>pygame.mixer.Sound(<span class="st">&#39;sounds/bounce.wav&#39;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>    channel<span class="op">=</span>pygame.mixer.find_channel()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> ball.left <span class="op">&lt;</span> <span class="dv">0</span>:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>      channel.set_volume(<span class="fl">1.0</span>, <span class="fl">0.0</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>      channel.set_volume(<span class="fl">0.0</span>, <span class="fl">1.0</span>)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>    channel.play(bounce)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>    ball_position[<span class="dv">0</span>]<span class="op">+=</span>ball_velocity[<span class="dv">0</span>]<span class="op">*</span>delta_time</span></code></pre></div>
+<p>If the ball has gone past the left or right edge, it bounces.
+Multiplying the x velocity by -1 flips its direction. Then the ball is
+moved one step in the new direction so it is back inside the screen.</p>
+<p>The bounce sound is <em>panned</em>. pygame plays sounds on
+<em>channels</em>, and a channel’s <code>set_volume()</code> can take
+two numbers: the left volume and the right volume. A bounce off the left
+wall plays only in the left ear, and a bounce off the right wall plays
+only in the right ear. That tells the player exactly where the ball is
+at that moment.</p>
+<h3 id="bouncing-off-the-top-and-bottom">Bouncing off the Top and
+Bottom</h3>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> ball.top <span class="op">&lt;</span> <span class="dv">0</span> <span class="kw">or</span> ball.bottom <span class="op">&gt;</span> height:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    ball_position[<span class="dv">1</span>]<span class="op">-=</span>ball_velocity[<span class="dv">1</span>]<span class="op">*</span>delta_time</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/bounce.wav&#39;</span>).play()</span></code></pre></div>
+<p>The same idea, for up and down. This bounce sound plays in both
+ears.</p>
+<h3 id="moving-the-sound-with-the-ball">Moving the Sound with the
+Ball</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>  ball_source.position<span class="op">=</span>(ball_position[<span class="dv">0</span>], ball_position[<span class="dv">1</span>], <span class="dv">0</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>  ball_source.pitch<span class="op">=</span>get_pitch(ball_position[<span class="dv">1</span>])</span></code></pre></div>
+<p>Every frame, the ball’s OpenAL source moves to the ball’s new
+position, and its pitch is set from its height. This is what makes the
+ball’s sound travel around your head.</p>
+<h2 id="the-game-loop">The Game Loop</h2>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>screen<span class="op">=</span>pygame.display.set_mode((width, height))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>pygame.display.set_caption(<span class="st">&#39;Rebound&#39;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>started<span class="op">=</span><span class="va">False</span></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>clock<span class="op">=</span>pygame.time.Clock()</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>delta_time<span class="op">=</span><span class="dv">0</span></span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ball_source.play()</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span></code></pre></div>
+<p><code>set_mode()</code> opens the game window, and
+<code>set_caption()</code> sets its title, which your screen reader
+reads when the window gets focus. The <code>Clock</code> measures time
+between frames. Then the ball’s looping sound starts, and the game loop
+begins.</p>
+<p>The loop does the same things every frame, in this order:</p>
+<ol type="1">
+<li>Handle events, like key presses.</li>
+<li>Move the paddle if an arrow key is held.</li>
+<li>Move the ball.</li>
+<li>Draw everything.</li>
+<li>Check for collisions with the paddle and the blocks.</li>
+<li>Update the beep for blocks above the paddle.</li>
+<li>Wait until it is time for the next frame.</li>
+</ol>
+<h3 id="events">Events</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> event <span class="kw">in</span> pygame.event.get():</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> event.<span class="bu">type</span> <span class="op">==</span> pygame.QUIT:</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>      pygame.quit()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">elif</span> event.<span class="bu">type</span> <span class="op">==</span> pygame.KEYDOWN:</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>      <span class="cf">if</span> event.key <span class="op">==</span> pygame.K_b:</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>        o.speak(<span class="ss">f&quot;</span><span class="sc">{</span><span class="bu">len</span>(blocks)<span class="sc">}</span><span class="ss"> blocks remaining.&quot;</span>)</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>      <span class="cf">elif</span> event.key <span class="op">==</span> pygame.K_c:</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        o.speak(<span class="bu">str</span>(<span class="bu">len</span>(in_front)))</span></code></pre></div>
+<p><code>pygame.event.get()</code> returns a list of everything that has
+happened since the last frame. A <code>KEYDOWN</code> event happens once
+when a key is first pressed. The B and C keys speak information through
+the screen reader. Commands that tell the player about the game, on
+demand, are very important in an audio game. The player cannot glance at
+a score display.</p>
+<h3 id="held-keys">Held Keys</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>  keys<span class="op">=</span>pygame.key.get_pressed()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_SPACE] <span class="kw">and</span> <span class="kw">not</span> started:</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    ball_position<span class="op">=</span>[paddle_position[<span class="dv">0</span>]<span class="op">+</span><span class="dv">20</span>, paddle_position[<span class="dv">1</span>]<span class="op">-</span><span class="dv">30</span>]</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    ball_velocity<span class="op">=</span>[<span class="dv">0</span>, <span class="dv">150</span>]</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_LEFT] <span class="kw">and</span> paddle.left <span class="op">&gt;=</span> <span class="dv">5</span>:</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>    paddle_position[<span class="dv">0</span>]<span class="op">-=</span><span class="dv">5</span></span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>    listener.position<span class="op">=</span>(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">0</span>)</span>
+<span id="cb16-8"><a href="#cb16-8" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> keys[pygame.K_RIGHT] <span class="kw">and</span> paddle.right <span class="op">&lt;=</span> width<span class="op">-</span><span class="dv">5</span>:</span>
+<span id="cb16-9"><a href="#cb16-9" aria-hidden="true" tabindex="-1"></a>    paddle_position[<span class="dv">0</span>]<span class="op">+=</span><span class="dv">5</span></span>
+<span id="cb16-10"><a href="#cb16-10" aria-hidden="true" tabindex="-1"></a>    listener.position<span class="op">=</span>(paddle_position[<span class="dv">0</span>], paddle_position[<span class="dv">1</span>], <span class="dv">0</span>)</span></code></pre></div>
+<p>Events are good for things that happen once. For movement, the game
+needs to know which keys are being <em>held down</em> right now.
+<code>get_pressed()</code> returns that, one entry per key.</p>
+<p>Space puts the ball just above the paddle and sends it straight up at
+150 pixels per second.</p>
+<p>The arrow keys move the paddle 5 pixels per frame, as long as it is
+not at the edge. Each time the paddle moves, the <em>listener</em> moves
+with it. Your ears are always at the paddle, so the ball’s sound is
+always heard from where you are. That is the key to the whole
+design.</p>
+<p>The paddle moves a fixed 5 pixels per frame, not using
+<code>delta_time</code>, so the paddle would move at different speeds on
+computers with different frame rates. The clock keeps the game near 60
+frames per second, so this is usually fine.</p>
+<h3 id="drawing">Drawing</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>  move_ball()</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>  paddle.center<span class="op">=</span>paddle_position</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>  screen.fill((<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>))</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> block <span class="kw">in</span> blocks:</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>    pygame.draw.rect(screen, (<span class="dv">255</span>, <span class="dv">255</span>, <span class="dv">255</span>), block, <span class="dv">1</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>  pygame.draw.rect(screen, (<span class="dv">0</span>, <span class="dv">255</span>, <span class="dv">0</span>), paddle)</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>  pygame.draw.rect(screen, (<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">255</span>), ball)</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>  pygame.display.update()</span></code></pre></div>
+<p>The game also draws itself, for sighted players and players with some
+vision. Colors are tuples of red, green, and blue, each from 0 to 255.
+The screen is filled with black, the blocks are drawn as white outlines,
+the paddle is green, and the ball is blue. <code>display.update()</code>
+shows the finished frame.</p>
+<p>A dark blue ball on a black background is hard to see for many people
+with low vision. A bright color like yellow or white would stand out
+much more.</p>
+<h3 id="hitting-the-paddle">Hitting the Paddle</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> pygame.Rect.colliderect(ball, paddle) <span class="kw">and</span> ball_position[<span class="dv">0</span>] <span class="op">&lt;=</span> paddle_position[<span class="dv">0</span>]:</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">=</span>randint(<span class="op">-</span><span class="dv">75</span>, <span class="dv">0</span>)</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/deflect.wav&#39;</span>).play()</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">elif</span> pygame.Rect.colliderect(ball, paddle) <span class="kw">and</span> ball_position[<span class="dv">0</span>] <span class="op">&gt;</span> paddle_position[<span class="dv">0</span>]:</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">1</span>]<span class="op">*=-</span><span class="dv">1</span></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    ball_velocity[<span class="dv">0</span>]<span class="op">=</span>randint(<span class="dv">0</span>, <span class="dv">75</span>)</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>    pygame.mixer.Sound(<span class="st">&#39;sounds/deflect.wav&#39;</span>).play()</span></code></pre></div>
+<p><code>colliderect()</code> returns <code>True</code> if two
+rectangles overlap. This is <em>collision detection</em>, and it is how
+almost every 2D game knows when things touch.</p>
+<p>If the ball hits the left half of the paddle, it bounces back up and
+to the left, at a random angle. If it hits the right half, it goes up
+and to the right. This gives the player some control over where the ball
+goes, which they can use to aim at the beeping blocks.</p>
+<h3 id="breaking-blocks">Breaking Blocks</h3>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>  <span class="cf">for</span> block <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(blocks)):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> pygame.Rect.colliderect(ball, blocks[block]):</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>      <span class="kw">del</span> blocks[block]</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>      pygame.mixer.Sound(<span class="st">&#39;sounds/collide.wav&#39;</span>).play()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>      <span class="cf">break</span></span></code></pre></div>
+<p>The loop checks each block. When the ball touches one, the block is
+deleted from the list, a crash plays, and <code>break</code> stops the
+loop. The <code>break</code> is important. Deleting from a list while
+looping over its indexes would skip items or go past the end, as you saw
+in the <code>Room</code> lesson.</p>
+<p>The ball does not bounce off blocks. It plows through, breaking one
+block per frame, until it reaches the top wall.</p>
+<h3 id="blocks-above-the-paddle">Blocks Above the Paddle</h3>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a>  in_front<span class="op">=</span>[block <span class="cf">for</span> block <span class="kw">in</span> blocks <span class="cf">if</span> block.left <span class="op">&gt;=</span> paddle.left <span class="kw">and</span> block.right <span class="op">&lt;=</span> paddle.right]</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>  <span class="cf">if</span> in_front:</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> front_sound.get_num_channels():</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>      front_sound.play(<span class="op">-</span><span class="dv">1</span>)</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a>  <span class="cf">else</span>:</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    front_sound.stop()</span></code></pre></div>
+<p>The list comprehension finds every block that is directly above the
+paddle. If there are any, the beep plays. <code>play(-1)</code> loops it
+forever, and <code>get_num_channels()</code> checks whether it is
+already playing, so it is not started again every frame. If there are no
+blocks above, the beep stops.</p>
+<p>This is a clever <em>audio cue</em>. A sighted player can see where
+the blocks are. A blind player hears the beep and knows that a ball sent
+straight up from here will hit something.</p>
+<h3 id="waiting-for-the-next-frame">Waiting for the Next Frame</h3>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a>  delta_time<span class="op">=</span>clock.tick(<span class="dv">60</span>)<span class="op">/</span><span class="dv">1000</span></span></code></pre></div>
+<p><code>clock.tick(60)</code> waits just long enough to keep the game
+at 60 frames per second. It returns how many milliseconds passed since
+the last call. Dividing by 1000 turns that into seconds, which is what
+<code>delta_time</code> needs.</p>
+<h2 id="finding-the-bugs">Finding the Bugs</h2>
+<p>Rebound is fun to play, but like all games in progress, it has some
+bugs.</p>
+<h3 id="closing-the-window-causes-an-error">Closing the Window Causes an
+Error</h3>
+<p>When you close the window, pygame sends a <code>QUIT</code> event.
+The program calls <code>pygame.quit()</code> and then
+<code>break</code>. But <code>break</code> only leaves the
+<code>for event</code> loop, not the <code>while True</code> loop. The
+game loop keeps going and calls <code>pygame.key.get_pressed()</code>,
+but pygame has been shut down, so the program stops with an error.</p>
+<p>Because the <code>while True</code> loop never ends normally, the
+last three lines, which free the OpenAL sounds, never run either.</p>
+<p>One fix is a flag variable. Set <code>running = True</code> before
+the loop, change the loop to <code>while running:</code>, and set
+<code>running = False</code> when the <code>QUIT</code> event arrives.
+Then call <code>pygame.quit()</code> after the loop, along with the
+OpenAL cleanup.</p>
+<h3 id="space-works-at-any-time">Space Works at Any Time</h3>
+<p>The variable <code>started</code> is set to <code>False</code> and
+checked when Space is pressed, but it is never set to <code>True</code>.
+So pressing Space at any time puts the ball back on the paddle. That is
+a handy cheat, but probably not intended.</p>
+<h3 id="you-cannot-lose">You Cannot Lose</h3>
+<p>When the ball reaches the bottom of the screen, it just bounces, as
+if there were a wall there. There is no way to miss. Adding lives, and a
+sound and a spoken message when the ball is missed, would make it a real
+challenge.</p>
+<h3 id="you-cannot-win">You Cannot Win</h3>
+<p>When the last block breaks, nothing happens. The game should say that
+you won.</p>
+<h3 id="loading-sounds-over-and-over">Loading Sounds Over and Over</h3>
+<p>Every bounce, deflect, and collide loads its <code>.wav</code> file
+from the disk again, with <code>pygame.mixer.Sound(...)</code>. That
+works, but it is slow. It is better to load each sound once, before the
+game loop, and store it in a variable, the way <code>front_sound</code>
+is.</p>
+<h2 id="summary">Summary</h2>
+<p>You studied a real-time audio game. You learned that:</p>
+<ul>
+<li>A game loop runs many times a second, whether or not the player does
+anything. Each time through is a frame.</li>
+<li>Multiplying velocity by delta time keeps speed the same on any
+computer.</li>
+<li>In screen coordinates, y gets bigger going down.</li>
+<li>Flipping the sign of a velocity makes something bounce.</li>
+<li>pygame rectangles make collision detection easy with
+<code>colliderect()</code>.</li>
+<li>Events are for things that happen once. <code>get_pressed()</code>
+is for held keys.</li>
+<li>Stereo panning tells the player left and right. 3D audio with OpenAL
+can move a sound smoothly around the listener.</li>
+<li>Pitch can stand for height, so the player can hear where the ball
+is.</li>
+<li>An audio cue, like the beep, can replace something a sighted player
+would see.</li>
+<li><code>accessible_output2</code> speaks through the player’s screen
+reader.</li>
+<li><code>break</code> only leaves the innermost loop.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Fix the window-closing bug with a <code>running</code> flag.</li>
+<li>Load the bounce, deflect, and collide sounds once, before the game
+loop.</li>
+<li>Make the ball brighter, such as yellow,
+<code>(255, 255, 0)</code>.</li>
+<li>Make the game end when the last block breaks, and say
+<code>You win!</code> with <code>o.speak()</code>.</li>
+<li>Add three lives. When the ball reaches the bottom, play a sound, say
+how many lives are left, and put the ball back on the paddle. When there
+are no lives left, say <code>Game over</code>.</li>
+<li>Add a score that goes up with each block, and a key that speaks
+it.</li>
+<li>Change the C key so it says a full sentence, such as
+<code>5 blocks above you.</code></li>
+<li>Set <code>started</code> to <code>True</code> when the ball is
+launched, and back to <code>False</code> when it is lost, so Space only
+works between turns.</li>
+</ol>

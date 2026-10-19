@@ -1,0 +1,384 @@
+<h1 id="a-whole-game-of-tic-tac-toe-without-functions">A Whole Game of
+Tic Tac Toe Without Functions</h1>
+<p>This program is a complete two-player game of Tic Tac Toe. Players
+take turns, the board is read after every move, and the game knows when
+someone has won or when the board is full. It is written all in one
+piece, from top to bottom, with no functions of its own.</p>
+<p>Writing it this way is a good way to see the whole game at once. It
+also shows why functions are so helpful, because by the end you will
+hear the same lines repeated, and you will notice a tricky bug that
+comes from using <code>continue</code> inside a loop inside another
+loop.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>A game loop with <code>while True:</code></li>
+<li>Switching between two players</li>
+<li>Checking rows, columns, and diagonals with slices</li>
+<li>Slices with a step</li>
+<li>Comparing a slice with a repeated list</li>
+<li><code>continue</code> in nested loops</li>
+<li>Ending the game with a flag and <code>quit()</code></li>
+<li>Checking for a full board</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play-tic-tac-toe">How to Play Tic Tac Toe</h2>
+<p>Two players take turns. X goes first. On your turn, you type the
+number of an empty square, from 1 to 9, to put your mark there. The
+squares are numbered from the top left, like a phone keypad:</p>
+<ul>
+<li>Top row: 1, 2, 3</li>
+<li>Middle row: 4, 5, 6</li>
+<li>Bottom row: 7, 8, 9</li>
+</ul>
+<p>The first player to get three marks in a row, across, down, or corner
+to corner, wins. If all nine squares are full and no one has won, it is
+a tie, sometimes called a “cat’s game.”</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>X takes the top row and wins:</p>
+<pre><code> 1 | 2 | 3
+---|---|---
+ 4 | 5 | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;X&#39;: 1
+You placed an &#39;X&#39;  in square 1
+ X | 2 | 3
+---|---|---
+ 4 | 5 | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;O&#39;: 4
+You placed an &#39;O&#39;  in square 4
+ X | 2 | 3
+---|---|---
+ O | 5 | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;X&#39;: 2
+You placed an &#39;X&#39;  in square 2
+ X | X | 3
+---|---|---
+ O | 5 | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;O&#39;: 5
+You placed an &#39;O&#39;  in square 5
+ X | X | 3
+---|---|---
+ O | O | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;X&#39;: 3
+You placed an &#39;X&#39;  in square 3
+ X | X | X
+---|---|---
+ O | O | 6
+---|---|---
+ 7 | 8 | 9
+&#39;X&#39; wins</code></pre>
+<h2 id="the-source-code-for-no-functions">The Source Code for No
+Functions</h2>
+<p>Type this program and save it as <code>no_functions.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co"># display</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>player <span class="op">=</span> <span class="st">&quot;O&quot;</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="co"># check to see if the game is over</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">0</span>] <span class="op">==</span> <span class="st">&quot;R&quot;</span>:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        quit()</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player <span class="op">==</span> <span class="st">&quot;X&quot;</span>:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        player <span class="op">=</span> <span class="st">&quot;O&quot;</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="co"># get input</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> choice <span class="kw">not</span> <span class="kw">in</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;incorrect position&quot;</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    game_state[<span class="bu">int</span>(choice)] <span class="op">=</span> player</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;You placed an &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;  in square </span><span class="sc">{</span><span class="bu">int</span>(choice)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="co"># display</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Check for winnner</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="co"># first row check</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">7</span>]:</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        <span class="co"># row check</span></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>] <span class="kw">and</span> game_state[i : i <span class="op">+</span> <span class="dv">3</span>] <span class="op">==</span> [game_state[i]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[i]<span class="sc">}</span><span class="ss">&#39; wins&quot;</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>            game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Column check</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">4</span> <span class="kw">and</span> game_state[i:<span class="dv">10</span>:<span class="dv">3</span>] <span class="op">==</span> [game_state[i]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[i]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>            game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>    <span class="co"># now test         down slope</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>:<span class="dv">4</span>] <span class="op">==</span> [game_state[<span class="dv">1</span>]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    <span class="co"># now test up slope</span></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">3</span>:<span class="dv">8</span>:<span class="dv">2</span>] <span class="op">==</span> [game_state[<span class="dv">3</span>]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If more moves continue</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> [x <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Cats game!&quot;</span>)</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>    <span class="cf">continue</span></span></code></pre></div>
+<h2 id="the-plan">The Plan</h2>
+<p>The program follows this plan:</p>
+<ol type="1">
+<li>Read the empty board.</li>
+<li>Repeat forever:
+<ol type="1">
+<li>If the game is over, quit.</li>
+<li>Switch to the other player.</li>
+<li>Ask the player for a free square and mark it.</li>
+<li>Read the board.</li>
+<li>Check for a win. If someone won, say so and mark the game as
+over.</li>
+<li>If the board is full, say it is a cat’s game and mark the game as
+over.</li>
+</ol></li>
+</ol>
+<h2 id="starting-the-game">Starting the Game</h2>
+<p>The program first prints the empty board with the same five lines you
+know from <code>simple_display.py</code>. Then:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>player <span class="op">=</span> <span class="st">&quot;O&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="va">True</span>:</span></code></pre></div>
+<p><code>player</code> holds whose turn it is. It starts as
+<code>"O"</code>, which seems odd, since X goes first. You will see why
+in a moment.</p>
+<p><code>while True:</code> starts a loop that runs forever. The program
+will stop it from inside.</p>
+<h2 id="is-the-game-over">Is the Game Over?</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># check to see if the game is over</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">0</span>] <span class="op">==</span> <span class="st">&quot;R&quot;</span>:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        quit()</span></code></pre></div>
+<p>Index 0 of <code>game_state</code> is used as a <em>flag</em>. When
+the game ends, the program puts <code>"R"</code> there. At the top of
+each turn, it checks the flag. If it is <code>"R"</code>,
+<code>quit()</code> ends the program.</p>
+<p><code>quit()</code> is built into Python and works like
+<code>sys.exit()</code>, which you saw in Rock, Paper, Scissors.
+<code>sys.exit()</code> is the better choice in real programs, because
+<code>quit()</code> is meant for the interactive shell, but both work
+here.</p>
+<h2 id="switching-players">Switching Players</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player <span class="op">==</span> <span class="st">&quot;X&quot;</span>:</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        player <span class="op">=</span> <span class="st">&quot;O&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<p>At the start of every turn, the player switches. If it was X, it
+becomes O, and if it was O, it becomes X. Because <code>player</code>
+started as <code>"O"</code>, the very first switch makes it
+<code>"X"</code>, so X goes first. That is why it started as O.</p>
+<h2 id="getting-the-move">Getting the Move</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> choice <span class="kw">not</span> <span class="kw">in</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;incorrect position&quot;</span>)</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    game_state[<span class="bu">int</span>(choice)] <span class="op">=</span> player</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;You placed an &#39;</span><span class="sc">{</span>player<span class="sc">}</span><span class="ss">&#39;  in square </span><span class="sc">{</span><span class="bu">int</span>(choice)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This is the same code as <code>player_input()</code> from
+<code>mark_square.py</code>, but written right here instead of in a
+function. It keeps asking until the player types a free square, marks
+it, and says what happened. If the list comprehension is new to you, go
+back to the <code>mark_square.py</code> lesson.</p>
+<p>Then the five board lines are printed again.</p>
+<h2 id="checking-for-a-winner">Checking for a Winner</h2>
+<p>There are eight ways to win: three rows, three columns, and two
+diagonals. The program checks them with slices.</p>
+<h3 id="slices-with-a-step">Slices with a Step</h3>
+<p>You know that <code>game_state[1:4]</code> gives the items at indexes
+1, 2, and 3. A slice can also have a third number, called the
+<em>step</em>. It says how far to jump each time.
+<code>game_state[1:10:3]</code> starts at 1, jumps by 3, and stops
+before 10, giving indexes 1, 4, and 7. That is the left column.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> board <span class="op">=</span> [<span class="st">&quot;-&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> board[<span class="dv">1</span>:<span class="dv">4</span>]</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> board[<span class="dv">1</span>:<span class="dv">10</span>:<span class="dv">3</span>]</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>]</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> board[<span class="dv">1</span>:<span class="dv">10</span>:<span class="dv">4</span>]</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">9</span>]</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> board[<span class="dv">3</span>:<span class="dv">8</span>:<span class="dv">2</span>]</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>]</span></code></pre></div>
+<p>With slices you can grab any line on the board:</p>
+<ul>
+<li>Rows start at 1, 4, or 7 and take three in a row:
+<code>[i : i + 3]</code>.</li>
+<li>Columns start at 1, 2, or 3 and jump by 3:
+<code>[i:10:3]</code>.</li>
+<li>The diagonal from top left to bottom right is 1, 5, 9:
+<code>[1:10:4]</code>.</li>
+<li>The diagonal from top right to bottom left is 3, 5, 7:
+<code>[3:8:2]</code>.</li>
+</ul>
+<h3 id="is-the-line-all-the-same">Is the Line All the Same?</h3>
+<p>To check whether a line is a win, the program compares the slice with
+a list of three copies of its first square:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>game_state[i : i <span class="op">+</span> <span class="dv">3</span>] <span class="op">==</span> [game_state[i]] <span class="op">*</span> <span class="dv">3</span></span></code></pre></div>
+<p>If square 1 holds <code>"X"</code>, then
+<code>[game_state[1]] * 3</code> is <code>["X", "X", "X"]</code>. If the
+slice is also <code>["X", "X", "X"]</code>, the row is a win.</p>
+<p>What about an empty row? Its slice might be <code>[1, 2, 3]</code>,
+and the list of copies would be <code>[1, 1, 1]</code>. Those are not
+equal, so an empty row is never a win. That is why the empty squares
+hold their own numbers instead of a blank. No two empty squares can ever
+match.</p>
+<h3 id="the-row-and-column-loop">The Row and Column Loop</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> i <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">7</span>]:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="co"># row check</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>] <span class="kw">and</span> game_state[i : i <span class="op">+</span> <span class="dv">3</span>] <span class="op">==</span> [game_state[i]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[i]<span class="sc">}</span><span class="ss">&#39; wins&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Column check</span></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> i <span class="op">&lt;</span> <span class="dv">4</span> <span class="kw">and</span> game_state[i:<span class="dv">10</span>:<span class="dv">3</span>] <span class="op">==</span> [game_state[i]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[i]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>            game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span></code></pre></div>
+<p>Rows start at 1, 4, and 7. Columns start at 1, 2, and 3. Put
+together, that is 1, 2, 3, 4, and 7, so the loop goes through those five
+numbers. For each one:</p>
+<ul>
+<li>If it is the start of a row, check the row.</li>
+<li>If it is less than 4, it is the start of a column, so check the
+column.</li>
+</ul>
+<p>Square 1 starts both a row and a column, so both checks run for
+it.</p>
+<h3 id="a-bug-continue-only-affects-the-inner-loop">A Bug: continue Only
+Affects the Inner Loop</h3>
+<p>When the program finds a winner, it says so, sets the flag, and calls
+<code>continue</code>. But <code>continue</code> goes back to the top of
+the loop it is <em>directly</em> inside. That is the <code>for</code>
+loop, not the <code>while</code> loop. So the program goes on to the
+next <code>i</code> and keeps checking.</p>
+<p>Usually that does no harm. But if one move makes two lines at once,
+such as the top row and the right-hand column, the program announces the
+winner twice: once when <code>i</code> is 1 and once when <code>i</code>
+is 3. And even after one win, it goes on to check the diagonals and the
+full board.</p>
+<p>What was probably meant was “stop checking, the game is over.” When
+you split this code into a function in the next lessons,
+<code>return</code> does exactly that.</p>
+<h3 id="the-diagonals">The Diagonals</h3>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># now test         down slope</span></span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>:<span class="dv">4</span>] <span class="op">==</span> [game_state[<span class="dv">1</span>]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>    <span class="co"># now test up slope</span></span>
+<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[<span class="dv">3</span>:<span class="dv">8</span>:<span class="dv">2</span>] <span class="op">==</span> [game_state[<span class="dv">3</span>]] <span class="op">*</span> <span class="dv">3</span>:</span>
+<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;&#39;</span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss">&#39; wins!&quot;</span>)</span>
+<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span></code></pre></div>
+<p>These check the two diagonals. Here, <code>continue</code> is inside
+the <code>while</code> loop directly, so it jumps to the top of the game
+loop, where the flag is checked and the program quits.</p>
+<h2 id="a-cats-game">A Cat’s Game</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="co"># If more moves continue</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> [x <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">continue</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Cats game!&quot;</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>    game_state[<span class="dv">0</span>] <span class="op">=</span> <span class="st">&quot;R&quot;</span></span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">continue</span></span></code></pre></div>
+<p>The list comprehension makes a list of the free squares. An empty
+list counts as <code>False</code>, and a list with anything in it counts
+as <code>True</code>. So this means: if there are any free squares, keep
+playing. Otherwise, the board is full, and it is a cat’s game.</p>
+<p>There is one more problem here. If the last move fills the board
+<em>and</em> wins, the game will say the player wins and then also say
+<code>Cats game!</code>, because the win check above did not stop the
+program from getting here.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote a whole game in one piece. You learned that:</p>
+<ul>
+<li>A slice can have a step: <code>[start:stop:step]</code>.</li>
+<li>Slices make it easy to grab rows, columns, and diagonals.</li>
+<li><code>[value] * 3</code> makes a list of three copies, which is
+handy for comparing.</li>
+<li>Empty squares that hold different numbers can never look like a
+win.</li>
+<li><code>continue</code> affects only the loop it is directly
+inside.</li>
+<li>A flag in the game’s data can tell the game loop when to stop.</li>
+<li>An empty list counts as <code>False</code>.</li>
+<li>Long programs with no functions repeat code and are hard to
+follow.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Play these squares in order: 1, 4, 2, 5, 6, 7, 9, 8, 3. X’s last
+move fills the board and completes the top row and the right-hand column
+at the same time. Listen for the winner being announced twice, and then
+<code>Cats game!</code>.</li>
+<li>Why is a win with the top row and the left-hand column only
+announced once? Hint: both are checked when <code>i</code> is 1. What
+does <code>continue</code> skip?</li>
+<li>Fix both bugs by replacing the <code>continue</code> lines in the
+win checks with <code>break</code>, and then checking the flag before
+the cat’s game check. Think about which loop each <code>break</code>
+leaves.</li>
+<li>Count how many lines are repeated in this program. Which ones would
+you turn into functions?</li>
+<li>Change <code>quit()</code> to <code>sys.exit()</code>. What else do
+you need to add?</li>
+</ol>

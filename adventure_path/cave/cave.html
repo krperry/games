@@ -1,0 +1,903 @@
+<h1 id="the-cave-of-the-golden-box">The Cave of the Golden Box</h1>
+<p>This is the game that the <code>Unit</code>, <code>Item</code>,
+<code>Player</code>, and <code>Room</code> classes were built for. You
+start in a dark tunnel at the edge of a cave. Somewhere in the cave’s
+nine dark rooms lies a little gold box. Find it, pick it up, and get
+back to the tunnel before you run out of strength, or a grue will find
+you first.</p>
+<p>Games like this are called <em>text adventures</em>, or
+<em>interactive fiction</em>. They are among the oldest computer games,
+and they have always been popular with blind players, because the whole
+world is made of words.</p>
+<p>In this lesson you will see how the classes fit together to build a
+world, and how the game understands commands the player types.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Importing classes from several files</li>
+<li>Building a world from objects in a list</li>
+<li>Connecting rooms into a map</li>
+<li>Multi-line strings with triple quotes</li>
+<li>A dictionary of functions</li>
+<li>Splitting a command into words with <code>split()</code></li>
+<li>Letting the player type short commands</li>
+<li>Handling errors with <code>try</code> and <code>except</code></li>
+<li>Checking for winning and losing</li>
+<li>A command loop</li>
+<li>Finding bugs in a game by playing it</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play">How to Play</h2>
+<p>You start in the Dark Tunnel with 8 health points. Each time you move
+to another room, you lose one. Type a direction to move:
+<code>north</code>, <code>east</code>, <code>south</code>, or
+<code>west</code>. You can type just the first letter or two, such as
+<code>n</code> or <code>we</code>.</p>
+<p>When you find the gold box, type <code>get</code> and its name, such
+as <code>get box</code>. Then return to the Dark Tunnel. If you get
+there with the box, you win. If your health runs out before then, you
+lose.</p>
+<p>The cave is a three-by-three grid of rooms, with the tunnel below the
+middle of the bottom row:</p>
+<ul>
+<li>Top row: rooms 1, 2, and 3</li>
+<li>Middle row: rooms 4, 5, and 6</li>
+<li>Bottom row: rooms 7, 8, and 9</li>
+<li>The tunnel, room 0, is south of room 8</li>
+</ul>
+<p>The box is placed at random in one of the rooms, but never in the
+center room, 5, or the entrance, room 8.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code>Welcome to the dark caves of the Golden box
+In this cave lies a golden box
+You have 9 health points to retrieve the box
+You lose one health for every room you visit.
+If you run out of health.ou will no longer be able to move and will most certainly be eatten by a grue
+Return to the starting room before you run out of health.
+If you find the Golden box you can take it
+each room has the listed directions you can go
+Good luck adventurer.
+Dark Tunnel
+
+
+This is a dark dank tunnel of a cave.
+
+You can walk [north]
+
+
+enter a command &gt;n
+You move  north
+Dark Entrance
+
+
+This is a dark dank entrance of the cave
+
+You can walk [north, east, south, west]
+
+
+enter a command &gt;e
+You move  east
+Dark SoutheastCorner
+
+
+This is a dark dank corner of the cave
+
+You can walk [north, west]
+a little Gold boxis laying on the ground.
+
+
+enter a command &gt;get little
+You pick up a little Gold box.
+enter a command &gt;w
+You move  west
+Dark Entrance
+
+
+This is a dark dank entrance of the cave
+
+You can walk [north, east, south, west]
+
+
+enter a command &gt;s
+You move  south
+Dark Tunnel
+
+
+This is a dark dank tunnel of a cave.
+
+You can walk [north]
+
+
+Great Job!
+You made it with energy to spare!
+You are a master finder.
+Game over.</code></pre>
+<p>Listen to how many blank lines there are. You will find out where
+they come from, and you will also hear a few typos and mistakes that you
+will fix by the end of the lesson.</p>
+<h2 id="the-source-code-for-cave">The Source Code for Cave</h2>
+<p>Type this program and save it as <code>cave.py</code> in the
+<code>cave</code> folder, with <code>unit.py</code>,
+<code>item.py</code>, <code>player.py</code>, and <code>room.py</code>.
+Run it from that folder with <code>python cave.py</code>.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;All the Cave room definitions rooms and items&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> room <span class="im">import</span> Room</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> player <span class="im">import</span> Player</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> item <span class="im">import</span> Item</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>random.seed(time.time())</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>rooms <span class="op">=</span> [</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave0&quot;</span>,</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Tunnel&quot;</span>,</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank tunnel of a cave.</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave1&quot;</span>,</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Northeast Corner&quot;</span>,</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank corner of the cave</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave2&quot;</span>,</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark North side&quot;</span>,</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank side of the cave</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave3&quot;</span>,</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Northwest Corner&quot;</span>,</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank corner of the cave</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave4&quot;</span>,</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark West side&quot;</span>,</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank side of the cave</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave5&quot;</span>,</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark center&quot;</span>,</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a><span class="st">This is the  dark dank center of the cave.  It is impossible to see in any direction.</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave6&quot;</span>,</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark east side&quot;</span>,</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank side of the cave</span></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave7&quot;</span>,</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Southwest Corner&quot;</span>,</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank corner of the cave</span></span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave8&quot;</span>,</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Entrance&quot;</span>,</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank entrance of the cave</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave9&quot;</span>,</span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark SoutheastCorner&quot;</span>,</span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank corner of the cave</span></span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>]</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a><span class="co"># Setup layout</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a><span class="co"># cave1 exits</span></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">1</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">2</span>])</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">1</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">4</span>])</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a><span class="co"># room 2 exits</span></span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">2</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">3</span>])</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">2</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">5</span>])</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">2</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">1</span>])</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a><span class="co"># room 3 exits</span></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">3</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">2</span>])</span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">3</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">6</span>])</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a><span class="co"># cave4 exits</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">4</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">5</span>])</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">4</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">7</span>])</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">4</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">1</span>])</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a><span class="co"># room 5 exits</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">5</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">2</span>])</span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">5</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">6</span>])</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">5</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">8</span>])</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">5</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">4</span>])</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a><span class="co"># room 6 exits</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">6</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">3</span>])</span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">6</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">5</span>])</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">6</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">9</span>])</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="co"># cave7 exits</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">7</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">4</span>])</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">7</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">8</span>])</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a><span class="co"># room 8 exits</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">8</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">5</span>])</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">8</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">9</span>])</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">8</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">0</span>])</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">8</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">7</span>])</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a><span class="co"># room 9 exits</span></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">9</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">6</span>])</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">9</span>].set_direction(<span class="st">&quot;west&quot;</span>, rooms[<span class="dv">8</span>])</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a><span class="co"># room 0 exits</span></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">0</span>].set_direction(<span class="st">&quot;north&quot;</span>, rooms[<span class="dv">8</span>])</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a><span class="co"># place player in cave 0</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>player <span class="op">=</span> Player(<span class="st">&quot;Milo&quot;</span>, <span class="st">&quot;an old man&quot;</span>, <span class="st">&quot;A short old man he is.&quot;</span>)</span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>player.set_location(rooms[<span class="dv">0</span>])</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a><span class="co"># make item to find</span></span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>item <span class="op">=</span> Item(</span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little gold box&quot;</span>,</span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little gold&quot;</span>,</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little box&quot;</span>,</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Gold box&quot;</span>,</span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little&quot;</span>,</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;gold&quot;</span>,</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;box&quot;</span>,</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;a little Gold box&quot;</span>,</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a><span class="st">This looks like the little gold box you were looking for.  Now pick it up and run for the way out.</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;&quot;&quot;</span>,</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>    <span class="dv">100</span>,</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a><span class="co"># place item randomly</span></span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>randRooms <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">9</span>]</span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> random.randint(<span class="dv">0</span>, <span class="dv">6</span>)</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>rooms[randRooms[i]].add_item(item)</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a><span class="co"># run game.</span></span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> do_get(cmd, args):</span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a><span class="co">    This is the get function that will let players pick up items.</span></span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>    take_item <span class="op">=</span> player.get_location().remove_item(args)</span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> take_item:</span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;No </span><span class="sc">{</span>args<span class="sc">}</span><span class="ss"> found.&quot;</span>)</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>        player.add_item(take_item)</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;You pick up </span><span class="sc">{</span>take_item<span class="sc">.</span>get_title()<span class="sc">}</span><span class="ss">.&quot;</span>)</span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_long_command(cmd):</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;get the long version of a short command&quot;&quot;&quot;</span></span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> command <span class="kw">in</span> commands:</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="op">==</span> command[: <span class="bu">len</span>(cmd)]:</span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> command</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cmd</span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> command_args(input_string):</span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;normalize function calls.  There might be a better way to do this&quot;&quot;&quot;</span></span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> input_string.split(<span class="st">&quot; &quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(args) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>        args.append(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>        args[<span class="dv">0</span>] <span class="op">=</span> get_long_command(args[<span class="dv">0</span>])</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>        <span class="co"># return a 3 part tupple             function, cmd, and args</span></span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (commands[args[<span class="dv">0</span>]], args[<span class="dv">0</span>], args[<span class="dv">1</span>])</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_win():</span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Check for a winner and kill the person if they lose&quot;&quot;&quot;</span></span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.health <span class="op">&lt;</span> <span class="dv">1</span> <span class="kw">and</span> <span class="kw">not</span> player.items:</span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(</span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;You are too tired to go on! You collapse.&quot;</span></span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="st">&quot;A big hairy Grue shows up and eats you.  Your dead.&quot;</span></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Better luck next time.&quot;</span>)</span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-244"><a href="#cb2-244" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Game Over.&quot;</span>)</span>
+<span id="cb2-245"><a href="#cb2-245" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-246"><a href="#cb2-246" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb2-247"><a href="#cb2-247" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-248"><a href="#cb2-248" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.health <span class="op">&lt;</span> <span class="dv">1</span> <span class="kw">and</span> player.get_location() <span class="op">==</span> rooms[<span class="dv">0</span>] <span class="kw">and</span> player.items:</span>
+<span id="cb2-249"><a href="#cb2-249" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;that was a close one!&quot;</span>)</span>
+<span id="cb2-250"><a href="#cb2-250" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-251"><a href="#cb2-251" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You barely stagger into the safe room and pass out.&quot;</span>)</span>
+<span id="cb2-252"><a href="#cb2-252" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-253"><a href="#cb2-253" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Your a winner!&quot;</span>)</span>
+<span id="cb2-254"><a href="#cb2-254" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-255"><a href="#cb2-255" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Game over.&quot;</span>)</span>
+<span id="cb2-256"><a href="#cb2-256" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-257"><a href="#cb2-257" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb2-258"><a href="#cb2-258" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-259"><a href="#cb2-259" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.get_location() <span class="op">==</span> rooms[<span class="dv">0</span>] <span class="kw">and</span> player.items:</span>
+<span id="cb2-260"><a href="#cb2-260" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Great Job!&quot;</span>)</span>
+<span id="cb2-261"><a href="#cb2-261" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-262"><a href="#cb2-262" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You made it with energy to spare!&quot;</span>)</span>
+<span id="cb2-263"><a href="#cb2-263" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-264"><a href="#cb2-264" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You are a master finder.&quot;</span>)</span>
+<span id="cb2-265"><a href="#cb2-265" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-266"><a href="#cb2-266" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Game over.&quot;</span>)</span>
+<span id="cb2-267"><a href="#cb2-267" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-268"><a href="#cb2-268" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb2-269"><a href="#cb2-269" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-270"><a href="#cb2-270" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-271"><a href="#cb2-271" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> do_move(cmd, args):</span>
+<span id="cb2-272"><a href="#cb2-272" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-273"><a href="#cb2-273" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-274"><a href="#cb2-274" aria-hidden="true" tabindex="-1"></a><span class="co">    This moves the character and takes the health it uses</span></span>
+<span id="cb2-275"><a href="#cb2-275" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-276"><a href="#cb2-276" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.can_move(cmd):</span>
+<span id="cb2-277"><a href="#cb2-277" aria-hidden="true" tabindex="-1"></a>        player.move(cmd)</span>
+<span id="cb2-278"><a href="#cb2-278" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-279"><a href="#cb2-279" aria-hidden="true" tabindex="-1"></a>        player.lose_health()</span>
+<span id="cb2-280"><a href="#cb2-280" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-281"><a href="#cb2-281" aria-hidden="true" tabindex="-1"></a>        check_win()</span>
+<span id="cb2-282"><a href="#cb2-282" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-283"><a href="#cb2-283" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-284"><a href="#cb2-284" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You can&#39;t go that way&quot;</span>)</span>
+<span id="cb2-285"><a href="#cb2-285" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-286"><a href="#cb2-286" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-287"><a href="#cb2-287" aria-hidden="true" tabindex="-1"></a>commands <span class="op">=</span> {</span>
+<span id="cb2-288"><a href="#cb2-288" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;get&quot;</span>: do_get,</span>
+<span id="cb2-289"><a href="#cb2-289" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;north&quot;</span>: do_move,</span>
+<span id="cb2-290"><a href="#cb2-290" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;east&quot;</span>: do_move,</span>
+<span id="cb2-291"><a href="#cb2-291" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;south&quot;</span>: do_move,</span>
+<span id="cb2-292"><a href="#cb2-292" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;west&quot;</span>: do_move,</span>
+<span id="cb2-293"><a href="#cb2-293" aria-hidden="true" tabindex="-1"></a>}</span>
+<span id="cb2-294"><a href="#cb2-294" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-295"><a href="#cb2-295" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-296"><a href="#cb2-296" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-297"><a href="#cb2-297" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main run functio of the game.&quot;&quot;&quot;</span></span>
+<span id="cb2-298"><a href="#cb2-298" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-299"><a href="#cb2-299" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Welcome to the dark caves of the Golden box&quot;</span>)</span>
+<span id="cb2-300"><a href="#cb2-300" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-301"><a href="#cb2-301" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;In this cave lies a golden box&quot;</span>)</span>
+<span id="cb2-302"><a href="#cb2-302" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-303"><a href="#cb2-303" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You have 9 health points to retrieve the box&quot;</span>)</span>
+<span id="cb2-304"><a href="#cb2-304" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-305"><a href="#cb2-305" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You lose one health for every room you visit.&quot;</span>)</span>
+<span id="cb2-306"><a href="#cb2-306" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb2-307"><a href="#cb2-307" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;If you run out of health.&quot;</span></span>
+<span id="cb2-308"><a href="#cb2-308" aria-hidden="true" tabindex="-1"></a>        <span class="op">+</span> <span class="st">&quot;ou will no longer be able to move and will most certainly be eatten by a grue&quot;</span></span>
+<span id="cb2-309"><a href="#cb2-309" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-310"><a href="#cb2-310" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-311"><a href="#cb2-311" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Return to the starting room before you run out of health.&quot;</span>)</span>
+<span id="cb2-312"><a href="#cb2-312" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-313"><a href="#cb2-313" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;If you find the Golden box you can take it&quot;</span>)</span>
+<span id="cb2-314"><a href="#cb2-314" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-315"><a href="#cb2-315" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;each room has the listed directions you can go&quot;</span>)</span>
+<span id="cb2-316"><a href="#cb2-316" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-317"><a href="#cb2-317" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Good luck adventurer.&quot;</span>)</span>
+<span id="cb2-318"><a href="#cb2-318" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-319"><a href="#cb2-319" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(player.get_location().get_room_string())</span>
+<span id="cb2-320"><a href="#cb2-320" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-321"><a href="#cb2-321" aria-hidden="true" tabindex="-1"></a>    command <span class="op">=</span> <span class="st">&quot;start&quot;</span></span>
+<span id="cb2-322"><a href="#cb2-322" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-323"><a href="#cb2-323" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> command <span class="kw">not</span> <span class="kw">in</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb2-324"><a href="#cb2-324" aria-hidden="true" tabindex="-1"></a>        command <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;enter a command &gt;&quot;</span>)</span>
+<span id="cb2-325"><a href="#cb2-325" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-326"><a href="#cb2-326" aria-hidden="true" tabindex="-1"></a>        targs <span class="op">=</span> command_args(command)</span>
+<span id="cb2-327"><a href="#cb2-327" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-328"><a href="#cb2-328" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> targs:</span>
+<span id="cb2-329"><a href="#cb2-329" aria-hidden="true" tabindex="-1"></a>            targs[<span class="dv">0</span>](targs[<span class="dv">1</span>], targs[<span class="dv">2</span>])</span>
+<span id="cb2-330"><a href="#cb2-330" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-331"><a href="#cb2-331" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-332"><a href="#cb2-332" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;No such command.&quot;</span>)</span>
+<span id="cb2-333"><a href="#cb2-333" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-334"><a href="#cb2-334" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-335"><a href="#cb2-335" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-336"><a href="#cb2-336" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div>
+<h2 id="how-the-program-is-organized">How the Program Is Organized</h2>
+<p><code>cave.py</code> has four parts, from top to bottom:</p>
+<ol type="1">
+<li>Import the modules and classes.</li>
+<li>Build the world: the rooms, how they connect, the player, and the
+box.</li>
+<li>Define the functions that handle commands and check for a win.</li>
+<li>Run the command loop in <code>main()</code>.</li>
+</ol>
+<p>The first two parts are not inside any function. They run as soon as
+the file is loaded, so the world is ready before <code>main()</code>
+starts.</p>
+<h2 id="importing-the-classes">Importing the Classes</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> room <span class="im">import</span> Room</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> player <span class="im">import</span> Player</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> item <span class="im">import</span> Item</span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>random.seed(time.time())</span></code></pre></div>
+<p>Each class is imported from its own file. Python finds
+<code>room.py</code>, <code>player.py</code>, and <code>item.py</code>
+because they are in the same folder as <code>cave.py</code>. You do not
+need to import <code>Unit</code> here. The other classes import it
+themselves.</p>
+<p><code>random.seed()</code> sets the starting point for the random
+number generator. Seeding with the current time was common in older
+programs, but Python already does this for you automatically, so this
+line is not needed. Seeding is useful when you want the <em>same</em>
+random results every time, for testing. Try <code>random.seed(1)</code>
+and the box will be in the same room every game.</p>
+<h2 id="building-the-rooms">Building the Rooms</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>rooms <span class="op">=</span> [</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    Room(</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;cave0&quot;</span>,</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Dark Tunnel&quot;</span>,</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="st">This is a dark dank tunnel of a cave.</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="st">&quot;&quot;&quot;</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>]</span></code></pre></div>
+<p><code>rooms</code> is a list of ten <code>Room</code> objects, made
+right inside the list. <code>rooms[0]</code> is the tunnel, and
+<code>rooms[1]</code> through <code>rooms[9]</code> are the cave. Each
+room gets an id, a title, and a description.</p>
+<h3 id="multi-line-strings">Multi-line Strings</h3>
+<p>Each description is in triple quotes. A triple-quoted string can go
+over several lines, and the line breaks are part of the string. Each
+description starts with two line breaks, then the text, then one more
+line break. That is where most of the blank lines in the game’s output
+come from.</p>
+<p>Blank lines can be a help or a hindrance by ear. One blank line
+between parts is a nice pause. Several in a row just mean more arrow key
+presses when you review the output. You can remove the extra line breaks
+from the descriptions in an exercise.</p>
+<h2 id="connecting-the-rooms">Connecting the Rooms</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># cave1 exits</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">1</span>].set_direction(<span class="st">&quot;east&quot;</span>, rooms[<span class="dv">2</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>rooms[<span class="dv">1</span>].set_direction(<span class="st">&quot;south&quot;</span>, rooms[<span class="dv">4</span>])</span></code></pre></div>
+<p>These lines build the map.
+<code>rooms[1].set_direction("east", rooms[2])</code> means “going east
+from room 1 leads to room 2.” Every connection has to be made in both
+directions. Room 2 also has
+<code>rooms[2].set_direction("west", rooms[1])</code>. If you forget one
+direction, the player can go somewhere but never come back.</p>
+<p>Because the map is built from these lines, you can make a new cave
+just by changing them. Making a map from a list of connections like this
+is a simple kind of <em>graph</em>, a structure computer scientists use
+for maps, networks, and much more.</p>
+<p>Some room titles do not match their place on the map. Room 1 is in
+the top left, but its title is “Dark Northeast Corner,” and room 3, in
+the top right, is “Dark Northwest Corner.” For a player who builds a map
+in their head, wrong directions in titles are confusing. Fixing them is
+an exercise.</p>
+<h2 id="making-the-player-and-the-box">Making the Player and the
+Box</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>player <span class="op">=</span> Player(<span class="st">&quot;Milo&quot;</span>, <span class="st">&quot;an old man&quot;</span>, <span class="st">&quot;A short old man he is.&quot;</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>player.set_location(rooms[<span class="dv">0</span>])</span></code></pre></div>
+<p>The player is made and put in the tunnel. Notice that the names are a
+string, <code>"Milo"</code>, not a list. <code>is_name()</code> uses
+<code>in</code>, which also works on strings, so it still works, but in
+a surprising way: <code>"il" in "Milo"</code> is <code>True</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>item <span class="op">=</span> Item(</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    [</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little gold box&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little gold&quot;</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little box&quot;</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;Gold box&quot;</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;little&quot;</span>,</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;gold&quot;</span>,</span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;box&quot;</span>,</span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>    ],</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;a little Gold box&quot;</span>,</span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;&quot;&quot;</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a><span class="st">This looks like the little gold box you were looking for.  Now pick it up and run for the way out.</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a><span class="st">    &quot;&quot;&quot;</span>,</span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="dv">100</span>,</span>
+<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div>
+<p>The box has seven names, so the player can call it many things. But
+look at the fourth name: <code>"Gold box"</code>, with a capital G.
+There is no <code>"gold box"</code> in lowercase. Since
+<code>is_name()</code> compares exactly, typing
+<code>get gold box</code> does not work, even though it is the most
+natural thing to type. You will hear <code>No gold box found.</code>
+while you are standing right next to it.</p>
+<h2 id="placing-the-box-at-random">Placing the Box at Random</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>randRooms <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">9</span>]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>i <span class="op">=</span> random.randint(<span class="dv">0</span>, <span class="dv">6</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>rooms[randRooms[i]].add_item(item)</span></code></pre></div>
+<p><code>randRooms</code> is the list of rooms the box can be in. The
+program picks a random index from 0 to 6 and puts the box in that
+room.</p>
+<p>Read <code>rooms[randRooms[i]]</code> from the inside out:
+<code>i</code> is a random index, <code>randRooms[i]</code> is a room
+number, and <code>rooms[...]</code> is that room. You could do the same
+thing more simply with <code>random.choice(randRooms)</code>.</p>
+<h2 id="commands">Commands</h2>
+<p>The game understands five commands: <code>get</code>,
+<code>north</code>, <code>east</code>, <code>south</code>, and
+<code>west</code>. They are stored in a dictionary near the bottom of
+the file:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>commands <span class="op">=</span> {</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;get&quot;</span>: do_get,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;north&quot;</span>: do_move,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;east&quot;</span>: do_move,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;south&quot;</span>: do_move,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>    <span class="st">&quot;west&quot;</span>: do_move,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>}</span></code></pre></div>
+<h3 id="a-dictionary-of-functions">A Dictionary of Functions</h3>
+<p>The values in this dictionary are functions! Notice there are no
+parentheses after <code>do_get</code> and <code>do_move</code>. The
+dictionary holds the functions themselves, not the result of calling
+them. In Python, a function is a value like any other. You can put it in
+a variable, a list, or a dictionary, and call it later.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">def</span> hello():</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">&quot;Hi!&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> greet <span class="op">=</span> hello</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> greet()</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>Hi<span class="op">!</span></span></code></pre></div>
+<p>So <code>commands["get"]</code> is the <code>do_get</code> function,
+and <code>commands["get"]("get", "box")</code> calls it. This is called
+a <em>dispatch table</em>. It is a clean way to match commands to the
+code that runs them, without a long chain of <code>if</code> and
+<code>elif</code>. To add a new command, you write a function and add
+one line to the dictionary.</p>
+<p>All four directions use the same function, <code>do_move()</code>. It
+knows which way to go because the command name is passed to it.</p>
+<h2 id="understanding-a-command">Understanding a Command</h2>
+<p>When the player types something, <code>command_args()</code> turns it
+into a function to call and the arguments to give it.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> command_args(input_string):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>    args <span class="op">=</span> input_string.split(<span class="st">&quot; &quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(args) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>        args.append(<span class="st">&quot;&quot;</span>)</span></code></pre></div>
+<h3 id="split">split()</h3>
+<p><code>split()</code> breaks a string into a list of words. The first
+argument is what to split on, here a space. The second is the most
+splits to make. With <code>1</code>, it splits only at the first space,
+so everything after the command stays together.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;get little box&quot;</span>.split(<span class="st">&quot; &quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;get&#39;</span>, <span class="st">&#39;little box&#39;</span>]</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;north&quot;</span>.split(<span class="st">&quot; &quot;</span>, <span class="dv">1</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;north&#39;</span>]</span></code></pre></div>
+<p>If the player typed just one word, there is nothing after it, so the
+program adds an empty string. Now <code>args</code> always has two
+items: the command word and the rest.</p>
+<h3 id="short-commands">Short Commands</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>        args[<span class="dv">0</span>] <span class="op">=</span> get_long_command(args[<span class="dv">0</span>])</span></code></pre></div>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_long_command(cmd):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;get the long version of a short command&quot;&quot;&quot;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> command <span class="kw">in</span> commands:</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> cmd <span class="op">==</span> command[: <span class="bu">len</span>(cmd)]:</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> command</span>
+<span id="cb14-7"><a href="#cb14-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> cmd</span></code></pre></div>
+<p>This lets the player type <code>n</code> for <code>north</code>, or
+<code>ge</code> for <code>get</code>. Looping over a dictionary gives
+you its keys, so <code>command</code> is each command name in turn.</p>
+<p><code>command[: len(cmd)]</code> is a slice of the start of the
+command name, as long as what the player typed. If the player typed
+<code>n</code>, the slice of <code>"north"</code> is <code>"n"</code>,
+which matches. The first command that matches is returned.</p>
+<p>Short commands are a big help for players who use screen readers, who
+often type quickly and do not want to type <code>north</code> over and
+over.</p>
+<h3 id="try-and-except">try and except</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">try</span>:</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        args[<span class="dv">0</span>] <span class="op">=</span> get_long_command(args[<span class="dv">0</span>])</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        <span class="co"># return a 3 part tupple             function, cmd, and args</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (commands[args[<span class="dv">0</span>]], args[<span class="dv">0</span>], args[<span class="dv">1</span>])</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">except</span>:</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<p>If the player types a word that is not a command,
+<code>commands[args[0]]</code> causes a <code>KeyError</code>. Normally
+that would stop the program. A <code>try</code> block lets you catch
+errors. If any line in the <code>try</code> block causes an error,
+Python jumps to the <code>except</code> block instead of stopping.</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">try</span>:</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>...     number <span class="op">=</span> <span class="bu">int</span>(<span class="st">&quot;hello&quot;</span>)</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>... <span class="cf">except</span> <span class="pp">ValueError</span>:</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">&quot;That is not a number.&quot;</span>)</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>That <span class="kw">is</span> <span class="kw">not</span> a number.</span></code></pre></div>
+<p>Here, the <code>except</code> returns <code>None</code>, which means
+“not a command.”</p>
+<p>This <code>except</code> does not name an error, so it catches
+<em>every</em> kind of error. That is called a <em>bare except</em>, and
+it is risky, because it can hide real bugs. If you made a typo inside
+the <code>try</code> block, the game would just say “No such command”
+and you would never hear the real error. Writing
+<code>except KeyError:</code> catches only the error you expect.</p>
+<p>If it works, the function returns a tuple of three things: the
+function to call, the command name, and the rest of what the player
+typed.</p>
+<h2 id="the-command-functions">The Command Functions</h2>
+<h3 id="moving">Moving</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> do_move(cmd, args):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.can_move(cmd):</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        player.move(cmd)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>        player.lose_health()</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        check_win()</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-9"><a href="#cb17-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb17-10"><a href="#cb17-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You can&#39;t go that way&quot;</span>)</span></code></pre></div>
+<p>For a move, the command name is the direction. If there is an exit,
+the player moves, loses one health, and the game checks whether they won
+or lost.</p>
+<h3 id="getting-an-item">Getting an Item</h3>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> do_get(cmd, args):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>    take_item <span class="op">=</span> player.get_location().remove_item(args)</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="kw">not</span> take_item:</span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;No </span><span class="sc">{</span>args<span class="sc">}</span><span class="ss"> found.&quot;</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb18-8"><a href="#cb18-8" aria-hidden="true" tabindex="-1"></a>        player.add_item(take_item)</span>
+<span id="cb18-9"><a href="#cb18-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb18-10"><a href="#cb18-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;You pick up </span><span class="sc">{</span>take_item<span class="sc">.</span>get_title()<span class="sc">}</span><span class="ss">.&quot;</span>)</span></code></pre></div>
+<p>The rest of the command, such as <code>box</code>, is passed to the
+room’s <code>remove_item()</code>, which finds and removes an item with
+that name. If it worked, the item goes into the player’s inventory.</p>
+<p>Both functions take the same two parameters, <code>cmd</code> and
+<code>args</code>, even though <code>do_move()</code> does not use
+<code>args</code> and <code>do_get()</code> does not use
+<code>cmd</code>. Functions in a dispatch table all need to be called
+the same way.</p>
+<h2 id="winning-and-losing">Winning and Losing</h2>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_win():</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.health <span class="op">&lt;</span> <span class="dv">1</span> <span class="kw">and</span> <span class="kw">not</span> player.items:</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.health <span class="op">&lt;</span> <span class="dv">1</span> <span class="kw">and</span> player.get_location() <span class="op">==</span> rooms[<span class="dv">0</span>] <span class="kw">and</span> player.items:</span>
+<span id="cb19-7"><a href="#cb19-7" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb19-8"><a href="#cb19-8" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span>
+<span id="cb19-9"><a href="#cb19-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-10"><a href="#cb19-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player.get_location() <span class="op">==</span> rooms[<span class="dv">0</span>] <span class="kw">and</span> player.items:</span>
+<span id="cb19-11"><a href="#cb19-11" aria-hidden="true" tabindex="-1"></a>        ...</span>
+<span id="cb19-12"><a href="#cb19-12" aria-hidden="true" tabindex="-1"></a>        sys.exit()</span></code></pre></div>
+<p>After every move, the game checks three cases:</p>
+<ol type="1">
+<li>Out of health without the box: the grue gets you.</li>
+<li>Out of health, but you just made it to the tunnel with the box: a
+close win.</li>
+<li>Back in the tunnel with the box, with health to spare: a clean
+win.</li>
+</ol>
+<p><code>player.get_location() == rooms[0]</code> checks whether the
+player’s room is the tunnel. For objects like rooms, <code>==</code>
+checks whether they are the same object.</p>
+<p>Think about a fourth case: out of health, carrying the box, but not
+in the tunnel. None of the checks match, so the game goes on. But the
+player has no health left. Every move makes it go lower, and the game
+never ends until they reach the tunnel. That is probably not what was
+intended.</p>
+<h2 id="the-command-loop">The Command Loop</h2>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Welcome to the dark caves of the Golden box&quot;</span>)</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>    ...</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(player.get_location().get_room_string())</span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a>    command <span class="op">=</span> <span class="st">&quot;start&quot;</span></span>
+<span id="cb20-7"><a href="#cb20-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-8"><a href="#cb20-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> command <span class="kw">not</span> <span class="kw">in</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb20-9"><a href="#cb20-9" aria-hidden="true" tabindex="-1"></a>        command <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;enter a command &gt;&quot;</span>)</span>
+<span id="cb20-10"><a href="#cb20-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-11"><a href="#cb20-11" aria-hidden="true" tabindex="-1"></a>        targs <span class="op">=</span> command_args(command)</span>
+<span id="cb20-12"><a href="#cb20-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-13"><a href="#cb20-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> targs:</span>
+<span id="cb20-14"><a href="#cb20-14" aria-hidden="true" tabindex="-1"></a>            targs[<span class="dv">0</span>](targs[<span class="dv">1</span>], targs[<span class="dv">2</span>])</span>
+<span id="cb20-15"><a href="#cb20-15" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb20-16"><a href="#cb20-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb20-17"><a href="#cb20-17" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;No such command.&quot;</span>)</span></code></pre></div>
+<p><code>main()</code> reads the instructions, describes the first room,
+and then runs the command loop. Each time through, it reads a command,
+turns it into a function and arguments, and calls the function.
+<code>targs[0](targs[1], targs[2])</code> calls the function stored in
+the tuple, passing it the command name and the rest.</p>
+<h3 id="the-quit-bug">The Quit Bug</h3>
+<p>Listen closely to the loop condition:
+<code>while command not in "quit"</code>. With a string after it,
+<code>in</code> checks whether one string is <em>inside</em> another. So
+the loop ends if the command is <code>"quit"</code>, but also if it is
+<code>"q"</code>, <code>"u"</code>, <code>"it"</code>, or even an empty
+string, because the empty string is inside every string.</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;quit&quot;</span> <span class="kw">in</span> <span class="st">&quot;quit&quot;</span></span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;q&quot;</span> <span class="kw">in</span> <span class="st">&quot;quit&quot;</span></span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;&quot;</span> <span class="kw">in</span> <span class="st">&quot;quit&quot;</span></span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>So if the player presses Enter without typing anything, the game
+ends. And the check happens at the top of the loop, <em>after</em> the
+command was already handled. <code>quit</code> is not in the
+<code>commands</code> dictionary, so when the player types
+<code>quit</code>, the game first says <code>No such command.</code> and
+then ends.</p>
+<p>What was probably meant is <code>while command != "quit":</code>, or
+better, a <code>quit</code> command in the dispatch table.</p>
+<h2 id="finding-the-mistakes-by-playing">Finding the Mistakes by
+Playing</h2>
+<p>Many of this game’s problems are easy to find just by playing it and
+listening carefully. Here is what a careful player will hear:</p>
+<ul>
+<li>The welcome says you have 9 health points, but the player starts
+with 8.</li>
+<li><code>If you run out of health.ou will no longer</code> is missing
+the <code>Y</code>, and has a period in the middle of the sentence.</li>
+<li><code>eatten</code> should be <code>eaten</code>, and
+<code>Your dead</code> and <code>Your a winner</code> should use
+<code>You're</code>.</li>
+<li><code>collapse.A big hairy Grue</code> is missing a space, because
+two strings are joined with <code>+</code>.</li>
+<li><code>a little Gold boxis laying</code> is missing a space, and
+should say “lying.” That one comes from
+<code>Room.get_items_string()</code>.</li>
+<li><code>get gold box</code> does not work, because the name has a
+capital G.</li>
+<li><code>quit</code> says <code>No such command.</code> before
+quitting, and pressing Enter on an empty line quits.</li>
+</ul>
+<p>Typos in messages matter more by ear than by eye. A sighted reader
+skims past a missing space. A screen reader reads <code>boxis</code> as
+one strange word.</p>
+<h2 id="summary">Summary</h2>
+<p>You studied a complete text adventure built from classes. You learned
+that:</p>
+<ul>
+<li>A world can be built from objects in a list, connected with method
+calls.</li>
+<li>Triple-quoted strings can span several lines, and their line breaks
+are kept.</li>
+<li>A dictionary can hold functions. Calling one from the dictionary is
+called dispatching.</li>
+<li><code>split(" ", 1)</code> splits a string at the first space.</li>
+<li>A slice like <code>command[:len(cmd)]</code> lets players type short
+commands.</li>
+<li><code>try</code> and <code>except</code> catch errors. Name the
+error you expect, instead of using a bare <code>except</code>.</li>
+<li><code>in</code> with two strings checks whether one is inside the
+other, which can cause surprising bugs.</li>
+<li>Playing your own game and listening carefully is a great way to find
+bugs.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Fix the typos and missing spaces in the messages, and make the
+welcome say 8 health points, or use <code>player.get_health()</code> in
+an f-string so it is always right.</li>
+<li>Change <code>"Gold box"</code> to <code>"gold box"</code>. Better
+yet, make <code>Unit.is_name()</code> ignore case.</li>
+<li>Fix the quit bug. Add a <code>quit</code> function to the
+<code>commands</code> dictionary that says goodbye and calls
+<code>sys.exit()</code>.</li>
+<li>Change <code>except:</code> to <code>except KeyError:</code>.</li>
+<li>Add a <code>look</code> command that describes the room again. Add
+an <code>inventory</code> or <code>i</code> command that says what the
+player is carrying. Add a <code>health</code> command that says how much
+health is left. These are especially helpful for players who cannot
+glance back at the screen.</li>
+<li>Fix the room titles so the corners have the right directions.</li>
+<li>Handle the fourth case in <code>check_win()</code>: out of health,
+carrying the box, not in the tunnel.</li>
+<li>Add a new room west of the tunnel. Remember to connect it in both
+directions, or the player will be able to go in but never come back
+out.</li>
+</ol>

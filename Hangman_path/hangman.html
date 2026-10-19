@@ -1,0 +1,1518 @@
+<h1 id="designing-and-writing-an-accessible-hangman">Designing and
+Writing an Accessible Hangman</h1>
+<p>In this lessonyou will design and then write a Hangman game. This
+game is longer than the games you have written so far, and it is also
+more fun. Because it is bigger, you will plan it first. Then you will
+write the code one function at a time.</p>
+<p>This version of Hangman is built to be played completely by ear. It
+never draws pictures on the screen. Everything the player needs to know
+is said in plain words that a screen reader can read aloud. While you
+build it, you will learn how to design a program so that it works well
+for everyone who uses it.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Planning a program with a step-by-step outline (a flowchart in
+words)</li>
+<li>Designing output that a screen reader can read clearly</li>
+<li>Constants</li>
+<li>Lists, the <code>in</code> operator, and the <code>len()</code>
+function</li>
+<li>Methods, such as <code>append()</code>, <code>lower()</code>,
+<code>strip()</code>, <code>count()</code>, <code>join()</code>,
+<code>isalpha()</code>, and <code>startswith()</code></li>
+<li>Reading words from a file</li>
+<li>Picking a random item with <code>random.choice()</code></li>
+<li><code>elif</code> statements</li>
+<li><code>while True</code> loops that end with <code>return</code> or
+<code>break</code>, and the <code>continue</code> statement</li>
+<li>Functions that return values, and functions that call other
+functions</li>
+<li>Docstrings</li>
+<li>A <code>main()</code> function</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or
+<code>def has_won(secret_word, guessed_letters):</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play-hangman">How to Play Hangman</h2>
+<p>Hangman is a game for two players. One player thinks of a secret word
+and tells the other player how many letters it has. The second player
+guesses letters one at a time.</p>
+<p>If the guessed letter is in the word, the first player shows where
+that letter goes. If the letter is not in the word, the guesser loses
+one of their chances. On paper, a missed guess is shown by drawing one
+part of a stick figure. In our game, we simply count the misses and say
+how many are left.</p>
+<p>The guesser wins by finding every letter in the word before running
+out of wrong guesses. In our game, the computer is the player who thinks
+of the word, and you are the guesser. You can make six wrong guesses
+before you lose.</p>
+<h2 id="sample-run-of-hangman">Sample Run of Hangman</h2>
+<p>Here is what a player hears when they run the program you will write
+in this lesson. Each line that begins with <code>Your guess:</code> is
+followed by what the player typed. The same is true of the line that
+asks <code>Do you want to play again?</code>.</p>
+<p>In this game the secret word is lobby. Listen for how the game
+answers when the player guesses a letter twice, types a number, types
+two letters, and asks for the status.</p>
+<pre class="text"><code>Welcome to Hangman.
+I am thinking of a word. Guess it one letter at a time.
+Each unknown letter is shown as an underscore.
+You can make 6 wrong guesses before you lose.
+Type the word help at any time to hear the commands.
+
+Starting a new game.
+The word has 5 letters.
+Word: _ _ _ _ _
+5 letters are still unknown.
+You have not guessed any letters yet.
+Wrong guesses left: 6
+
+Your guess: e
+Sorry, there is no e in the word.
+The word has 5 letters.
+Word: _ _ _ _ _
+5 letters are still unknown.
+Letters guessed so far: e
+Wrong guesses left: 5
+
+Your guess: o
+Yes! There is one o in the word.
+The word has 5 letters.
+Word: _ o _ _ _
+4 letters are still unknown.
+Letters guessed so far: e, o
+Wrong guesses left: 5
+
+Your guess: b
+Yes! There are 2 of the letter b in the word.
+The word has 5 letters.
+Word: _ o b b _
+2 letters are still unknown.
+Letters guessed so far: b, e, o
+Wrong guesses left: 5
+
+Your guess: B
+You already guessed b. Try a different letter.
+Your guess: 7
+That is not a letter. Please type a letter from a to z.
+Your guess: by
+Please type just one letter.
+Your guess: status
+The word has 5 letters.
+Word: _ o b b _
+2 letters are still unknown.
+Letters guessed so far: b, e, o
+Wrong guesses left: 5
+
+Your guess: t
+Sorry, there is no t in the word.
+The word has 5 letters.
+Word: _ o b b _
+2 letters are still unknown.
+Letters guessed so far: b, e, o, t
+Wrong guesses left: 4
+
+Your guess: l
+Yes! There is one l in the word.
+The word has 5 letters.
+Word: l o b b _
+1 letters are still unknown.
+Letters guessed so far: b, e, l, o, t
+Wrong guesses left: 4
+
+Your guess: y
+Yes! There is one y in the word.
+You win! The word was lobby.
+You had 4 wrong guesses left.
+Games won: 1. Games lost: 0.
+Do you want to play again? Type yes or no: no
+Thanks for playing Hangman. Goodbye.</code></pre>
+<p>If the player runs out of wrong guesses, the game says
+<code>Out of guesses. You lose.</code> and then tells the player the
+word and spells it letter by letter, like this:
+<code>The word was lobby. It is spelled l o b b y.</code></p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p>Many Hangman programs draw the hanging man with keyboard characters,
+a style called ASCII art. A picture made of slashes, bars, and letters
+is easy to see but makes no sense when a screen reader reads it one
+symbol at a time. So before writing any code, decide how the game will
+give the player the same information in words.</p>
+<p>Here are the design rules this game follows. Each one shapes a part
+of the code you will write.</p>
+<ol type="1">
+<li>Say it in words, not pictures. Instead of a drawing, the game says
+<code>Wrong guesses left: 4</code>.</li>
+<li>Put spaces between letters. A screen reader may try to say
+<code>_obb_</code> as one strange word. With spaces,
+<code>_ o b b _</code>, it reads each letter or blank on its own.</li>
+<li>Do not rely on one way of showing the same fact. Some screen readers
+do not speak underscores when the punctuation setting is low. So the
+game also says how many letters are still unknown.</li>
+<li>Let the player ask again. Speech goes by quickly. The player can
+type <code>status</code> at any time to hear the word, the guessed
+letters, and the guesses left again. Typing <code>help</code> repeats
+the commands.</li>
+<li>List guessed letters in alphabetical order with commas between them.
+<code>b, e, o</code> is easier to follow by ear than letters in the
+order they were guessed.</li>
+<li>Give a clear answer to every guess. The game says whether the letter
+is in the word and how many times it appears.</li>
+<li>Spell the answer. When the game ends without a win, the player hears
+the word and then its spelling, so an unusual word is not a
+mystery.</li>
+<li>Keep messages short and complete. Every message is a full sentence
+that makes sense on its own, because the player may only hear one
+line.</li>
+</ol>
+<p>These rules make the game better for sighted players too. Clear words
+are easier for everyone.</p>
+<h2 id="planning-the-program-with-a-flowchart-in-words">Planning the
+Program with a Flowchart in Words</h2>
+<p>A flowchart is a plan that shows the steps of a program and the order
+in which they happen. Usually a flowchart is drawn as boxes connected by
+arrows. You can write the very same plan as a numbered outline. Each
+step is one box. “Go to step” is an arrow.</p>
+<p>You do not have to make a plan before you code. But once you start
+programming, you will often think of things that must be added or
+changed. You may have to delete a lot of code you already wrote.
+Planning first saves that wasted work.</p>
+<h3 id="building-the-plan-a-step-at-a-time">Building the Plan a Step at
+a Time</h3>
+<p>Start with the smallest plan possible: a start and an end.</p>
+<ol type="1">
+<li>Start.</li>
+<li>End.</li>
+</ol>
+<p>Now think about what happens when you play. First the computer thinks
+of a secret word. Then the player guesses a letter.</p>
+<ol type="1">
+<li>Start.</li>
+<li>Think of a secret word.</li>
+<li>Ask the player to guess a letter.</li>
+<li>End.</li>
+</ol>
+<p>But the game does not end after one guess. The program has to check
+whether the letter is in the word. There are two possibilities, so the
+plan branches, like a road that splits in two.</p>
+<ul>
+<li>If the letter is in the word, check whether the player has found
+every letter and won.</li>
+<li>If the letter is not in the word, count a wrong guess and check
+whether the player has run out of guesses and lost.</li>
+</ul>
+<p>You do not need to check for a loss after a correct guess. A correct
+guess can never make the player lose. In the same way, a wrong guess can
+never make the player win.</p>
+<p>The player does not guess only once. If they have not won or lost,
+they guess again. And when a game ends, the player is asked whether they
+want to play another game.</p>
+<p>What if the player types the same letter twice, or types something
+that is not a letter? The game should not count that as a guess. It
+should explain the problem and ask again.</p>
+<p>Finally, the player needs to know how they are doing. After every
+guess, the game should tell them the word with blanks, the letters they
+have guessed, and how many wrong guesses they have left. Our accessible
+design adds the commands <code>help</code>, <code>status</code>, and
+<code>quit</code>.</p>
+<h3 id="the-complete-plan">The Complete Plan</h3>
+<p>Here is the finished plan. Read it from step 1 and follow the “go to”
+instructions, just as you would follow arrows on a drawn flowchart.</p>
+<ol type="1">
+<li>Start. Load the list of words and say welcome. Set the number of
+games won and lost to zero.</li>
+<li>Say “Starting a new game.” Pick a random secret word. Nothing has
+been guessed yet, and there have been no wrong guesses.</li>
+<li>Tell the player the status: how long the word is, the word with
+blanks, how many letters are unknown, which letters have been guessed,
+and how many wrong guesses are left.</li>
+<li>Ask the player for a guess.
+<ul>
+<li>If they type <code>help</code>, tell them the commands. Go to step
+4.</li>
+<li>If they type two or more characters, a character that is not a
+letter, or a letter they already guessed, explain the problem. Go to
+step 4.</li>
+<li>If they type <code>quit</code>, tell them the word and its spelling.
+Go to step 8.</li>
+<li>If they type <code>status</code>, go to step 3.</li>
+<li>If they type a new letter, go to step 5.</li>
+</ul></li>
+<li>Add the letter to the guessed letters. Tell the player whether the
+letter is in the word and how many times.
+<ul>
+<li>If the letter is in the word, go to step 6.</li>
+<li>If the letter is not in the word, add one wrong guess and go to step
+7.</li>
+</ul></li>
+<li>If every letter in the word has been guessed, the player wins. Say
+so, add one to the games won, and go to step 8. Otherwise go to step
+3.</li>
+<li>If the player has made six wrong guesses, the player loses. Say so,
+tell them the word and its spelling, add one to the games lost, and go
+to step 8. Otherwise go to step 3.</li>
+<li>Tell the player how many games they have won and lost.
+<ul>
+<li>If the player quit, go to step 10.</li>
+<li>Otherwise, go to step 9.</li>
+</ul></li>
+<li>Ask whether they want to play again. If yes, go to step 2. If no, go
+to step 10.</li>
+<li>Say goodbye. End.</li>
+</ol>
+<p>This plan maps out everything that can happen in the game. As you
+write the code, you will see each step turn into a function or a few
+lines of Python. When you design your own games, write a plan like this
+first. It will help you remember everything you need to code.</p>
+<h2 id="the-source-code-for-hangman">The Source Code for Hangman</h2>
+<p>Here is the whole program. Type it into your editor and save it as
+<code>hangman.py</code>. Then save the word list,
+<code>new_words.txt</code>, in the same folder. The program reads its
+words from that file. The file has one word on each line.</p>
+<p>Do not worry if this looks like a lot. The rest of the lesson
+explains it one piece at a time. You may find it easier to type each
+function as you read about it, and run the whole program at the end.</p>
+<p>When you type the code, pay close attention to indentation, colons,
+and quotation marks. If you get an error, Python tells you the line
+number. Go to that line and compare it carefully with the code here.
+Also check the line just before it, because a missing parenthesis or
+quote on one line often causes an error on the next.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Play a text-based game of Hangman in the terminal.&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>MAX_WRONG_GUESSES <span class="op">=</span> <span class="dv">6</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_words(file_name):</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Read and return the words in the file at ``file_name``.&quot;&quot;&quot;</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> []</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    word_file <span class="op">=</span> <span class="bu">open</span>(file_name, <span class="st">&quot;r&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> word <span class="kw">in</span> word_file:</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        words.append(word.strip())</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    word_file.close()</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> words</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_display_word(secret_word, guessed_letters):</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return the secret word with unguessed letters replaced by underscores.</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">    Separate the displayed characters with spaces so they can be read aloud</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">    one by one by a screen reader.</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    display <span class="op">=</span> []</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> letter <span class="kw">in</span> secret_word:</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> letter.lower() <span class="kw">in</span> guessed_letters:</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>            display.append(letter)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>            display.append(<span class="st">&quot;_&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot; &quot;</span>.join(display)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_won(secret_word, guessed_letters):</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return whether every letter in ``secret_word`` has been guessed.&quot;&quot;&quot;</span></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> count_blanks(secret_word, guessed_letters) <span class="op">==</span> <span class="dv">0</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_lost(wrong_guesses):</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return whether the number of wrong guesses has reached the limit.&quot;&quot;&quot;</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> wrong_guesses <span class="op">&gt;=</span> MAX_WRONG_GUESSES</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> spell_word(word):</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return ``word`` with spaces between its letters for spoken output.&quot;&quot;&quot;</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot; &quot;</span>.join(word)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_score(wins, losses):</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the totals for games won and lost.&quot;&quot;&quot;</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Games won: &quot;</span> <span class="op">+</span> <span class="bu">str</span>(wins) <span class="op">+</span> <span class="st">&quot;. Games lost: &quot;</span> <span class="op">+</span> <span class="bu">str</span>(losses) <span class="op">+</span> <span class="st">&quot;.&quot;</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_blanks(secret_word, guessed_letters):</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return the number of letters in ``secret_word`` not yet guessed.&quot;&quot;&quot;</span></span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>    blanks <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> letter <span class="kw">in</span> secret_word:</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> letter.lower() <span class="kw">not</span> <span class="kw">in</span> guessed_letters:</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            blanks <span class="op">=</span> blanks <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> blanks</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_guess(guessed_letters):</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Prompt until the player enters a valid letter or a supported command.</span></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">    Return a new guessed letter, ``&quot;quit&quot;``, or ``&quot;status&quot;``. The ``help``</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">    command displays instructions and then prompts again.</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Your guess: &quot;</span>)</span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> guess.strip().lower()</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;help&quot;</span>:</span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>            show_help()</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> guess <span class="kw">in</span> [<span class="st">&quot;quit&quot;</span>, <span class="st">&quot;status&quot;</span>]:</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> guess</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">len</span>(guess) <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Please type just one letter.&quot;</span>)</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="kw">not</span> guess.isalpha():</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;That is not a letter. Please type a letter from a to z.&quot;</span>)</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> guess <span class="kw">in</span> guessed_letters:</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;You already guessed &quot;</span> <span class="op">+</span> guess <span class="op">+</span> <span class="st">&quot;. Try a different letter.&quot;</span></span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> guess</span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_guess(secret_word, guess):</span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print whether ``guess`` occurs in ``secret_word``.</span></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="co">    Return the result, True or False.</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> secret_word.lower().count(guess)</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> count <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Sorry, there is no&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> count <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Yes! There is one&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Yes! There are&quot;</span>, count, <span class="st">&quot;of the letter&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_welcome():</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the welcome message and basic game instructions.&quot;&quot;&quot;</span></span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Welcome to Hangman.&quot;</span>)</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;I am thinking of a word. Guess it one letter at a time.&quot;</span>)</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Each unknown letter is shown as an underscore.&quot;</span>)</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You can make&quot;</span>, MAX_WRONG_GUESSES, <span class="st">&quot;wrong guesses before you lose.&quot;</span>)</span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type the word help at any time to hear the commands.&quot;</span>)</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_help():</span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the available commands and how to use them.&quot;&quot;&quot;</span></span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Commands:&quot;</span>)</span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type one letter and press Enter to guess it.&quot;</span>)</span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type status to hear the word and your guesses again.&quot;</span>)</span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type help to hear these commands.&quot;</span>)</span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type quit to stop playing.&quot;</span>)</span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_status(secret_word, guessed_letters, wrong_guesses):</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the current word display and guessed letters.</span></span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a><span class="co">    Also print how many wrong guesses remain.</span></span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;The word has&quot;</span>, <span class="bu">len</span>(secret_word), <span class="st">&quot;letters.&quot;</span>)</span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Word:&quot;</span>, make_display_word(secret_word, guessed_letters))</span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a>        count_blanks(secret_word, guessed_letters),</span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;letters are still unknown.&quot;</span>,</span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(guessed_letters) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You have not guessed any letters yet.&quot;</span>)</span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        sorted_letters <span class="op">=</span> <span class="bu">sorted</span>(guessed_letters)</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Letters guessed so far:&quot;</span>, <span class="st">&quot;, &quot;</span>.join(sorted_letters))</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a>    guesses_left <span class="op">=</span> MAX_WRONG_GUESSES <span class="op">-</span> wrong_guesses</span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Wrong guesses left:&quot;</span>, guesses_left)</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> play_one_game(words):</span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Play one game using ``words``.</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a><span class="co">    Return ``&quot;won&quot;``, ``&quot;lost&quot;``, or ``&quot;quit&quot;``.</span></span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>    secret_word <span class="op">=</span> random.choice(words)</span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>    guessed_letters <span class="op">=</span> []</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>    wrong_guesses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>    show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> get_guess(guessed_letters)</span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;The word was &quot;</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> secret_word</span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;. It is spelled &quot;</span></span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> spell_word(secret_word)</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;quit&quot;</span></span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;status&quot;</span>:</span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a>            show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>        guessed_letters.append(guess)</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>        correct <span class="op">=</span> check_guess(secret_word, guess)</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> correct:</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>            wrong_guesses <span class="op">=</span> wrong_guesses <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-179"><a href="#cb2-179" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-180"><a href="#cb2-180" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_won(secret_word, guessed_letters):</span>
+<span id="cb2-181"><a href="#cb2-181" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You win! The word was &quot;</span> <span class="op">+</span> secret_word <span class="op">+</span> <span class="st">&quot;.&quot;</span>)</span>
+<span id="cb2-182"><a href="#cb2-182" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb2-183"><a href="#cb2-183" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;You had&quot;</span>,</span>
+<span id="cb2-184"><a href="#cb2-184" aria-hidden="true" tabindex="-1"></a>                MAX_WRONG_GUESSES <span class="op">-</span> wrong_guesses,</span>
+<span id="cb2-185"><a href="#cb2-185" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;wrong guesses left.&quot;</span>,</span>
+<span id="cb2-186"><a href="#cb2-186" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-187"><a href="#cb2-187" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;won&quot;</span></span>
+<span id="cb2-188"><a href="#cb2-188" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-189"><a href="#cb2-189" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_lost(wrong_guesses):</span>
+<span id="cb2-190"><a href="#cb2-190" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Out of guesses. You lose.&quot;</span>)</span>
+<span id="cb2-191"><a href="#cb2-191" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb2-192"><a href="#cb2-192" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;The word was &quot;</span></span>
+<span id="cb2-193"><a href="#cb2-193" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> secret_word</span>
+<span id="cb2-194"><a href="#cb2-194" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;. It is spelled &quot;</span></span>
+<span id="cb2-195"><a href="#cb2-195" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> spell_word(secret_word)</span>
+<span id="cb2-196"><a href="#cb2-196" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb2-197"><a href="#cb2-197" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-198"><a href="#cb2-198" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;lost&quot;</span></span>
+<span id="cb2-199"><a href="#cb2-199" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-200"><a href="#cb2-200" aria-hidden="true" tabindex="-1"></a>        show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb2-201"><a href="#cb2-201" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-202"><a href="#cb2-202" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-203"><a href="#cb2-203" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_play_again():</span>
+<span id="cb2-204"><a href="#cb2-204" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Prompt until the player answers yes or no, then return their choice.&quot;&quot;&quot;</span></span>
+<span id="cb2-205"><a href="#cb2-205" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-206"><a href="#cb2-206" aria-hidden="true" tabindex="-1"></a>        answer <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Do you want to play again? Type yes or no: &quot;</span>)</span>
+<span id="cb2-207"><a href="#cb2-207" aria-hidden="true" tabindex="-1"></a>        answer <span class="op">=</span> answer.strip().lower()</span>
+<span id="cb2-208"><a href="#cb2-208" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">&quot;yes&quot;</span>.startswith(answer.lower()):</span>
+<span id="cb2-209"><a href="#cb2-209" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-210"><a href="#cb2-210" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">&quot;no&quot;</span>.startswith(answer.lower()):</span>
+<span id="cb2-211"><a href="#cb2-211" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-212"><a href="#cb2-212" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Please type yes or no.&quot;</span>)</span>
+<span id="cb2-213"><a href="#cb2-213" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-214"><a href="#cb2-214" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-215"><a href="#cb2-215" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-216"><a href="#cb2-216" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Load the word list and run games until the player chooses to stop.&quot;&quot;&quot;</span></span>
+<span id="cb2-217"><a href="#cb2-217" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> load_words(<span class="st">&quot;new_words.txt&quot;</span>)</span>
+<span id="cb2-218"><a href="#cb2-218" aria-hidden="true" tabindex="-1"></a>    show_welcome()</span>
+<span id="cb2-219"><a href="#cb2-219" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-220"><a href="#cb2-220" aria-hidden="true" tabindex="-1"></a>    wins <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-221"><a href="#cb2-221" aria-hidden="true" tabindex="-1"></a>    losses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-222"><a href="#cb2-222" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-223"><a href="#cb2-223" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb2-224"><a href="#cb2-224" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Starting a new game.&quot;</span>)</span>
+<span id="cb2-225"><a href="#cb2-225" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> play_one_game(words)</span>
+<span id="cb2-226"><a href="#cb2-226" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-227"><a href="#cb2-227" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="op">==</span> <span class="st">&quot;won&quot;</span>:</span>
+<span id="cb2-228"><a href="#cb2-228" aria-hidden="true" tabindex="-1"></a>            wins <span class="op">=</span> wins <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-229"><a href="#cb2-229" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> result <span class="op">==</span> <span class="st">&quot;lost&quot;</span>:</span>
+<span id="cb2-230"><a href="#cb2-230" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> losses <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-231"><a href="#cb2-231" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-232"><a href="#cb2-232" aria-hidden="true" tabindex="-1"></a>        show_score(wins, losses)</span>
+<span id="cb2-233"><a href="#cb2-233" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-234"><a href="#cb2-234" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="op">==</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb2-235"><a href="#cb2-235" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb2-236"><a href="#cb2-236" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> ask_play_again():</span>
+<span id="cb2-237"><a href="#cb2-237" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb2-238"><a href="#cb2-238" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb2-239"><a href="#cb2-239" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-240"><a href="#cb2-240" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Thanks for playing Hangman. Goodbye.&quot;</span>)</span>
+<span id="cb2-241"><a href="#cb2-241" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-242"><a href="#cb2-242" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-243"><a href="#cb2-243" aria-hidden="true" tabindex="-1"></a>main()</span></code></pre></div>
+<h3 id="how-the-program-is-organized">How the Program Is Organized</h3>
+<p>The program has four parts, from top to bottom:</p>
+<ol type="1">
+<li>A docstring that describes the program, the
+<code>import random</code> line, and one constant,
+<code>MAX_WRONG_GUESSES</code>.</li>
+<li>Small helper functions that do one job each and print nothing:
+<code>load_words()</code>, <code>make_display_word()</code>,
+<code>has_won()</code>, <code>has_lost()</code>,
+<code>spell_word()</code>, and <code>count_blanks()</code>. The
+exception is <code>show_score()</code>, which prints the score.</li>
+<li>Functions that talk to the player: <code>get_guess()</code>,
+<code>check_guess()</code>, <code>show_welcome()</code>,
+<code>show_help()</code>, <code>show_status()</code>,
+<code>play_one_game()</code>, and <code>ask_play_again()</code>.</li>
+<li>The <code>main()</code> function, which runs the whole thing, and
+the single line <code>main()</code> at the very bottom that calls
+it.</li>
+</ol>
+<p>A good way to move around the file with a screen reader is to search
+for <code>def</code>, the word def followed by a space. Every function
+starts with it.</p>
+<p>The rest of this lesson walks through the program in this order.
+Along the way, you will stop and try new ideas in the interactive
+shell.</p>
+<h2 id="docstrings-importing-and-constants">Docstrings, Importing, and
+Constants</h2>
+<p>The very first line of the program is a string by itself:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Play a text-based game of Hangman in the terminal.&quot;&quot;&quot;</span></span></code></pre></div>
+<p>A string in three double quotes can stretch across several lines.
+When a string like this is the first thing in a file or the first line
+of a function, it is called a docstring, short for documentation string.
+Python does not print it. It is there to tell people reading the code
+what the file or function does. Every function in this program has a
+docstring.</p>
+<p>Some docstrings in this program put a name between two pairs of
+backquotes, like <code>``file_name``</code>. That is just a common way
+of marking a name in documentation. It does not change how the program
+runs.</p>
+<p>You can read a function’s docstring in the interactive shell with the
+<code>help()</code> function. For example, after you type a function
+into the shell, <code>help(has_won)</code> reads you its docstring.</p>
+<p>Next comes the import:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span></code></pre></div>
+<p>The game picks a random secret word. The <code>random</code> module
+has the code that does that, so the program imports it.</p>
+<p>Then comes a variable with a name in all capital letters:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>MAX_WRONG_GUESSES <span class="op">=</span> <span class="dv">6</span></span></code></pre></div>
+<p>A name in all capitals is the Python way of saying “this is a
+constant.” A constant is a variable whose value should never change
+after it is set. Python does not stop you from changing it. The capital
+letters are a message to people reading the code.</p>
+<p>Why use a constant instead of typing 6 everywhere? The number of
+allowed wrong guesses is used in four places: the welcome message, the
+status report, the win message, and the check for a loss. If you want to
+make the game easier and allow eight wrong guesses, you change one line
+and every part of the game agrees. If you had typed 6 in four places,
+you might change three of them and forget the fourth.</p>
+<h2 id="lists">Lists</h2>
+<p>The game has to keep track of many words and many guessed letters. It
+does this with lists. A list is a value that holds other values in
+order. Try this in the interactive shell:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> animals <span class="op">=</span> [<span class="st">&quot;aardvark&quot;</span>, <span class="st">&quot;anteater&quot;</span>, <span class="st">&quot;antelope&quot;</span>, <span class="st">&quot;albert&quot;</span>]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> animals</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;aardvark&#39;</span>, <span class="st">&#39;anteater&#39;</span>, <span class="st">&#39;antelope&#39;</span>, <span class="st">&#39;albert&#39;</span>]</span></code></pre></div>
+<p>A list starts with a left square bracket and ends with a right square
+bracket. Commas separate the values inside. The values in a list are
+called items. This list has four items, and each one is a string.</p>
+<p>Without lists, you would need a separate variable for every animal.
+That would be impossible to manage with the more than 48,000 words in
+<code>new_words.txt</code>. A list can hold any number of items.</p>
+<h3 id="getting-items-by-index">Getting Items by Index</h3>
+<p>Each item in a list has a number called its index. The first item is
+at index 0, the second at index 1, and so on. Put the index in square
+brackets after the list to get that item:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> animals[<span class="dv">0</span>]</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;aardvark&#39;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> animals[<span class="dv">3</span>]</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;albert&#39;</span></span></code></pre></div>
+<p>If you ask for an index that does not exist, Python stops with an
+<code>IndexError</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> animals[<span class="dv">9999</span>]</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>  File <span class="st">&quot;&lt;stdin&gt;&quot;</span>, line <span class="dv">1</span>, <span class="kw">in</span> <span class="op">&lt;</span>module<span class="op">&gt;</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="pp">IndexError</span>: <span class="bu">list</span> index out of <span class="bu">range</span></span></code></pre></div>
+<p>Our Hangman program does not use indexes directly, but it helps to
+know they are there. The <code>random.choice()</code> function, which
+you will meet soon, uses them for you.</p>
+<h3 id="the-len-function">The len() Function</h3>
+<p>The <code>len()</code> function tells you how many items are in a
+list. It also tells you how many characters are in a string:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">len</span>(animals)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">len</span>(<span class="st">&quot;lobby&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span></code></pre></div>
+<p>The game uses <code>len()</code> to tell the player how many letters
+the secret word has, to check whether the player typed exactly one
+character, and to see whether any letters have been guessed yet.</p>
+<h3 id="the-in-and-not-in-operators">The in and not in Operators</h3>
+<p>The <code>in</code> operator checks whether a value is somewhere in a
+list. It gives back <code>True</code> or <code>False</code>:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;antelope&quot;</span> <span class="kw">in</span> animals</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;ant&quot;</span> <span class="kw">in</span> animals</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<p><code>in</code> also works on strings. It checks whether one string
+appears inside another:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;obb&quot;</span> <span class="kw">in</span> <span class="st">&quot;lobby&quot;</span></span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>The <code>not in</code> operator is the opposite. It gives
+<code>True</code> when the value is missing:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;z&quot;</span> <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;b&quot;</span>, <span class="st">&quot;e&quot;</span>, <span class="st">&quot;o&quot;</span>]</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>Hangman uses <code>in</code> and <code>not in</code> to ask, “Has the
+player already guessed this letter?”</p>
+<h2 id="methods">Methods</h2>
+<p>A method is a function that belongs to a value. To call a method,
+type the value, a period, and then the method name with parentheses.
+Python has many methods for lists and strings. Here are the ones Hangman
+uses.</p>
+<h3 id="the-append-list-method">The append() List Method</h3>
+<p>The <code>append()</code> method adds an item to the end of a
+list:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> letters <span class="op">=</span> []</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> letters.append(<span class="st">&quot;e&quot;</span>)</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> letters</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;e&#39;</span>]</span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> letters.append(<span class="st">&quot;o&quot;</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> letters</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;e&#39;</span>, <span class="st">&#39;o&#39;</span>]</span></code></pre></div>
+<p>Two square brackets with nothing between them make an empty list. The
+game starts each round with an empty list of guessed letters and appends
+each new guess to it.</p>
+<p><code>append()</code> changes the list it is called on. It does not
+make a new list. We say it changes the list in place.</p>
+<h3 id="the-strip-and-lower-string-methods">The strip() and lower()
+String Methods</h3>
+<p>The <code>strip()</code> method gives back a copy of a string with
+spaces, tabs, and line endings removed from both ends. The middle is
+left alone:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;  b  &quot;</span>.strip()</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;b&#39;</span></span></code></pre></div>
+<p>The <code>lower()</code> method gives back a copy of a string with
+every letter in lowercase. There is also an <code>upper()</code> method
+that does the opposite:</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;Hello World!&quot;</span>.lower()</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;hello world!&#39;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;Hello World!&quot;</span>.upper()</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;HELLO WORLD!&#39;</span></span></code></pre></div>
+<p>You can chain methods, one after another. Python runs them from left
+to right. Each method works on the string the one before it gave
+back:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;  B &quot;</span>.strip().lower()</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;b&#39;</span></span></code></pre></div>
+<p>String methods never change the original string. They give back a new
+one. So to keep the result, you store it in a variable, like this:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> guess <span class="op">=</span> <span class="st">&quot;  B &quot;</span></span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> guess <span class="op">=</span> guess.strip().lower()</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> guess</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;b&#39;</span></span></code></pre></div>
+<p>Hangman uses these two methods on everything the player types. Then
+it does not matter if the player presses the space bar by accident or
+types a capital letter.</p>
+<h3 id="the-isalpha-string-method">The isalpha() String Method</h3>
+<p>The <code>isalpha()</code> method gives <code>True</code> if every
+character in the string is a letter, and <code>False</code> if not:</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;b&quot;</span>.isalpha()</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;7&quot;</span>.isalpha()</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<h3 id="the-count-string-method">The count() String Method</h3>
+<p>The <code>count()</code> method tells you how many times one string
+appears inside another:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;lobby&quot;</span>.count(<span class="st">&quot;b&quot;</span>)</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;lobby&quot;</span>.count(<span class="st">&quot;z&quot;</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span></span></code></pre></div>
+<p>Hangman uses <code>count()</code> to tell the player how many times
+their letter appears in the word.</p>
+<h3 id="the-startswith-string-method">The startswith() String
+Method</h3>
+<p>The <code>startswith()</code> method gives <code>True</code> if a
+string begins with the string you pass to it:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;yes&quot;</span>.startswith(<span class="st">&quot;y&quot;</span>)</span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;yes&quot;</span>.startswith(<span class="st">&quot;ye&quot;</span>)</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;yes&quot;</span>.startswith(<span class="st">&quot;n&quot;</span>)</span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<p>There is also an <code>endswith()</code> method that checks the end
+of a string.</p>
+<h3 id="the-join-string-method">The join() String Method</h3>
+<p>The <code>join()</code> method is a little different. You call it on
+the string you want to put between items, and you pass it the items:</p>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot; &quot;</span>.join([<span class="st">&quot;_&quot;</span>, <span class="st">&quot;o&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;_&quot;</span>])</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;_ o b b _&#39;</span></span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;, &quot;</span>.join([<span class="st">&quot;b&quot;</span>, <span class="st">&quot;e&quot;</span>, <span class="st">&quot;o&quot;</span>])</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;b, e, o&#39;</span></span></code></pre></div>
+<p>A string is a sequence of characters, so you can also join the
+characters of a string:</p>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot; &quot;</span>.join(<span class="st">&quot;lobby&quot;</span>)</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;l o b b y&#39;</span></span></code></pre></div>
+<p><code>join()</code> is the most important method for making this game
+accessible. It puts spaces between the letters of the word so a screen
+reader reads them one at a time. It puts commas between the guessed
+letters so they are easy to tell apart.</p>
+<h2 id="reading-the-word-list-from-a-file">Reading the Word List from a
+File</h2>
+<p>The first function in the program reads the words from
+<code>new_words.txt</code>:</p>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> load_words(file_name):</span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Read and return the words in the file at ``file_name``.&quot;&quot;&quot;</span></span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> []</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>    word_file <span class="op">=</span> <span class="bu">open</span>(file_name, <span class="st">&quot;r&quot;</span>)</span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> word <span class="kw">in</span> word_file:</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a>        words.append(word.strip())</span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a>    word_file.close()</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> words</span></code></pre></div>
+<p>The function takes one parameter, <code>file_name</code>, the name of
+the file to read. It starts with an empty list called
+<code>words</code>.</p>
+<p>The <code>open()</code> function opens a file so the program can use
+it. Its second argument, <code>"r"</code>, means “read.” The program
+will only read the file, not change it. <code>open()</code> gives back a
+file object, which is stored in <code>word_file</code>.</p>
+<p>A <code>for</code> loop over a file object gives you one line of the
+file at a time. Each line still has the invisible line-ending character
+at the end, so <code>word.strip()</code> removes it before the word is
+appended to the list.</p>
+<p>When the loop is done, <code>word_file.close()</code> closes the
+file. It is good manners to close a file when you are finished with it.
+Finally, the function returns the full list of words.</p>
+<p>The file must be in the folder you run the program from. If Python
+says <code>FileNotFoundError</code>, check that
+<code>new_words.txt</code> is in the same folder as
+<code>hangman.py</code> and that you started the program from that
+folder.</p>
+<p>Keeping words in a separate file has a big advantage. You can change
+the words without changing the code. Make a file of your own, with one
+word on each line, and the game will use it.</p>
+<h2 id="showing-the-word-with-blanks">Showing the Word with Blanks</h2>
+<p>The next function builds the version of the secret word the player
+hears, with an underscore for each letter that has not been guessed:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> make_display_word(secret_word, guessed_letters):</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return the secret word with unguessed letters replaced by underscores.</span></span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Separate the displayed characters with spaces so they can be read aloud</span></span>
+<span id="cb24-5"><a href="#cb24-5" aria-hidden="true" tabindex="-1"></a><span class="co">    one by one by a screen reader.</span></span>
+<span id="cb24-6"><a href="#cb24-6" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb24-7"><a href="#cb24-7" aria-hidden="true" tabindex="-1"></a>    display <span class="op">=</span> []</span>
+<span id="cb24-8"><a href="#cb24-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> letter <span class="kw">in</span> secret_word:</span>
+<span id="cb24-9"><a href="#cb24-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> letter.lower() <span class="kw">in</span> guessed_letters:</span>
+<span id="cb24-10"><a href="#cb24-10" aria-hidden="true" tabindex="-1"></a>            display.append(letter)</span>
+<span id="cb24-11"><a href="#cb24-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb24-12"><a href="#cb24-12" aria-hidden="true" tabindex="-1"></a>            display.append(<span class="st">&quot;_&quot;</span>)</span>
+<span id="cb24-13"><a href="#cb24-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot; &quot;</span>.join(display)</span></code></pre></div>
+<p>It has two parameters. <code>secret_word</code> is the word the
+player is trying to guess. <code>guessed_letters</code> is the list of
+letters guessed so far.</p>
+<p>A <code>for</code> loop over a string gives you one character at a
+time. For each letter in the secret word, the function asks whether that
+letter has been guessed. If it has, the real letter goes into the
+<code>display</code> list. If not, an underscore goes in instead.</p>
+<p>Why <code>letter.lower()</code>? Some words in the word list start
+with a capital letter, such as names of people and places. The player’s
+guesses are always lowercase. To compare them fairly, the function makes
+a lowercase copy of each letter before checking it. Notice that it
+appends the original <code>letter</code>, so a capital letter still
+shows as a capital.</p>
+<p>At the end, <code>" ".join(display)</code> turns the list into one
+string with a space between each item.</p>
+<p>Let’s follow the function when the secret word is lobby and the
+guessed letters are <code>["e", "o", "b"]</code>:</p>
+<ol type="1">
+<li><code>l</code> is not in the guessed letters, so <code>_</code> is
+appended.</li>
+<li><code>o</code> is in the guessed letters, so <code>o</code> is
+appended.</li>
+<li><code>b</code> is in the guessed letters, so <code>b</code> is
+appended.</li>
+<li>The second <code>b</code> is also appended.</li>
+<li><code>y</code> is not in the guessed letters, so <code>_</code> is
+appended.</li>
+</ol>
+<p>The list is now <code>["_", "o", "b", "b", "_"]</code>, and the
+function returns the string <code>_ o b b _</code>.</p>
+<h2 id="counting-blanks-winning-and-losing">Counting Blanks, Winning,
+and Losing</h2>
+<p>The next few functions answer simple questions about the game. Each
+one does one job and returns the answer.</p>
+<h3 id="counting-the-unknown-letters">Counting the Unknown Letters</h3>
+<p><code>count_blanks()</code> appears later in the file, but it is
+easiest to look at first, because <code>has_won()</code> uses it:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> count_blanks(secret_word, guessed_letters):</span>
+<span id="cb25-2"><a href="#cb25-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return the number of letters in ``secret_word`` not yet guessed.&quot;&quot;&quot;</span></span>
+<span id="cb25-3"><a href="#cb25-3" aria-hidden="true" tabindex="-1"></a>    blanks <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb25-4"><a href="#cb25-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> letter <span class="kw">in</span> secret_word:</span>
+<span id="cb25-5"><a href="#cb25-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> letter.lower() <span class="kw">not</span> <span class="kw">in</span> guessed_letters:</span>
+<span id="cb25-6"><a href="#cb25-6" aria-hidden="true" tabindex="-1"></a>            blanks <span class="op">=</span> blanks <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb25-7"><a href="#cb25-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> blanks</span></code></pre></div>
+<p>This works like <code>make_display_word()</code>, but instead of
+building a list, it counts. <code>blanks</code> starts at 0. Every time
+the loop finds a letter that has not been guessed, it adds 1. For lobby
+with <code>e</code>, <code>o</code>, and <code>b</code> guessed, the
+<code>l</code> and the <code>y</code> are unknown, so the function
+returns 2.</p>
+<p>Each repeated letter counts on its own. Lobby has two b’s, so before
+<code>b</code> is guessed, it adds 2 to the count.</p>
+<p>The game tells the player this number after every guess. It is the
+second way of showing the same fact, in case the player’s screen reader
+does not speak the underscores.</p>
+<h3 id="checking-for-a-win">Checking for a Win</h3>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_won(secret_word, guessed_letters):</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return whether every letter in ``secret_word`` has been guessed.&quot;&quot;&quot;</span></span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> count_blanks(secret_word, guessed_letters) <span class="op">==</span> <span class="dv">0</span></span></code></pre></div>
+<p>The player has won when there are no blanks left. This function calls
+<code>count_blanks()</code> and compares the answer with 0. The
+comparison <code>== 0</code> gives <code>True</code> or
+<code>False</code>, and the function returns that value.</p>
+<p>This is a function calling another function. Notice that
+<code>has_won()</code> is written above <code>count_blanks()</code> in
+the file. That is fine. Python only needs <code>count_blanks()</code> to
+exist by the time <code>has_won()</code> actually runs, and nothing runs
+until the last line of the file calls <code>main()</code>.</p>
+<p>Why not just check whether the guessed letters equal the secret word?
+The player may guess the letters in any order, and guess wrong letters
+too. For lobby, the guessed letters might be
+<code>e, o, b, t, l, y</code>. That list is nothing like the word lobby,
+yet the player has found every letter. Counting blanks gives the right
+answer every time.</p>
+<h3 id="checking-for-a-loss">Checking for a Loss</h3>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> has_lost(wrong_guesses):</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return whether the number of wrong guesses has reached the limit.&quot;&quot;&quot;</span></span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> wrong_guesses <span class="op">&gt;=</span> MAX_WRONG_GUESSES</span></code></pre></div>
+<p>The <code>&gt;=</code> operator means “greater than or equal to.” The
+player has lost once the number of wrong guesses reaches the limit. This
+function reads the constant <code>MAX_WRONG_GUESSES</code>. Functions
+can read variables that are set outside of any function.</p>
+<h3 id="spelling-a-word">Spelling a Word</h3>
+<div class="sourceCode" id="cb28"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb28-1"><a href="#cb28-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> spell_word(word):</span>
+<span id="cb28-2"><a href="#cb28-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Return ``word`` with spaces between its letters for spoken output.&quot;&quot;&quot;</span></span>
+<span id="cb28-3"><a href="#cb28-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="st">&quot; &quot;</span>.join(word)</span></code></pre></div>
+<p>This is one line, but it is an important accessibility feature. When
+the game ends without a win, the player hears the word spoken as a word
+and then hears it spelled, <code>l o b b y</code>. A screen reader might
+say an unusual word in a way that is hard to recognize. The spelling
+removes any doubt.</p>
+<h3 id="showing-the-score">Showing the Score</h3>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_score(wins, losses):</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the totals for games won and lost.&quot;&quot;&quot;</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Games won: &quot;</span> <span class="op">+</span> <span class="bu">str</span>(wins) <span class="op">+</span> <span class="st">&quot;. Games lost: &quot;</span> <span class="op">+</span> <span class="bu">str</span>(losses) <span class="op">+</span> <span class="st">&quot;.&quot;</span>)</span></code></pre></div>
+<p>The <code>+</code> operator joins strings together, but it cannot
+join a string and a number. The <code>str()</code> function turns the
+numbers into strings first. If <code>wins</code> is 1 and
+<code>losses</code> is 0, this prints
+<code>Games won: 1. Games lost: 0.</code></p>
+<h2 id="getting-the-players-guess">Getting the Player’s Guess</h2>
+<p><code>get_guess()</code> asks the player for a guess. It does not
+give up until the player types something the game can use.</p>
+<div class="sourceCode" id="cb30"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb30-1"><a href="#cb30-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> get_guess(guessed_letters):</span>
+<span id="cb30-2"><a href="#cb30-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Prompt until the player enters a valid letter or a supported command.</span></span>
+<span id="cb30-3"><a href="#cb30-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-4"><a href="#cb30-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Return a new guessed letter, ``&quot;quit&quot;``, or ``&quot;status&quot;``. The ``help``</span></span>
+<span id="cb30-5"><a href="#cb30-5" aria-hidden="true" tabindex="-1"></a><span class="co">    command displays instructions and then prompts again.</span></span>
+<span id="cb30-6"><a href="#cb30-6" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb30-7"><a href="#cb30-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb30-8"><a href="#cb30-8" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Your guess: &quot;</span>)</span>
+<span id="cb30-9"><a href="#cb30-9" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> guess.strip().lower()</span>
+<span id="cb30-10"><a href="#cb30-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb30-11"><a href="#cb30-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;help&quot;</span>:</span>
+<span id="cb30-12"><a href="#cb30-12" aria-hidden="true" tabindex="-1"></a>            show_help()</span>
+<span id="cb30-13"><a href="#cb30-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> guess <span class="kw">in</span> [<span class="st">&quot;quit&quot;</span>, <span class="st">&quot;status&quot;</span>]:</span>
+<span id="cb30-14"><a href="#cb30-14" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> guess</span>
+<span id="cb30-15"><a href="#cb30-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="bu">len</span>(guess) <span class="op">!=</span> <span class="dv">1</span>:</span>
+<span id="cb30-16"><a href="#cb30-16" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Please type just one letter.&quot;</span>)</span>
+<span id="cb30-17"><a href="#cb30-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="kw">not</span> guess.isalpha():</span>
+<span id="cb30-18"><a href="#cb30-18" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;That is not a letter. Please type a letter from a to z.&quot;</span>)</span>
+<span id="cb30-19"><a href="#cb30-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> guess <span class="kw">in</span> guessed_letters:</span>
+<span id="cb30-20"><a href="#cb30-20" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb30-21"><a href="#cb30-21" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;You already guessed &quot;</span> <span class="op">+</span> guess <span class="op">+</span> <span class="st">&quot;. Try a different letter.&quot;</span></span>
+<span id="cb30-22"><a href="#cb30-22" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb30-23"><a href="#cb30-23" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb30-24"><a href="#cb30-24" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> guess</span></code></pre></div>
+<h3 id="a-prompt-the-player-can-hear">A Prompt the Player Can Hear</h3>
+<p><code>input("Your guess: ")</code> prints the words
+<code>Your guess:</code> and waits for the player to type something and
+press Enter. Putting the prompt inside <code>input()</code> keeps the
+prompt and the answer on the same line. A screen reader user who reviews
+the screen later hears <code>Your guess: b</code> on one line, which
+makes clear what they typed and why.</p>
+<p>Next, <code>guess.strip().lower()</code> removes any extra spaces and
+makes the guess lowercase. Now <code>B</code>, <code>b</code>, and
+<code>b</code> with spaces around it all become <code>b</code>.</p>
+<h3 id="leaving-a-while-true-loop">Leaving a while True Loop</h3>
+<p>The loop is <code>while True:</code>. <code>True</code> is always
+true, so this loop never ends on its own. The only way out is a
+<code>return</code> statement, which leaves not just the loop but the
+whole function, handing a value back to whoever called it.</p>
+<p>That is exactly what we want. The function keeps asking until the
+guess is good, and then returns it.</p>
+<h3 id="elif-statements">elif Statements</h3>
+<p>The checks inside the loop use <code>elif</code>, which is short for
+“else if.” An <code>if</code> statement with <code>elif</code> parts
+says, “If this is true, do this. Or else, if this next thing is true, do
+that. Or else, if none of them is true, do this last thing.”</p>
+<p>Here is a smaller example. Try it with different values of
+<code>cat_name</code>:</p>
+<div class="sourceCode" id="cb31"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> cat_name <span class="op">==</span> <span class="st">&quot;Fuzzball&quot;</span>:</span>
+<span id="cb31-2"><a href="#cb31-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Your cat is fuzzy.&quot;</span>)</span>
+<span id="cb31-3"><a href="#cb31-3" aria-hidden="true" tabindex="-1"></a><span class="cf">elif</span> cat_name <span class="op">==</span> <span class="st">&quot;Spots&quot;</span>:</span>
+<span id="cb31-4"><a href="#cb31-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Your cat is spotted.&quot;</span>)</span>
+<span id="cb31-5"><a href="#cb31-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb31-6"><a href="#cb31-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Your cat is not fuzzy or spotted.&quot;</span>)</span></code></pre></div>
+<p>Python checks each condition from the top down. As soon as one is
+true, it runs that block and skips all the rest. So one, and only one,
+of the blocks runs. You can have as many <code>elif</code> parts as you
+want, and the <code>else</code> part at the end is optional.</p>
+<h3 id="the-order-of-the-checks-matters">The Order of the Checks
+Matters</h3>
+<p>Here are the checks in <code>get_guess()</code>, from top to
+bottom:</p>
+<ol type="1">
+<li>If the guess is <code>help</code>, call <code>show_help()</code> to
+read the commands. The loop then goes around and asks again.</li>
+<li>If the guess is <code>quit</code> or <code>status</code>, return it.
+<code>guess in ["quit", "status"]</code> is a short way of asking
+whether the guess is either of those two words.</li>
+<li>If the guess is not exactly one character long, say
+<code>Please type just one letter.</code> The operator <code>!=</code>
+means “is not equal to.”</li>
+<li>If the guess is not a letter, say so. The <code>not</code> operator
+flips <code>True</code> to <code>False</code> and <code>False</code> to
+<code>True</code>. So <code>not guess.isalpha()</code> is true when the
+guess is not a letter.</li>
+<li>If the letter has already been guessed, remind the player.</li>
+<li>If none of those problems happened, return the letter.</li>
+</ol>
+<p>Why are the commands checked first? Because <code>help</code>,
+<code>quit</code>, and <code>status</code> are longer than one letter.
+If the length check came first, typing <code>help</code> would get the
+answer <code>Please type just one letter.</code> and the player could
+never use the command.</p>
+<p>Every message tells the player what went wrong and what to do
+instead. <code>Please type just one letter.</code> is more helpful than
+<code>Invalid input.</code>, especially when it is the only line the
+player hears.</p>
+<h2 id="checking-a-guess">Checking a Guess</h2>
+<p>Once the player has typed a good letter, <code>check_guess()</code>
+tells them whether it is in the word:</p>
+<div class="sourceCode" id="cb32"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb32-1"><a href="#cb32-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> check_guess(secret_word, guess):</span>
+<span id="cb32-2"><a href="#cb32-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print whether ``guess`` occurs in ``secret_word``.</span></span>
+<span id="cb32-3"><a href="#cb32-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb32-4"><a href="#cb32-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Return the result, True or False.</span></span>
+<span id="cb32-5"><a href="#cb32-5" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb32-6"><a href="#cb32-6" aria-hidden="true" tabindex="-1"></a>    count <span class="op">=</span> secret_word.lower().count(guess)</span>
+<span id="cb32-7"><a href="#cb32-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> count <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb32-8"><a href="#cb32-8" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Sorry, there is no&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb32-9"><a href="#cb32-9" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb32-10"><a href="#cb32-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> count <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb32-11"><a href="#cb32-11" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Yes! There is one&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb32-12"><a href="#cb32-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb32-13"><a href="#cb32-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Yes! There are&quot;</span>, count, <span class="st">&quot;of the letter&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span>
+<span id="cb32-14"><a href="#cb32-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">True</span></span></code></pre></div>
+<p>First it makes a lowercase copy of the secret word and counts how
+many times the guess appears in it. Then there are three cases:</p>
+<ul>
+<li>The count is 0. The letter is not there. The function says so and
+returns <code>False</code>.</li>
+<li>The count is 1. The function says there is one and returns
+<code>True</code>.</li>
+<li>Otherwise, the count is 2 or more. The function says how many and
+returns <code>True</code>.</li>
+</ul>
+<p>This function does two jobs. It tells the player the result, and it
+returns <code>True</code> or <code>False</code> so the rest of the game
+knows whether to count a wrong guess.</p>
+<p>Notice there is no <code>elif</code> or <code>else</code> here. It is
+not needed, because a <code>return</code> statement ends the function.
+If the count is 0, the function returns right away, and the lines below
+it never run. The last two lines only run if neither <code>if</code> was
+true.</p>
+<h3 id="printing-several-values-at-once">Printing Several Values at
+Once</h3>
+<p>These <code>print()</code> calls pass several values separated by
+commas:</p>
+<div class="sourceCode" id="cb33"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Yes! There are&quot;</span>, count, <span class="st">&quot;of the letter&quot;</span>, guess, <span class="st">&quot;in the word.&quot;</span>)</span></code></pre></div>
+<p>When you give <code>print()</code> several values, it prints them all
+on one line and puts a space between each one. It also turns numbers
+into text for you, so there is no need for <code>str()</code>. If
+<code>count</code> is 2 and <code>guess</code> is <code>b</code>, this
+prints <code>Yes! There are 2 of the letter b in the word.</code></p>
+<p>Compare this with <code>show_score()</code>, which uses
+<code>+</code> and <code>str()</code>. Both ways work. With
+<code>+</code>, you control every space yourself. With commas,
+<code>print()</code> adds the spaces for you. That is why
+<code>show_score()</code> can put a period right after a number, as in
+<code>Games lost: 0.</code>, but the comma style always puts a space
+there.</p>
+<h2 id="talking-to-the-player">Talking to the Player</h2>
+<p>Three functions print information for the player.</p>
+<h3 id="the-welcome-message-and-the-help-command">The Welcome Message
+and the Help Command</h3>
+<div class="sourceCode" id="cb34"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb34-1"><a href="#cb34-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_welcome():</span>
+<span id="cb34-2"><a href="#cb34-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the welcome message and basic game instructions.&quot;&quot;&quot;</span></span>
+<span id="cb34-3"><a href="#cb34-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Welcome to Hangman.&quot;</span>)</span>
+<span id="cb34-4"><a href="#cb34-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;I am thinking of a word. Guess it one letter at a time.&quot;</span>)</span>
+<span id="cb34-5"><a href="#cb34-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Each unknown letter is shown as an underscore.&quot;</span>)</span>
+<span id="cb34-6"><a href="#cb34-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;You can make&quot;</span>, MAX_WRONG_GUESSES, <span class="st">&quot;wrong guesses before you lose.&quot;</span>)</span>
+<span id="cb34-7"><a href="#cb34-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type the word help at any time to hear the commands.&quot;</span>)</span>
+<span id="cb34-8"><a href="#cb34-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span>
+<span id="cb34-9"><a href="#cb34-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-10"><a href="#cb34-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb34-11"><a href="#cb34-11" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_help():</span>
+<span id="cb34-12"><a href="#cb34-12" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the available commands and how to use them.&quot;&quot;&quot;</span></span>
+<span id="cb34-13"><a href="#cb34-13" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Commands:&quot;</span>)</span>
+<span id="cb34-14"><a href="#cb34-14" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type one letter and press Enter to guess it.&quot;</span>)</span>
+<span id="cb34-15"><a href="#cb34-15" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type status to hear the word and your guesses again.&quot;</span>)</span>
+<span id="cb34-16"><a href="#cb34-16" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type help to hear these commands.&quot;</span>)</span>
+<span id="cb34-17"><a href="#cb34-17" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Type quit to stop playing.&quot;</span>)</span>
+<span id="cb34-18"><a href="#cb34-18" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div>
+<p>These functions only print. Each message is a complete sentence. The
+welcome message explains what an underscore means, because that is the
+one symbol in the game the player has to understand. It also tells the
+player that <code>help</code> exists, so they never feel stuck.</p>
+<p>Calling <code>print()</code> with nothing between the parentheses
+prints an empty line. The empty line separates one group of messages
+from the next. Many screen readers say “blank” for an empty line, which
+tells the player that a group has ended.</p>
+<h3 id="the-status-report">The Status Report</h3>
+<div class="sourceCode" id="cb35"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> show_status(secret_word, guessed_letters, wrong_guesses):</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Print the current word display and guessed letters.</span></span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Also print how many wrong guesses remain.</span></span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;The word has&quot;</span>, <span class="bu">len</span>(secret_word), <span class="st">&quot;letters.&quot;</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Word:&quot;</span>, make_display_word(secret_word, guessed_letters))</span>
+<span id="cb35-8"><a href="#cb35-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(</span>
+<span id="cb35-9"><a href="#cb35-9" aria-hidden="true" tabindex="-1"></a>        count_blanks(secret_word, guessed_letters),</span>
+<span id="cb35-10"><a href="#cb35-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">&quot;letters are still unknown.&quot;</span>,</span>
+<span id="cb35-11"><a href="#cb35-11" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb35-12"><a href="#cb35-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-13"><a href="#cb35-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> <span class="bu">len</span>(guessed_letters) <span class="op">==</span> <span class="dv">0</span>:</span>
+<span id="cb35-14"><a href="#cb35-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You have not guessed any letters yet.&quot;</span>)</span>
+<span id="cb35-15"><a href="#cb35-15" aria-hidden="true" tabindex="-1"></a>    <span class="cf">else</span>:</span>
+<span id="cb35-16"><a href="#cb35-16" aria-hidden="true" tabindex="-1"></a>        sorted_letters <span class="op">=</span> <span class="bu">sorted</span>(guessed_letters)</span>
+<span id="cb35-17"><a href="#cb35-17" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Letters guessed so far:&quot;</span>, <span class="st">&quot;, &quot;</span>.join(sorted_letters))</span>
+<span id="cb35-18"><a href="#cb35-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb35-19"><a href="#cb35-19" aria-hidden="true" tabindex="-1"></a>    guesses_left <span class="op">=</span> MAX_WRONG_GUESSES <span class="op">-</span> wrong_guesses</span>
+<span id="cb35-20"><a href="#cb35-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Wrong guesses left:&quot;</span>, guesses_left)</span>
+<span id="cb35-21"><a href="#cb35-21" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>()</span></code></pre></div>
+<p>This function replaces the hanging man picture. It tells the player
+everything a sighted player would get from looking at the drawing and
+the blanks:</p>
+<ol type="1">
+<li>How many letters the word has.</li>
+<li>The word itself, with underscores for unknown letters and spaces
+between them. This calls <code>make_display_word()</code>.</li>
+<li>How many letters are still unknown. This calls
+<code>count_blanks()</code>.</li>
+<li>The letters guessed so far.</li>
+<li>How many wrong guesses are left.</li>
+</ol>
+<p>Look at step 4. If no letters have been guessed, the list is empty
+and <code>len(guessed_letters)</code> is 0. Instead of printing an empty
+line after <code>Letters guessed so far:</code>, which would be
+confusing to hear, the game says
+<code>You have not guessed any letters yet.</code></p>
+<p>Otherwise, the built-in <code>sorted()</code> function makes a new
+list with the items in alphabetical order. The original list is not
+changed. Try it:</p>
+<div class="sourceCode" id="cb36"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">sorted</span>([<span class="st">&quot;o&quot;</span>, <span class="st">&quot;e&quot;</span>, <span class="st">&quot;b&quot;</span>])</span>
+<span id="cb36-2"><a href="#cb36-2" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;b&#39;</span>, <span class="st">&#39;e&#39;</span>, <span class="st">&#39;o&#39;</span>]</span></code></pre></div>
+<p>Then <code>", ".join()</code> puts a comma and a space between the
+letters. A screen reader reads <code>b, e, o</code> with a short pause
+at each comma.</p>
+<p>Finally, the number of wrong guesses left is the limit minus the
+wrong guesses so far. Telling the player how many are left, instead of
+how many they have used, answers the question they really care about:
+how close am I to losing?</p>
+<p>The game calls this function at the start of each round, after every
+guess, and whenever the player types <code>status</code>.</p>
+<h2 id="playing-one-game">Playing One Game</h2>
+<p><code>play_one_game()</code> is the heart of the program. It follows
+steps 2 through 7 of the plan. It plays a single game and returns a
+string that says how the game ended: <code>"won"</code>,
+<code>"lost"</code>, or <code>"quit"</code>.</p>
+<div class="sourceCode" id="cb37"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> play_one_game(words):</span>
+<span id="cb37-2"><a href="#cb37-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Play one game using ``words``.</span></span>
+<span id="cb37-3"><a href="#cb37-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-4"><a href="#cb37-4" aria-hidden="true" tabindex="-1"></a><span class="co">    Return ``&quot;won&quot;``, ``&quot;lost&quot;``, or ``&quot;quit&quot;``.</span></span>
+<span id="cb37-5"><a href="#cb37-5" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb37-6"><a href="#cb37-6" aria-hidden="true" tabindex="-1"></a>    secret_word <span class="op">=</span> random.choice(words)</span>
+<span id="cb37-7"><a href="#cb37-7" aria-hidden="true" tabindex="-1"></a>    guessed_letters <span class="op">=</span> []</span>
+<span id="cb37-8"><a href="#cb37-8" aria-hidden="true" tabindex="-1"></a>    wrong_guesses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb37-9"><a href="#cb37-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-10"><a href="#cb37-10" aria-hidden="true" tabindex="-1"></a>    show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb37-11"><a href="#cb37-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-12"><a href="#cb37-12" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb37-13"><a href="#cb37-13" aria-hidden="true" tabindex="-1"></a>        guess <span class="op">=</span> get_guess(guessed_letters)</span>
+<span id="cb37-14"><a href="#cb37-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-15"><a href="#cb37-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb37-16"><a href="#cb37-16" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb37-17"><a href="#cb37-17" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;The word was &quot;</span></span>
+<span id="cb37-18"><a href="#cb37-18" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> secret_word</span>
+<span id="cb37-19"><a href="#cb37-19" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;. It is spelled &quot;</span></span>
+<span id="cb37-20"><a href="#cb37-20" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> spell_word(secret_word)</span>
+<span id="cb37-21"><a href="#cb37-21" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb37-22"><a href="#cb37-22" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb37-23"><a href="#cb37-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;quit&quot;</span></span>
+<span id="cb37-24"><a href="#cb37-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-25"><a href="#cb37-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;status&quot;</span>:</span>
+<span id="cb37-26"><a href="#cb37-26" aria-hidden="true" tabindex="-1"></a>            show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb37-27"><a href="#cb37-27" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb37-28"><a href="#cb37-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-29"><a href="#cb37-29" aria-hidden="true" tabindex="-1"></a>        guessed_letters.append(guess)</span>
+<span id="cb37-30"><a href="#cb37-30" aria-hidden="true" tabindex="-1"></a>        correct <span class="op">=</span> check_guess(secret_word, guess)</span>
+<span id="cb37-31"><a href="#cb37-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> correct:</span>
+<span id="cb37-32"><a href="#cb37-32" aria-hidden="true" tabindex="-1"></a>            wrong_guesses <span class="op">=</span> wrong_guesses <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb37-33"><a href="#cb37-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-34"><a href="#cb37-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_won(secret_word, guessed_letters):</span>
+<span id="cb37-35"><a href="#cb37-35" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You win! The word was &quot;</span> <span class="op">+</span> secret_word <span class="op">+</span> <span class="st">&quot;.&quot;</span>)</span>
+<span id="cb37-36"><a href="#cb37-36" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb37-37"><a href="#cb37-37" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;You had&quot;</span>,</span>
+<span id="cb37-38"><a href="#cb37-38" aria-hidden="true" tabindex="-1"></a>                MAX_WRONG_GUESSES <span class="op">-</span> wrong_guesses,</span>
+<span id="cb37-39"><a href="#cb37-39" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;wrong guesses left.&quot;</span>,</span>
+<span id="cb37-40"><a href="#cb37-40" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb37-41"><a href="#cb37-41" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;won&quot;</span></span>
+<span id="cb37-42"><a href="#cb37-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-43"><a href="#cb37-43" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_lost(wrong_guesses):</span>
+<span id="cb37-44"><a href="#cb37-44" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Out of guesses. You lose.&quot;</span>)</span>
+<span id="cb37-45"><a href="#cb37-45" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb37-46"><a href="#cb37-46" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;The word was &quot;</span></span>
+<span id="cb37-47"><a href="#cb37-47" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> secret_word</span>
+<span id="cb37-48"><a href="#cb37-48" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;. It is spelled &quot;</span></span>
+<span id="cb37-49"><a href="#cb37-49" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> spell_word(secret_word)</span>
+<span id="cb37-50"><a href="#cb37-50" aria-hidden="true" tabindex="-1"></a>                <span class="op">+</span> <span class="st">&quot;.&quot;</span></span>
+<span id="cb37-51"><a href="#cb37-51" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb37-52"><a href="#cb37-52" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;lost&quot;</span></span>
+<span id="cb37-53"><a href="#cb37-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb37-54"><a href="#cb37-54" aria-hidden="true" tabindex="-1"></a>        show_status(secret_word, guessed_letters, wrong_guesses)</span></code></pre></div>
+<h3 id="setting-up-a-new-game">Setting Up a New Game</h3>
+<div class="sourceCode" id="cb38"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a>    secret_word <span class="op">=</span> random.choice(words)</span>
+<span id="cb38-2"><a href="#cb38-2" aria-hidden="true" tabindex="-1"></a>    guessed_letters <span class="op">=</span> []</span>
+<span id="cb38-3"><a href="#cb38-3" aria-hidden="true" tabindex="-1"></a>    wrong_guesses <span class="op">=</span> <span class="dv">0</span></span></code></pre></div>
+<p><code>random.choice()</code> takes a list and returns one item from
+it, picked at random. Try it in the shell a few times:</p>
+<div class="sourceCode" id="cb39"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> random</span>
+<span id="cb39-2"><a href="#cb39-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice([<span class="st">&quot;apple&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;grape&quot;</span>])</span>
+<span id="cb39-3"><a href="#cb39-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;grape&#39;</span></span>
+<span id="cb39-4"><a href="#cb39-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice([<span class="st">&quot;apple&quot;</span>, <span class="st">&quot;orange&quot;</span>, <span class="st">&quot;grape&quot;</span>])</span>
+<span id="cb39-5"><a href="#cb39-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;apple&#39;</span></span></code></pre></div>
+<p>You will probably get different answers, because they are random.</p>
+<p>The game also starts with an empty list of guessed letters and zero
+wrong guesses. These three variables are created inside the function, so
+they are local variables. Every time <code>play_one_game()</code> is
+called, it gets a fresh set. That is how each new game starts clean.</p>
+<p>Then the function calls <code>show_status()</code> so the player
+hears how long the word is before their first guess.</p>
+<h3 id="the-guessing-loop">The Guessing Loop</h3>
+<p>The rest of the function is a <code>while True:</code> loop. Each
+time around the loop is one turn. The loop ends only when a
+<code>return</code> statement runs: when the player quits, wins, or
+loses.</p>
+<p>Each turn starts by calling <code>get_guess()</code>, passing it the
+list of letters already guessed. Remember, <code>get_guess()</code> only
+returns a new letter, <code>"quit"</code>, or <code>"status"</code>. It
+handles everything else itself.</p>
+<h3 id="quitting">Quitting</h3>
+<p>If the guess is <code>"quit"</code>, the game tells the player the
+word and its spelling and returns <code>"quit"</code>.</p>
+<p>The <code>print()</code> call here is long, so it is split across
+several lines. Python allows this because the lines are inside the
+parentheses of <code>print()</code>. Python knows the statement is not
+finished until the closing parenthesis. Each line starts with a
+<code>+</code> sign, which makes it easy to hear that each piece is
+joined to the one before. If the word is lobby, this prints
+<code>The word was lobby. It is spelled l o b b y.</code></p>
+<h3 id="status-and-the-continue-statement">Status and the continue
+Statement</h3>
+<div class="sourceCode" id="cb40"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> guess <span class="op">==</span> <span class="st">&quot;status&quot;</span>:</span>
+<span id="cb40-2"><a href="#cb40-2" aria-hidden="true" tabindex="-1"></a>            show_status(secret_word, guessed_letters, wrong_guesses)</span>
+<span id="cb40-3"><a href="#cb40-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span></code></pre></div>
+<p>If the player typed <code>status</code>, the game reads the status
+again. Then the <code>continue</code> statement jumps straight back to
+the top of the loop, skipping everything below it. The game asks for
+another guess without counting <code>status</code> as a guess.</p>
+<h3 id="recording-the-guess">Recording the Guess</h3>
+<div class="sourceCode" id="cb41"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb41-1"><a href="#cb41-1" aria-hidden="true" tabindex="-1"></a>        guessed_letters.append(guess)</span>
+<span id="cb41-2"><a href="#cb41-2" aria-hidden="true" tabindex="-1"></a>        correct <span class="op">=</span> check_guess(secret_word, guess)</span>
+<span id="cb41-3"><a href="#cb41-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> correct:</span>
+<span id="cb41-4"><a href="#cb41-4" aria-hidden="true" tabindex="-1"></a>            wrong_guesses <span class="op">=</span> wrong_guesses <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<p>If the program gets this far, the guess is a new letter. It is added
+to the list of guessed letters. Then <code>check_guess()</code> tells
+the player whether the letter is in the word and returns
+<code>True</code> or <code>False</code>, which is stored in
+<code>correct</code>.</p>
+<p>If the guess was not correct, one more wrong guess is counted. Notice
+that every letter, right or wrong, goes into
+<code>guessed_letters</code>. That one list is all the game needs to
+know which blanks to fill in and which letters the player cannot guess
+again.</p>
+<h3 id="winning-losing-or-going-around-again">Winning, Losing, or Going
+Around Again</h3>
+<div class="sourceCode" id="cb42"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb42-1"><a href="#cb42-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_won(secret_word, guessed_letters):</span>
+<span id="cb42-2"><a href="#cb42-2" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You win! The word was &quot;</span> <span class="op">+</span> secret_word <span class="op">+</span> <span class="st">&quot;.&quot;</span>)</span>
+<span id="cb42-3"><a href="#cb42-3" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(</span>
+<span id="cb42-4"><a href="#cb42-4" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;You had&quot;</span>,</span>
+<span id="cb42-5"><a href="#cb42-5" aria-hidden="true" tabindex="-1"></a>                MAX_WRONG_GUESSES <span class="op">-</span> wrong_guesses,</span>
+<span id="cb42-6"><a href="#cb42-6" aria-hidden="true" tabindex="-1"></a>                <span class="st">&quot;wrong guesses left.&quot;</span>,</span>
+<span id="cb42-7"><a href="#cb42-7" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb42-8"><a href="#cb42-8" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;won&quot;</span></span>
+<span id="cb42-9"><a href="#cb42-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-10"><a href="#cb42-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> has_lost(wrong_guesses):</span>
+<span id="cb42-11"><a href="#cb42-11" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Out of guesses. You lose.&quot;</span>)</span>
+<span id="cb42-12"><a href="#cb42-12" aria-hidden="true" tabindex="-1"></a>            ...</span>
+<span id="cb42-13"><a href="#cb42-13" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;lost&quot;</span></span>
+<span id="cb42-14"><a href="#cb42-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb42-15"><a href="#cb42-15" aria-hidden="true" tabindex="-1"></a>        show_status(secret_word, guessed_letters, wrong_guesses)</span></code></pre></div>
+<p>The three dots in this short version stand for the long
+<code>print()</code> call that tells the player the word and its
+spelling.</p>
+<p>After each guess, the game checks for a win and then for a loss. Each
+check calls one of the small helper functions you wrote earlier. Because
+those functions have clear names, these lines read almost like English:
+“if has won,” “if has lost.”</p>
+<p>If the player has won, the game says so and returns
+<code>"won"</code>. If they have lost, it tells them the word and its
+spelling and returns <code>"lost"</code>.</p>
+<p>If neither happened, the game reads the status and the loop goes
+around for another turn.</p>
+<h3 id="why-return-a-string">Why Return a String?</h3>
+<p><code>play_one_game()</code> does not keep score itself. It reports
+what happened and lets its caller decide what to do about it. Returning
+a short string, like <code>"won"</code>, is a simple way to do that.
+This keeps each function focused on one job.</p>
+<h2 id="asking-to-play-again">Asking to Play Again</h2>
+<div class="sourceCode" id="cb43"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb43-1"><a href="#cb43-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> ask_play_again():</span>
+<span id="cb43-2"><a href="#cb43-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Prompt until the player answers yes or no, then return their choice.&quot;&quot;&quot;</span></span>
+<span id="cb43-3"><a href="#cb43-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb43-4"><a href="#cb43-4" aria-hidden="true" tabindex="-1"></a>        answer <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Do you want to play again? Type yes or no: &quot;</span>)</span>
+<span id="cb43-5"><a href="#cb43-5" aria-hidden="true" tabindex="-1"></a>        answer <span class="op">=</span> answer.strip().lower()</span>
+<span id="cb43-6"><a href="#cb43-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">&quot;yes&quot;</span>.startswith(answer.lower()):</span>
+<span id="cb43-7"><a href="#cb43-7" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb43-8"><a href="#cb43-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">&quot;no&quot;</span>.startswith(answer.lower()):</span>
+<span id="cb43-9"><a href="#cb43-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb43-10"><a href="#cb43-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Please type yes or no.&quot;</span>)</span></code></pre></div>
+<p>This is another <code>while True:</code> loop that keeps asking until
+it gets a good answer. The prompt tells the player exactly what to
+type.</p>
+<p>The checks use <code>startswith()</code> in a clever, backward way.
+Instead of asking whether the answer starts with <code>y</code>, it asks
+whether the word <code>yes</code> starts with the answer. So
+<code>y</code>, <code>ye</code>, and <code>yes</code> all count as yes.
+In the same way, <code>n</code> and <code>no</code> count as no. A word
+like <code>maybe</code> is neither, so the game says
+<code>Please type yes or no.</code> and asks again.</p>
+<p>The answer has already been made lowercase on the line before, so the
+extra <code>.lower()</code> inside each check does not change anything.
+It is harmless.</p>
+<p>What happens if the player presses Enter without typing anything?
+Then <code>answer</code> is an empty string, and every string starts
+with the empty string. Try it:</p>
+<div class="sourceCode" id="cb44"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb44-1"><a href="#cb44-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;yes&quot;</span>.startswith(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb44-2"><a href="#cb44-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>So pressing Enter alone means yes, and a new game starts. This is a
+good example of why you should test what happens when a player types
+nothing. You will look at this again in the exercises.</p>
+<h2 id="the-main-function">The main() Function</h2>
+<p><code>main()</code> follows the outer part of the plan: steps 1, 8,
+9, and 10.</p>
+<div class="sourceCode" id="cb45"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb45-1"><a href="#cb45-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb45-2"><a href="#cb45-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Load the word list and run games until the player chooses to stop.&quot;&quot;&quot;</span></span>
+<span id="cb45-3"><a href="#cb45-3" aria-hidden="true" tabindex="-1"></a>    words <span class="op">=</span> load_words(<span class="st">&quot;new_words.txt&quot;</span>)</span>
+<span id="cb45-4"><a href="#cb45-4" aria-hidden="true" tabindex="-1"></a>    show_welcome()</span>
+<span id="cb45-5"><a href="#cb45-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-6"><a href="#cb45-6" aria-hidden="true" tabindex="-1"></a>    wins <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb45-7"><a href="#cb45-7" aria-hidden="true" tabindex="-1"></a>    losses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb45-8"><a href="#cb45-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-9"><a href="#cb45-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:</span>
+<span id="cb45-10"><a href="#cb45-10" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;Starting a new game.&quot;</span>)</span>
+<span id="cb45-11"><a href="#cb45-11" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> play_one_game(words)</span>
+<span id="cb45-12"><a href="#cb45-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-13"><a href="#cb45-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="op">==</span> <span class="st">&quot;won&quot;</span>:</span>
+<span id="cb45-14"><a href="#cb45-14" aria-hidden="true" tabindex="-1"></a>            wins <span class="op">=</span> wins <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb45-15"><a href="#cb45-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> result <span class="op">==</span> <span class="st">&quot;lost&quot;</span>:</span>
+<span id="cb45-16"><a href="#cb45-16" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> losses <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb45-17"><a href="#cb45-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-18"><a href="#cb45-18" aria-hidden="true" tabindex="-1"></a>        show_score(wins, losses)</span>
+<span id="cb45-19"><a href="#cb45-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-20"><a href="#cb45-20" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> result <span class="op">==</span> <span class="st">&quot;quit&quot;</span>:</span>
+<span id="cb45-21"><a href="#cb45-21" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb45-22"><a href="#cb45-22" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> ask_play_again():</span>
+<span id="cb45-23"><a href="#cb45-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb45-24"><a href="#cb45-24" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>()</span>
+<span id="cb45-25"><a href="#cb45-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb45-26"><a href="#cb45-26" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;Thanks for playing Hangman. Goodbye.&quot;</span>)</span></code></pre></div>
+<p>First it loads the words, says welcome, and sets the score to zero.
+The words are loaded only once, before the loop, because reading a file
+of 48,000 words takes a moment and the words never change.</p>
+<p>Each time around the loop is one whole game. <code>main()</code>
+stores the string returned by <code>play_one_game()</code> in
+<code>result</code>. If the result is <code>"won"</code>, it adds one to
+<code>wins</code>. If it is <code>"lost"</code>, it adds one to
+<code>losses</code>. If the player quit, neither number changes. Then it
+reports the score.</p>
+<h3 id="leaving-the-loop-with-break">Leaving the Loop with break</h3>
+<p>The <code>break</code> statement leaves a loop right away. Unlike
+<code>return</code>, it does not leave the function. The program carries
+on with the first line after the loop, which here says goodbye.</p>
+<p>There are two ways out of this loop:</p>
+<ul>
+<li>If the player typed <code>quit</code>, the game breaks out of the
+loop without asking whether to play again. The player already said they
+want to stop.</li>
+<li>If <code>ask_play_again()</code> returns <code>False</code>, then
+<code>not ask_play_again()</code> is <code>True</code>, and the game
+breaks out of the loop.</li>
+</ul>
+<p>Notice that <code>ask_play_again()</code> is called inside the
+<code>if</code> condition itself. The question is asked, the answer
+comes back, and the <code>if</code> uses it, all on one line.</p>
+<p>If the player wants another game, <code>print()</code> prints an
+empty line to separate the games, and the loop goes around again.</p>
+<h3 id="calling-main">Calling main()</h3>
+<p>The very last line of the program is:</p>
+<div class="sourceCode" id="cb46"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb46-1"><a href="#cb46-1" aria-hidden="true" tabindex="-1"></a>main()</span></code></pre></div>
+<p>Everything above it is a function definition. Defining a function
+does not run it. It only teaches Python what the function means. This
+one line is what actually starts the game. If you leave it out, the
+program runs, defines all the functions, and then ends without doing
+anything.</p>
+<p>Putting the main part of a program in a function named
+<code>main()</code> is a common habit. It makes the start of the program
+easy to find. Search for <code>def main</code> and you are there.</p>
+<h2 id="review-of-the-hangman-functions">Review of the Hangman
+Functions</h2>
+<p>Here is every function in the program and the job it does.</p>
+<ul>
+<li><code>load_words(file_name)</code> reads the file and returns a list
+of words.</li>
+<li><code>make_display_word(secret_word, guessed_letters)</code> returns
+the word with underscores for unknown letters and spaces between
+characters.</li>
+<li><code>has_won(secret_word, guessed_letters)</code> returns
+<code>True</code> if no blanks are left.</li>
+<li><code>has_lost(wrong_guesses)</code> returns <code>True</code> if
+the player has used all their wrong guesses.</li>
+<li><code>spell_word(word)</code> returns the word with spaces between
+its letters.</li>
+<li><code>show_score(wins, losses)</code> prints the number of games won
+and lost.</li>
+<li><code>count_blanks(secret_word, guessed_letters)</code> returns how
+many letters are still unknown.</li>
+<li><code>get_guess(guessed_letters)</code> asks until it gets a new
+letter, <code>"quit"</code>, or <code>"status"</code>, and returns it.
+It handles <code>help</code> itself.</li>
+<li><code>check_guess(secret_word, guess)</code> says whether the letter
+is in the word and how many times, and returns <code>True</code> or
+<code>False</code>.</li>
+<li><code>show_welcome()</code> prints the welcome and the basic
+rules.</li>
+<li><code>show_help()</code> prints the commands.</li>
+<li><code>show_status(secret_word, guessed_letters, wrong_guesses)</code>
+prints everything the player needs to know about the current game.</li>
+<li><code>play_one_game(words)</code> plays one game and returns
+<code>"won"</code>, <code>"lost"</code>, or <code>"quit"</code>.</li>
+<li><code>ask_play_again()</code> returns <code>True</code> for yes and
+<code>False</code> for no.</li>
+<li><code>main()</code> runs games, keeps score, and says goodbye.</li>
+</ul>
+<p>Look back at the plan. Each step in it became one of these functions,
+or a few lines inside <code>play_one_game()</code> or
+<code>main()</code>. That is what a good plan does for you.</p>
+<h2 id="summary">Summary</h2>
+<p>Hangman is the biggest game you have written so far. You planned it
+first, with a flowchart written as a numbered outline, and then turned
+each step into code.</p>
+<p>You also designed it to be heard instead of seen. You replaced
+pictures with words, put spaces between letters, gave the same fact in
+more than one way, let the player hear the status again, and spelled the
+answer. These choices are not extras added at the end. They shaped the
+code from the start.</p>
+<p>Along the way, you learned these Python ideas:</p>
+<ul>
+<li>Lists hold many values in order. <code>append()</code> adds to a
+list, <code>in</code> and <code>not in</code> check what is in it,
+<code>len()</code> counts it, and <code>sorted()</code> returns a sorted
+copy.</li>
+<li>Methods are functions attached to a value. Strings have
+<code>strip()</code>, <code>lower()</code>, <code>upper()</code>,
+<code>isalpha()</code>, <code>count()</code>, <code>startswith()</code>,
+<code>endswith()</code>, and <code>join()</code>.</li>
+<li><code>open()</code> opens a file, a <code>for</code> loop reads it a
+line at a time, and <code>close()</code> closes it.</li>
+<li><code>random.choice()</code> picks a random item from a list.</li>
+<li><code>elif</code> lets you check several conditions in a row. Only
+one block runs.</li>
+<li>A <code>while True:</code> loop runs until a <code>return</code> or
+<code>break</code> statement ends it. <code>continue</code> jumps back
+to the top of the loop.</li>
+<li>Constants are written in capital letters and should not change.</li>
+<li>Docstrings explain what a file or function does.</li>
+<li>Small functions with clear names make a big program easy to
+read.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<p>Try these changes to practice what you have learned. Save a copy of
+<code>hangman.py</code> before you start, so you can always go back.</p>
+<ol type="1">
+<li>Change <code>MAX_WRONG_GUESSES</code> to 8. Play a game and listen
+for every message that changed. How many lines of code did you have to
+change?</li>
+<li>When only one letter is left, the game says
+<code>1 letters are still unknown.</code> Change
+<code>show_status()</code> so it says
+<code>1 letter is still unknown.</code> when there is exactly one. Hint:
+use an <code>if</code> and <code>else</code>, as
+<code>check_guess()</code> does.</li>
+<li>Some words in <code>new_words.txt</code> contain an apostrophe, such
+as <code>abbey's</code>. The player can never guess an apostrophe, so
+those games cannot be won. Change <code>load_words()</code> so it only
+appends a word if <code>word.strip().isalpha()</code> is
+<code>True</code>.</li>
+<li>Pressing Enter without typing anything at the play-again question
+counts as yes. Change <code>ask_play_again()</code> so an empty answer
+gets the message <code>Please type yes or no.</code> instead.</li>
+<li>Make your own word list file with one word on each line, such as
+animals or words from a subject you are studying. Change
+<code>main()</code> to load your file instead.</li>
+<li>Add a new command, <code>guesses</code>, that tells the player only
+how many wrong guesses they have left. Which two functions do you need
+to change? Remember to add it to <code>show_help()</code>, too.</li>
+</ol>

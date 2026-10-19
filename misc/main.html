@@ -1,0 +1,165 @@
+<h1 id="a-starting-point-for-every-program">A Starting Point for Every
+Program</h1>
+<p>This program does nothing at all when you run it. That is on purpose.
+It is a <em>template</em>: a skeleton that you copy when you start a new
+program. It shows the shape that most Python programs have, with a
+<code>main()</code> function and a special <code>if</code> statement at
+the bottom.</p>
+<p>In this lesson you will learn how to make your own functions and why
+so many Python programs end with the same two lines.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Defining a function with <code>def</code></li>
+<li>The <code>pass</code> statement</li>
+<li>Calling a function</li>
+<li>The <code>main()</code> function</li>
+<li><code>if __name__ == "__main__":</code></li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>When you run <code>python main.py</code>, nothing is printed. The
+program starts, does nothing, and ends. The command prompt comes right
+back.</p>
+<h2 id="the-source-code-for-main">The Source Code for Main</h2>
+<p>Type this program and save it as <code>main.py</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div>
+<h2 id="defining-a-function">Defining a Function</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="cf">pass</span></span></code></pre></div>
+<p>You have been calling functions that come with Python, such as
+<code>print()</code> and <code>input()</code>. You can also make your
+own. Making a function is called <em>defining</em> it.</p>
+<p>The <code>def</code> keyword starts a function definition. After it
+comes the function’s name, <code>main</code>, then a pair of
+parentheses, then a colon. The indented lines under it are the
+function’s <em>body</em>, the code that runs when the function is
+called.</p>
+<p>Defining a function does not run it. It just teaches Python a new
+name. The body runs only when something calls the function.</p>
+<h3 id="pass">pass</h3>
+<p>A function must have at least one line in its body. While you are
+still planning a program, you might not know what goes there yet. The
+<code>pass</code> statement means “do nothing.” It holds the place until
+you write real code.</p>
+<h2 id="the-main-function">The main() Function</h2>
+<p>There is nothing special about the name <code>main</code> to Python.
+You could name the function <code>start</code> or <code>run_game</code>.
+But programmers in many languages use <code>main</code> for the function
+that starts the program, so when someone reads your code, they know
+right where to look first.</p>
+<p>Putting your program inside <code>main()</code> has another benefit.
+As your programs grow, you will split them into many functions.
+<code>main()</code> becomes a short summary that calls the others in
+order, like a table of contents.</p>
+<h2 id="the-if-name-main-line">The if <strong>name</strong> ==
+“<strong>main</strong>”: Line</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div>
+<p>These two lines are at the bottom of a great many Python programs.
+Here is what they mean.</p>
+<p>Listen carefully to the spelling. Each side of <code>name</code> and
+<code>main</code> has <em>two</em> underscores. Your screen reader may
+read this as “underline underline name underline underline.” Programmers
+often say “dunder name,” short for “double underscore name.”</p>
+<p><code>__name__</code> is a variable that Python sets for you. When
+you run a file directly, by typing <code>python main.py</code>, Python
+sets <code>__name__</code> to the string <code>"__main__"</code>. When
+another program <em>imports</em> your file, so it can use your
+functions, Python sets <code>__name__</code> to the file’s name instead,
+such as <code>"main"</code>.</p>
+<p>So the <code>if</code> statement means: “If this file is the one
+being run, call <code>main()</code>.” If another program imports this
+file, <code>main()</code> is not called, and the other program can use
+your functions without starting your game.</p>
+<p>You can see this for yourself. Add this line to the top of
+<code>main.py</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;__name__ is </span><span class="sc">{</span><span class="va">__name__</span><span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Run <code>python main.py</code> and you will hear
+<code>__name__ is __main__</code>. Then start the interactive shell in
+the same folder and type <code>import main</code>. You will hear
+<code>__name__ is main</code>.</p>
+<p>You will use this pattern in the Rock, Paper, Scissors game, in Tic
+Tac Toe, and in Hangman.</p>
+<h2 id="using-the-template">Using the Template</h2>
+<p>To start a new program from this template:</p>
+<ol type="1">
+<li>Copy <code>main.py</code> and give the copy a new name.</li>
+<li>Add a docstring at the top that says what the program does.</li>
+<li>Add your <code>import</code> lines under the docstring.</li>
+<li>Replace <code>pass</code> with your program’s code, indented four
+spaces.</li>
+<li>As the program grows, move parts of it into their own functions, and
+call them from <code>main()</code>.</li>
+</ol>
+<p>For example:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Say hello to the player.&quot;&quot;&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    name <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;What is your name? &quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Hello, </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!&quot;</span>)</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div>
+<p>Notice the two blank lines before and after the function. That is the
+usual Python style. It gives a clear break between functions, which is
+easy to find when you move through a file line by line.</p>
+<h2 id="summary">Summary</h2>
+<p>This program does nothing, but it shows the shape of a good Python
+program. You learned that:</p>
+<ul>
+<li><code>def</code> defines a new function. The indented lines under it
+are its body.</li>
+<li>Defining a function does not run it. Calling it does.</li>
+<li><code>pass</code> means “do nothing” and holds a place for code you
+have not written.</li>
+<li><code>main()</code> is the usual name for the function that starts a
+program.</li>
+<li><code>if __name__ == "__main__":</code> runs <code>main()</code>
+only when the file is run directly, not when it is imported.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Replace <code>pass</code> with a <code>print()</code> line that says
+<code>Hello from main!</code> Run the program.</li>
+<li>Add a docstring to the file and a docstring to <code>main()</code>.
+A function’s docstring goes on the first line of its body.</li>
+<li>Define a second function called <code>say_goodbye()</code> that
+prints <code>Goodbye!</code>. Call it from the end of
+<code>main()</code>.</li>
+<li>Remove the last two lines and run the program. What happens?
+Why?</li>
+<li>Add the <code>print(f"__name__ is {__name__}")</code> line and try
+both running and importing the file, as described above.</li>
+</ol>

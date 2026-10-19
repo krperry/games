@@ -1,0 +1,325 @@
+<h1 id="the-player-class">The Player Class</h1>
+<p>The player is the hero of the cave game. Like an item, the player has
+names, a title, and a description, so the <code>Player</code> class
+inherits from <code>Unit</code>. But a player also has things an item
+does not: health that goes down as they walk, a location in the cave,
+and a bag of items they are carrying. A player can also <em>do</em>
+things, such as move from room to room and pick things up.</p>
+<p>In this lesson you will see how an object keeps track of changing
+information, and how one object can hold a reference to another.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>A child class with several new attributes</li>
+<li><code>None</code></li>
+<li>Methods that change an object’s attributes</li>
+<li>Getters and setters</li>
+<li>Objects that refer to other objects</li>
+<li>Making a list only when it is needed</li>
+<li>Joining two strings that sit next to each other</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="the-source-code-for-player">The Source Code for Player</h2>
+<p>Type this program and save it as <code>player.py</code> in the
+<code>cave</code> folder:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Player information class&quot;&quot;&quot;</span> <span class="st">&quot;cave.lnt&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unit <span class="im">import</span> Unit</span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Player(Unit):</span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    This class defines the basic Player.</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, t, d):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(n, t, d)</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.health <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> can_move(<span class="va">self</span>, direction):</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Checks if player can move.&quot;&quot;&quot;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.location.has_exit(direction)</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_location(<span class="va">self</span>, room):</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Sets the room player is in&quot;&quot;&quot;</span></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> room</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_location(<span class="va">self</span>):</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Get player current location&quot;&quot;&quot;</span></span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.location</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_health(<span class="va">self</span>):</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;REturn current health&quot;&quot;&quot;</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.health</span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> lose_health(<span class="va">self</span>):</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;decrease health by one&quot;&quot;&quot;</span></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.health <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.health</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> move(<span class="va">self</span>, direction):</span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;move player in a direction&quot;&quot;&quot;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> <span class="va">self</span>.location.exits[direction]</span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You move &quot;</span>, direction)</span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="va">self</span>.location.get_room_string())</span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_item(<span class="va">self</span>, item):</span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Adds an item to players inventory&quot;&quot;&quot;</span></span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items <span class="op">=</span> []</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> item:</span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items.append(item)</span></code></pre></div>
+<h2 id="a-strange-first-line">A Strange First Line</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Player information class&quot;&quot;&quot;</span> <span class="st">&quot;cave.lnt&quot;</span></span></code></pre></div>
+<p>This line has two strings next to each other with only a space
+between them. Python has a rule that two string literals side by side
+are joined into one. So the docstring is really
+<code>"Player information classcave.lnt"</code>.</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;Hello &quot;</span> <span class="st">&quot;world&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Hello world&#39;</span></span></code></pre></div>
+<p>The <code>"cave.lnt"</code> part was almost certainly added by
+accident. A <code>.lnt</code> file is the output from a <em>linter</em>,
+a tool that reads code and reports problems. There is a file like that,
+<code>room.lnt</code>, in this folder. You can delete
+<code>"cave.lnt"</code> from the docstring.</p>
+<h2 id="setting-up-a-player">Setting Up a Player</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Player(Unit):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, t, d):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(n, t, d)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.health <span class="op">=</span> <span class="dv">8</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span></code></pre></div>
+<p>Like <code>Item</code>, <code>Player</code> inherits from
+<code>Unit</code> and calls <code>super().__init__()</code> first, so
+the parent sets up the names, title, and description. Then it adds three
+attributes of its own:</p>
+<ul>
+<li><code>health</code> starts at 8. The player loses one each time they
+move.</li>
+<li><code>location</code> will hold the room the player is in.</li>
+<li><code>items</code> will hold the things the player is carrying.</li>
+</ul>
+<p>The file has a blank line between almost every line of code. Python
+ignores blank lines, so it does no harm. But with a screen reader, every
+blank line is one more press of the down arrow. Most Python code uses
+blank lines only to separate groups of related lines.</p>
+<h3 id="none">None</h3>
+<p><code>location</code> and <code>items</code> start as
+<code>None</code>. <code>None</code> is a special value in Python that
+means “nothing” or “no value yet.” It is not zero, and it is not an
+empty string. It is its own thing.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x <span class="kw">is</span> <span class="va">None</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(x)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="va">None</span></span></code></pre></div>
+<p>When a player is first made, they are not in any room yet, so
+<code>location</code> is <code>None</code>. The game puts them in a room
+right after making them.</p>
+<p><code>None</code> counts as <code>False</code> in a condition, like
+<code>0</code> and empty strings and empty lists do.</p>
+<h2 id="setters-and-getters">Setters and Getters</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_location(<span class="va">self</span>, room):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Sets the room player is in&quot;&quot;&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> room</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_location(<span class="va">self</span>):</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Get player current location&quot;&quot;&quot;</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.location</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_health(<span class="va">self</span>):</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;REturn current health&quot;&quot;&quot;</span></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.health</span></code></pre></div>
+<p><code>set_location()</code> is a <em>setter</em>. It changes an
+attribute. <code>get_location()</code> and <code>get_health()</code> are
+<em>getters</em>. They return an attribute. You met getters in the
+<code>Item</code> lesson.</p>
+<h2 id="objects-that-refer-to-other-objects">Objects That Refer to Other
+Objects</h2>
+<p>When the game calls <code>player.set_location(rooms[0])</code>, the
+player’s <code>location</code> attribute holds a <code>Room</code>
+object. It does not hold a copy of the room. It holds the room itself.
+The player and the cave’s list of rooms both refer to the very same
+object.</p>
+<p>This is how objects are connected to each other in a program. Through
+<code>self.location</code>, the player can reach their room and use its
+methods.</p>
+<h2 id="can-the-player-move">Can the Player Move?</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> can_move(<span class="va">self</span>, direction):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Checks if player can move.&quot;&quot;&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.location.has_exit(direction)</span></code></pre></div>
+<p>The player does not know which ways out a room has. The room knows.
+So the player asks its room, by calling the room’s
+<code>has_exit()</code> method. The direction is a string such as
+<code>"north"</code>.</p>
+<p>Read <code>self.location.has_exit(direction)</code> from left to
+right: this player, its location, which is a room, and that room’s
+<code>has_exit()</code> method. Long chains of periods like this are
+common when objects refer to other objects.</p>
+<p><code>has_exit()</code> returns the room in that direction, or
+<code>None</code> if there is no exit. A room counts as
+<code>True</code> and <code>None</code> counts as <code>False</code>, so
+the result works as a yes or no answer.</p>
+<h2 id="losing-health">Losing Health</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> lose_health(<span class="va">self</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;decrease health by one&quot;&quot;&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.health <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.health</span></code></pre></div>
+<p>This method changes the player’s own health. Because
+<code>health</code> is an attribute, the change stays with the player
+after the method ends. It also returns the new health, in case the
+caller wants to know.</p>
+<h2 id="moving">Moving</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> move(<span class="va">self</span>, direction):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;move player in a direction&quot;&quot;&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> <span class="va">self</span>.location.exits[direction]</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;You move &quot;</span>, direction)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="va">self</span>.location.get_room_string())</span></code></pre></div>
+<p>Each room has an attribute called <code>exits</code>, which is a
+<em>dictionary</em> that matches directions to rooms. You will learn
+about dictionaries in the <code>Room</code> lesson.
+<code>self.location.exits[direction]</code> looks up the room in that
+direction. The player’s location is changed to that new room.</p>
+<p>Then the player hears where they went and a description of the new
+room.</p>
+<p><code>print("You move ", direction)</code> gives <code>print()</code>
+two arguments. <code>print()</code> puts a space between its arguments,
+and the first string already ends with a space, so the result has two
+spaces: <code>You move  north</code>. You probably cannot hear it, but
+an f-string such as <code>print(f"You move {direction}.")</code> avoids
+it and adds a period, which makes the screen reader pause.</p>
+<p>This method does not check whether there is an exit. It expects the
+caller to call <code>can_move()</code> first. If it did not, and there
+was no exit, the player’s location would become <code>None</code>, and
+the next line would cause an error.</p>
+<h2 id="picking-things-up">Picking Things Up</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_item(<span class="va">self</span>, item):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Adds an item to players inventory&quot;&quot;&quot;</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items <span class="op">=</span> []</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> item:</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items.append(item)</span></code></pre></div>
+<p>The list of items the player carries is often called their
+<em>inventory</em>.</p>
+<p><code>self.items</code> starts as <code>None</code>. The first time
+the player picks something up, <code>not self.items</code> is
+<code>True</code>, so the method makes an empty list. After that, the
+list already exists, and the method just adds to it.</p>
+<p>The second <code>if</code> makes sure there really is an item before
+adding it, so that <code>None</code> is never added to the list.</p>
+<p>Making the list only when it is first needed works, but it means
+every piece of code that uses <code>self.items</code> has to remember it
+might be <code>None</code>. It is simpler to start with an empty list in
+<code>__init__()</code>: <code>self.items = []</code>. An empty list
+counts as <code>False</code> too, so the game’s checks would still
+work.</p>
+<h2 id="trying-player-in-the-shell">Trying Player in the Shell</h2>
+<p>A player needs a room, so this test uses the <code>Room</code> class
+too. In the <code>cave</code> folder, run
+<code>python -i player.py</code>, then:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">from</span> room <span class="im">import</span> Room</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hall <span class="op">=</span> Room(<span class="st">&quot;hall&quot;</span>, <span class="st">&quot;Great Hall&quot;</span>, <span class="st">&quot;A huge stone hall.&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> yard <span class="op">=</span> Room(<span class="st">&quot;yard&quot;</span>, <span class="st">&quot;Courtyard&quot;</span>, <span class="st">&quot;A grassy courtyard.&quot;</span>)</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hall.set_direction(<span class="st">&quot;north&quot;</span>, yard)</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> yard.set_direction(<span class="st">&quot;south&quot;</span>, hall)</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero <span class="op">=</span> Player([<span class="st">&quot;Sam&quot;</span>], <span class="st">&quot;a brave hero&quot;</span>, <span class="st">&quot;A brave hero with a lamp.&quot;</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.set_location(hall)</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.can_move(<span class="st">&quot;north&quot;</span>)</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a><span class="op">&lt;</span>room.Room <span class="bu">object</span> at <span class="bn">0x000001F2A3B4C5D0</span><span class="op">&gt;</span></span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.can_move(<span class="st">&quot;west&quot;</span>)</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.move(<span class="st">&quot;north&quot;</span>)</span></code></pre></div>
+<p><code>can_move("north")</code> returns the courtyard room. The shell
+shows an object as its class name and a memory address, a long number
+that will be different on your computer. <code>can_move("west")</code>
+returns <code>None</code>, and the shell shows nothing for
+<code>None</code>. Then <code>move("north")</code> prints the
+courtyard’s description.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.lose_health()</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="dv">7</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hero.get_location().title</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Courtyard&#39;</span></span></code></pre></div>
+<h2 id="summary">Summary</h2>
+<p>You studied the <code>Player</code> class. You learned that:</p>
+<ul>
+<li><code>None</code> means “no value yet,” and counts as
+<code>False</code>.</li>
+<li>Setters change attributes and getters return them.</li>
+<li>An attribute can hold another object, which connects the two
+objects.</li>
+<li>One object can ask another for information by calling its
+methods.</li>
+<li>A method that changes an attribute, like <code>lose_health()</code>,
+changes the object for good.</li>
+<li>Two strings side by side are joined into one string.</li>
+<li>Starting a list as <code>[]</code> is simpler than starting it as
+<code>None</code>.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Remove <code>"cave.lnt"</code> from the docstring.</li>
+<li>Remove the extra blank lines inside the methods.</li>
+<li>Start <code>items</code> as an empty list in
+<code>__init__()</code>, and simplify <code>add_item()</code>.</li>
+<li>Change <code>move()</code> to use an f-string, so it says
+<code>You move north.</code></li>
+<li>Make <code>move()</code> safe by checking <code>can_move()</code>
+inside it, and printing <code>You can't go that way.</code> if there is
+no exit.</li>
+<li>Add a method called <code>inventory_string()</code> that returns a
+sentence listing what the player is carrying, or
+<code>You are not carrying anything.</code></li>
+</ol>

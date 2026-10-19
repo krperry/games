@@ -1,0 +1,168 @@
+<h1 id="saying-hello-with-a-variable">Saying Hello with a Variable</h1>
+<p>In the last lesson your program said hello to the whole world. In
+this lesson it will say hello to a person. To do that, you will store
+the person’s name in a <em>variable</em> and then put that variable
+inside a message with an <em>f-string</em>.</p>
+<p>Variables and f-strings are in almost every program you will write
+from now on, so this short program is an important one.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Docstrings</li>
+<li>Comments</li>
+<li>Variables</li>
+<li>The assignment operator, <code>=</code></li>
+<li>f-strings</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>When you run the program, you hear:</p>
+<pre><code>Hellow Kathy!</code></pre>
+<h2 id="the-source-code-for-hello-variable">The Source Code for Hello
+Variable</h2>
+<p>Make a new file, type in this program, and save it as
+<code>hello_variable.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Example of  simple f string print&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>name <span class="op">=</span> <span class="st">&quot;Kathy&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co"># print a variable with a f string</span></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Hellow </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!&quot;</span>)</span></code></pre></div>
+<p>Run it by typing <code>python hello_variable.py</code> at the command
+prompt.</p>
+<p>The program has five lines. One of them is blank. Python skips blank
+lines, but they make a program easier to read by breaking it into parts,
+the same way paragraphs break up a story.</p>
+<h2 id="docstrings">Docstrings</h2>
+<p>The first line is a string by itself:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Example of  simple f string print&quot;&quot;&quot;</span></span></code></pre></div>
+<p>It starts and ends with three double quotes. A string at the very top
+of a file is called a <em>docstring</em>. It describes what the file is
+for. Python does not print it or do anything with it when the program
+runs. It is a note for people who read the code, including you, weeks
+from now.</p>
+<p>Three quotes in a row let a string go on for more than one line.
+Docstrings almost always use them, even when the note fits on one
+line.</p>
+<h2 id="variables">Variables</h2>
+<p>The next line makes a variable:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>name <span class="op">=</span> <span class="st">&quot;Kathy&quot;</span></span></code></pre></div>
+<p>A variable is a name that holds a value. Think of it as a labeled
+box. The label on this box is <code>name</code>, and inside the box is
+the string <code>"Kathy"</code>.</p>
+<p>The equal sign is called the <em>assignment operator</em>. It does
+not mean “is equal to” the way it does in math. It means “put the value
+on the right into the variable on the left.” Read the line out loud as
+“name gets Kathy” or “set name to Kathy.”</p>
+<p>Try it in the interactive shell:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> name <span class="op">=</span> <span class="st">&quot;Kathy&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> name</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Kathy&#39;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> name <span class="op">=</span> <span class="st">&quot;Jordan&quot;</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> name</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Jordan&#39;</span></span></code></pre></div>
+<p>When you type just a variable’s name in the shell, Python tells you
+what is in it. Notice that when you put a new value in the variable, the
+old value is gone. A variable holds one value at a time.</p>
+<h3 id="naming-variables">Naming Variables</h3>
+<p>You get to choose your variable names. Pick names that say what the
+variable holds. <code>name</code> is a good name for a person’s name.
+<code>x</code> would work too, but you would have to remember what
+<code>x</code> means.</p>
+<p>Variable names can use letters, numbers, and the underscore,
+<code>_</code>. They cannot have spaces and cannot start with a number.
+If you need more than one word, join the words with underscores, as in
+<code>first_name</code> or <code>player_score</code>. Underscores are
+read clearly by screen readers, which is one reason Python programmers
+like them.</p>
+<p>Variable names are case sensitive. <code>name</code>,
+<code>Name</code>, and <code>NAME</code> are three different
+variables.</p>
+<h2 id="comments">Comments</h2>
+<p>The next line starts with a number sign, <code>#</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># print a variable with a f string</span></span></code></pre></div>
+<p>This is a <em>comment</em>. Python ignores everything from the
+<code>#</code> to the end of the line. Comments are notes for people.
+Use them to explain <em>why</em> you did something, or to label a part
+of your program.</p>
+<h2 id="f-strings">f-strings</h2>
+<p>The last line prints the greeting:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Hellow </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!&quot;</span>)</span></code></pre></div>
+<p>There is an <code>f</code> right before the opening quote. That
+<code>f</code> makes this an <em>f-string</em>, which is short for
+“formatted string.” In an f-string, anything inside curly braces,
+<code>{</code> and <code>}</code>, is not printed as is. Instead, Python
+looks it up and puts its value in that spot.</p>
+<p>So <code>f"Hellow {name}!"</code> becomes <code>Hellow Kathy!</code>
+because <code>name</code> holds <code>"Kathy"</code>.</p>
+<p>Try it in the shell, and then try it without the <code>f</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> name <span class="op">=</span> <span class="st">&quot;Kathy&quot;</span></span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f&quot;Hello </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">!&quot;</span>)</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>Hello Kathy<span class="op">!</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="st">&quot;Hello </span><span class="sc">{name}</span><span class="st">!&quot;</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>Hello {name}<span class="op">!</span></span></code></pre></div>
+<p>Without the <code>f</code>, Python treats the braces as ordinary
+characters and prints them. Forgetting the <code>f</code> is a very
+common mistake. If you ever hear your screen reader say “left brace” in
+your program’s output, check for a missing <code>f</code>.</p>
+<p>You can put more than one variable in an f-string:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> first <span class="op">=</span> <span class="st">&quot;Kathy&quot;</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> pet <span class="op">=</span> <span class="st">&quot;cat&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>first<span class="sc">}</span><span class="ss"> has a </span><span class="sc">{</span>pet<span class="sc">}</span><span class="ss">.&quot;</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>Kathy has a cat.</span></code></pre></div>
+<h2 id="the-typo-again">The Typo, Again</h2>
+<p>Like the last program, this one prints <code>Hellow</code> instead of
+<code>Hello</code>. Now that you know how the line works, you know that
+<code>Hellow</code> is part of the string, not part of the variable. Fix
+it by changing the text inside the quotes.</p>
+<h2 id="summary">Summary</h2>
+<p>This short program introduced ideas you will use constantly:</p>
+<ul>
+<li>A docstring at the top of a file says what the program does.</li>
+<li>A comment starts with <code>#</code> and is ignored by Python.</li>
+<li>A variable is a name that holds a value.</li>
+<li>The <code>=</code> sign puts a value into a variable.</li>
+<li>An f-string starts with <code>f</code> and fills in anything inside
+curly braces with its value.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change <code>"Kathy"</code> to your own name and run the
+program.</li>
+<li>Fix the <code>Hellow</code> typo.</li>
+<li>Add a second variable called <code>city</code> that holds the name
+of your town. Change the <code>print()</code> line so it says something
+like <code>Hello Kathy from Denver!</code>.</li>
+<li>Take the <code>f</code> off the front of the string and run the
+program. What does your screen reader say? Put the <code>f</code>
+back.</li>
+<li>Add a line that changes <code>name</code> to a different name, and
+then a second <code>print()</code> line that uses the same f-string.
+What do you hear?</li>
+</ol>

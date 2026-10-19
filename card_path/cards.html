@@ -1,0 +1,266 @@
+<h1 id="building-and-shuffling-a-deck-of-cards">Building and Shuffling a
+Deck of Cards</h1>
+<p>Card games are some of the most popular games in the world, and they
+work very well by ear. Before you can play a card game, though, you need
+a deck of cards. In this lesson you will build a full deck of 52 cards,
+shuffle it, and peek at a few cards before and after the shuffle.</p>
+<p>To build the deck you will put one loop inside another and make a
+list of lists.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Nested <code>for</code> loops</li>
+<li>Lists of lists</li>
+<li>The <code>append()</code> list method</li>
+<li>Copying a list with <code>[:]</code></li>
+<li>Negative indexes</li>
+<li><code>random.shuffle()</code></li>
+<li>The <code>join()</code> string method</li>
+<li>Single quotes inside an f-string</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>The cards after the shuffle will be different each time you run
+it.</p>
+<pre><code>Before shuffling
+The top card is: 2 Clubs
+The bottom card is: Ace Spades
+The middle card is: 8 Clubs
+After shuffling:
+The top card is: Ace Diamonds
+The bottom card is: 4 Clubs
+The middle card is: 8 Diamonds</code></pre>
+<h2 id="a-deck-of-cards">A Deck of Cards</h2>
+<p>A standard deck has 52 cards. There are four <em>suits</em>: clubs,
+diamonds, hearts, and spades. Each suit has thirteen <em>ranks</em>: 2
+through 10, Jack, Queen, King, and Ace. Every rank comes in every suit,
+so 13 ranks times 4 suits makes 52 cards.</p>
+<h2 id="the-source-code-for-cards">The Source Code for Cards</h2>
+<p>Type this program and save it as <code>cards.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>cards <span class="op">=</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>, <span class="st">&quot;Ace&quot;</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>clean_deck <span class="op">=</span> []</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> card <span class="kw">in</span> cards:</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> suit <span class="kw">in</span> [<span class="st">&quot;Clubs&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>, <span class="st">&quot;Hearts&quot;</span>, <span class="st">&quot;Spades&quot;</span>]:</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        clean_deck.append([card, suit])</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>deck <span class="op">=</span> clean_deck[:]  <span class="co"># copy a clean deck for use</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Before shuffling&quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The top card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The bottom card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="op">-</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The middle card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">24</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>random.shuffle(deck)  <span class="co"># Shuffle the deck.</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;After shuffling:&quot;</span>)</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The top card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The bottom card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="op">-</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The middle card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">24</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="the-list-of-ranks">The List of Ranks</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>cards <span class="op">=</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>, <span class="st">&quot;Ace&quot;</span>]</span></code></pre></div>
+<p>This list holds the thirteen ranks as strings. Even the numbers are
+strings, such as <code>"2"</code>, so every rank is the same kind of
+value. That makes them easy to print together.</p>
+<p>This is a long line. When you read it with a screen reader, it can
+help to read it word by word, or to move through it with the arrow keys
+and count the commas. Python lets you split a list over several lines,
+one item per line, as long as the line breaks are inside the brackets.
+Many programmers do that for long lists.</p>
+<h2 id="building-the-deck">Building the Deck</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>clean_deck <span class="op">=</span> []</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> card <span class="kw">in</span> cards:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> suit <span class="kw">in</span> [<span class="st">&quot;Clubs&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>, <span class="st">&quot;Hearts&quot;</span>, <span class="st">&quot;Spades&quot;</span>]:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        clean_deck.append([card, suit])</span></code></pre></div>
+<h3 id="an-empty-list">An Empty List</h3>
+<p><code>clean_deck = []</code> makes a list with nothing in it. The
+loops will fill it.</p>
+<h3 id="the-append-method">The append() Method</h3>
+<p>Lists have methods, just like strings do. <code>append()</code> adds
+an item to the end of a list.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand <span class="op">=</span> []</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand.append(<span class="st">&quot;Ace&quot;</span>)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;Ace&#39;</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand.append(<span class="st">&quot;King&quot;</span>)</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;Ace&#39;</span>, <span class="st">&#39;King&#39;</span>]</span></code></pre></div>
+<p>Unlike <code>upper()</code>, which makes a new string,
+<code>append()</code> changes the list itself. You do not need to store
+its result.</p>
+<h3 id="lists-inside-lists">Lists Inside Lists</h3>
+<p>Each card is itself a list of two strings, the rank and the suit,
+such as <code>["Ace", "Spades"]</code>. So the deck is a list of
+lists.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;Clubs&quot;</span>]]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck[<span class="dv">0</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;Ace&#39;</span>, <span class="st">&#39;Spades&#39;</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck[<span class="dv">0</span>][<span class="dv">0</span>]</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Ace&#39;</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> deck[<span class="dv">0</span>][<span class="dv">1</span>]</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Spades&#39;</span></span></code></pre></div>
+<p><code>deck[0]</code> is the first card. <code>deck[0][0]</code> is
+the first item of the first card, its rank. Read two sets of square
+brackets from left to right: first pick the card, then pick the part of
+the card.</p>
+<h3 id="nested-loops">Nested Loops</h3>
+<p>There are two <code>for</code> loops, one inside the other. Listen
+for the indentation: the second <code>for</code> is indented four
+spaces, and the <code>append()</code> line is indented eight. The inner
+loop runs all the way through for every single trip through the outer
+loop.</p>
+<p>Here is what happens:</p>
+<ul>
+<li>The outer loop sets <code>card</code> to <code>"2"</code>. The inner
+loop then runs four times, adding the 2 of Clubs, the 2 of Diamonds, the
+2 of Hearts, and the 2 of Spades.</li>
+<li>The outer loop sets <code>card</code> to <code>"3"</code>. The inner
+loop adds the four 3s.</li>
+<li>This continues through all 13 ranks.</li>
+</ul>
+<p>13 trips through the outer loop, times 4 trips through the inner
+loop, makes 52 calls to <code>append()</code>, and 52 cards.</p>
+<p>Try a smaller version in the shell:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> rank <span class="kw">in</span> [<span class="st">&quot;A&quot;</span>, <span class="st">&quot;K&quot;</span>]:</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>...     <span class="cf">for</span> suit <span class="kw">in</span> [<span class="st">&quot;C&quot;</span>, <span class="st">&quot;D&quot;</span>]:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>...         <span class="bu">print</span>(rank, suit)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>A C</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>A D</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>K C</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>K D</span></code></pre></div>
+<h2 id="copying-the-deck">Copying the Deck</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>deck <span class="op">=</span> clean_deck[:]  <span class="co"># copy a clean deck for use</span></span></code></pre></div>
+<p><code>[:]</code> makes a copy of a list. Why copy it? Because of how
+lists and variables work. When you write <code>deck = clean_deck</code>
+without <code>[:]</code>, you do not get a second list. You get a second
+name for the <em>same</em> list. Shuffling <code>deck</code> would also
+shuffle <code>clean_deck</code>, since they are the same list.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> a <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> b <span class="op">=</span> a</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> b.append(<span class="dv">4</span>)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> a</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> c <span class="op">=</span> a[:]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> c.append(<span class="dv">5</span>)</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> a</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span></code></pre></div>
+<p>Adding to <code>b</code> changed <code>a</code>, because they are the
+same list. Adding to the copy, <code>c</code>, did not.</p>
+<p>By keeping <code>clean_deck</code> in order and playing with a copy,
+a game can easily start over with a fresh deck.</p>
+<h2 id="peeking-at-cards">Peeking at Cards</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Before shuffling&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The top card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The bottom card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="op">-</span><span class="dv">1</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;The middle card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">24</span>])<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h3 id="negative-indexes">Negative Indexes</h3>
+<p><code>deck[0]</code> is the first card, the top of the deck.
+<code>deck[-1]</code> is the <em>last</em> card. Negative indexes count
+backward from the end. <code>-1</code> is the last item, <code>-2</code>
+is the one before it, and so on. This is handy because you do not need
+to know how long the list is.</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ranks <span class="op">=</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ranks[<span class="op">-</span><span class="dv">1</span>]</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;5&#39;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ranks[<span class="op">-</span><span class="dv">2</span>]</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;4&#39;</span></span></code></pre></div>
+<p><code>deck[24]</code> is the 25th card, near the middle of the
+deck.</p>
+<h3 id="the-join-method">The join() Method</h3>
+<p>Each card is a list, like <code>["Ace", "Spades"]</code>. To say it
+out loud, the program needs the string <code>"Ace Spades"</code>. The
+<code>join()</code> method does that. You call it on the string you want
+<em>between</em> the items, and you give it the list:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot; &quot;</span>.join([<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Spades&quot;</span>])</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Ace Spades&#39;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot; of &quot;</span>.join([<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Spades&quot;</span>])</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Ace of Spades&#39;</span></span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;, &quot;</span>.join([<span class="st">&quot;red&quot;</span>, <span class="st">&quot;green&quot;</span>, <span class="st">&quot;blue&quot;</span>])</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;red, green, blue&#39;</span></span></code></pre></div>
+<p>Notice the second example. <code>" of "</code> makes a card sound
+much more natural.</p>
+<h3 id="quotes-inside-an-f-string">Quotes Inside an f-string</h3>
+<p>Look at this f-string:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="ss">f&quot;The top card is: </span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[<span class="dv">0</span>])<span class="sc">}</span><span class="ss">&quot;</span></span></code></pre></div>
+<p>The f-string is in double quotes. The space string inside the braces
+is in single quotes, <code>' '</code>. That matters. If you used double
+quotes inside, Python could think the f-string ended there. Using the
+other kind of quote inside keeps them apart. Listen carefully for the
+difference with punctuation reading on. Your screen reader will say
+“quote” for one and “tick” or “apostrophe” for the other.</p>
+<h2 id="shuffling">Shuffling</h2>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>random.shuffle(deck)  <span class="co"># Shuffle the deck.</span></span></code></pre></div>
+<p><code>random.shuffle()</code> mixes up the items in a list into a
+random order. Like <code>append()</code>, it changes the list itself and
+does not return anything.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> numbers <span class="op">=</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>]</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.shuffle(numbers)</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> numbers</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">4</span>, <span class="dv">1</span>, <span class="dv">5</span>, <span class="dv">3</span>, <span class="dv">2</span>]</span></code></pre></div>
+<p>Then the program prints the top, bottom, and middle cards again, so
+you can hear that they changed.</p>
+<h2 id="summary">Summary</h2>
+<p>You built and shuffled a deck of 52 cards. You learned that:</p>
+<ul>
+<li>A list can hold other lists. <code>deck[0][1]</code> picks the first
+card, then its suit.</li>
+<li><code>append()</code> adds an item to the end of a list.</li>
+<li>A loop inside another loop runs all the way through for each trip
+through the outer loop.</li>
+<li><code>[:]</code> makes a copy of a list. Plain <code>=</code> gives
+the same list a second name.</li>
+<li>Negative indexes count from the end. <code>-1</code> is the last
+item.</li>
+<li><code>random.shuffle()</code> mixes up a list.</li>
+<li><code>join()</code> turns a list of strings into one string.</li>
+<li>Use single quotes inside a double-quoted f-string.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change the program so it says <code>Ace of Spades</code> instead of
+<code>Ace Spades</code>.</li>
+<li>Print how many cards are in the deck, using <code>len()</code>.</li>
+<li>Print the second card from the bottom.</li>
+<li>Swap the two <code>for</code> lines so the suit loop is on the
+outside. Then print the first five cards. How did the order change?</li>
+<li>Write <code>deck = clean_deck</code> without <code>[:]</code>. After
+the shuffle, print the top card of <code>clean_deck</code>. Is the clean
+deck still in order? Why not?</li>
+<li>Print every card in the shuffled deck, one per line.</li>
+</ol>

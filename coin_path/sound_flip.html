@@ -1,0 +1,165 @@
+<h1 id="adding-sound-to-the-coin-flip">Adding Sound to the Coin
+Flip</h1>
+<p>Your coin flip program works, but it is a little plain. A real coin
+makes a sound when you flip it. In this lesson you will play a sound
+file before you announce the result.</p>
+<p>Sound is very useful in games for people who are blind or have low
+vision. A sound can tell the player that something happened, faster than
+words can. It also makes a game feel alive.</p>
+<p>To play the sound you will install and use a module that does not
+come with Python.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Installing a module with <code>pip</code></li>
+<li>Importing a module with a shorter name using <code>as</code></li>
+<li>Playing a sound file with <code>playsound</code></li>
+<li>File paths and folders</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>When you run the program, you hear the sound of a coin being flipped.
+When the sound finishes, you hear either:</p>
+<pre><code>Head</code></pre>
+<p>or:</p>
+<pre><code>tail</code></pre>
+<h2 id="getting-ready">Getting Ready</h2>
+<h3 id="installing-playsound">Installing playsound</h3>
+<p>The <code>random</code> module you used in the last lesson comes with
+Python. The <code>playsound</code> module does not. You need to install
+it once before you can use it.</p>
+<p>Python comes with a tool called <code>pip</code> that downloads and
+installs modules. At the command prompt, type:</p>
+<pre><code>pip install playsound</code></pre>
+<p>You will hear some messages as it downloads and installs. If the last
+message says it was successfully installed, you are ready.</p>
+<p>If <code>pip</code> is not found, try
+<code>py -m pip install playsound</code> on Windows or
+<code>python3 -m pip install playsound</code> on a Mac or Linux. If the
+newest version of <code>playsound</code> gives you errors, many people
+have good luck with an older version:
+<code>pip install playsound==1.2.2</code>.</p>
+<h3 id="the-sound-file">The Sound File</h3>
+<p>The program plays a file named <code>flip.wav</code> that is in a
+folder named <code>sounds</code>. Your folders should look like
+this:</p>
+<ul>
+<li><code>coin_path</code> folder
+<ul>
+<li><code>sound_flip.py</code></li>
+<li><code>sounds</code> folder
+<ul>
+<li><code>flip.wav</code></li>
+</ul></li>
+</ul></li>
+</ul>
+<p>The <code>sounds</code> folder must be inside the same folder as your
+program, and you must run the program from that folder.</p>
+<h2 id="the-source-code-for-sound-flip">The Source Code for Sound
+Flip</h2>
+<p>Type this program and save it as <code>sound_flip.py</code>:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>coin <span class="op">=</span> [<span class="st">&quot;Head&quot;</span>, <span class="st">&quot;tail&quot;</span>]</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>choice(coin)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This is the same as <code>flip.py</code> with two new lines: one to
+import the module and one to play the sound. It does not have a
+docstring. Adding one is the first exercise.</p>
+<h2 id="importing-with-a-short-name">Importing with a Short Name</h2>
+<p>The second line imports the sound module:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span></code></pre></div>
+<p>The word <code>as</code> gives the module a nickname. From here on,
+the program can type <code>ps</code> instead of <code>playsound</code>.
+Programmers do this to save typing when they use a module a lot. It is
+your choice whether to use <code>as</code>. These two programs do the
+same thing:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>playsound.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span></code></pre></div>
+<p>Notice that the module and the function inside it are both named
+<code>playsound</code>. That is why <code>playsound.playsound</code>
+repeats itself. The nickname makes it shorter.</p>
+<h2 id="playing-the-sound">Playing the Sound</h2>
+<p>This line plays the sound:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/flip.wav&quot;</span>)</span></code></pre></div>
+<p>The argument is a string that tells <code>playsound()</code> where to
+find the sound file. A string that names a file and the folders it is in
+is called a <em>path</em>. This path says: go into the
+<code>sounds</code> folder, and find the file <code>flip.wav</code>. The
+forward slash, <code>/</code>, separates a folder name from the name of
+what is inside it. Python understands forward slashes on Windows, Mac,
+and Linux.</p>
+<p>The path is <em>relative</em>. That means it starts from the folder
+you are in when you run the program. If you run the program from a
+different folder, Python looks for a <code>sounds</code> folder there
+instead, does not find it, and gives you an error. If you hear an error
+about a file that cannot be found, check which folder you are in.</p>
+<h3 id="waiting-for-the-sound">Waiting for the Sound</h3>
+<p><code>playsound()</code> does not return until the sound has finished
+playing. So the program plays the whole flip sound first, and only then
+moves to the next line and prints the result. This is the order you
+want. The player hears the coin in the air, and then hears how it
+landed.</p>
+<p>Try moving the <code>ps.playsound()</code> line to the end of the
+program, after the <code>print()</code> line. Run it. Which order sounds
+better?</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p>Sounds and speech can get in each other’s way. If a sound plays while
+a screen reader is talking, the player might miss some words. Because
+<code>playsound()</code> waits until the sound is done, the result is
+spoken after the sound, not on top of it.</p>
+<p>Keep sounds short, and use the same sound for the same event every
+time. Players quickly learn what each sound means.</p>
+<h2 id="summary">Summary</h2>
+<p>You added sound to a program. You learned that:</p>
+<ul>
+<li><code>pip install</code> downloads and installs modules that do not
+come with Python.</li>
+<li><code>import module as nickname</code> lets you use a shorter name
+for a module.</li>
+<li><code>playsound()</code> plays a sound file and waits until it is
+done.</li>
+<li>A path is a string that says where a file is. A relative path starts
+from the folder you run the program in.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Add a docstring to the top of the program that says what it
+does.</li>
+<li>Change the program so it says a full sentence, such as
+<code>The coin landed on heads.</code></li>
+<li>Play the flip sound two times in a row before the result. Does that
+sound better or worse?</li>
+<li>Change the path to <code>"sounds/missing.wav"</code> and run the
+program. Listen to the error. Then change it back.</li>
+<li>Record or find another short <code>.wav</code> file, put it in the
+<code>sounds</code> folder, and play it after the result is
+printed.</li>
+</ol>

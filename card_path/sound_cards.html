@@ -1,0 +1,183 @@
+<h1 id="dealing-cards-with-sound">Dealing Cards with Sound</h1>
+<p>Now that you can build and shuffle a deck, it is time to deal. In
+this lesson the program shuffles the deck with a shuffling sound, asks
+how many cards to deal, and then deals them one at a time, with a
+different card sound for each.</p>
+<p>Picking a random sound each time is a small trick that makes a game
+sound much more natural. Real cards never make exactly the same sound
+twice.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Playing a sound with <code>playsound</code></li>
+<li>Picking a random sound file with <code>random.choice()</code></li>
+<li>Converting input to a number with <code>int()</code></li>
+<li><code>range()</code> with a start and a stop</li>
+<li>Pausing with <code>time.sleep()</code></li>
+<li>Off-by-one errors</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>After the shuffle sound, the program asks how many cards to deal. The
+player types <code>3</code>. Each card is spoken after its deal
+sound.</p>
+<pre><code>How many cards do you want to deal? 3
+4 Diamonds
+Jack Diamonds
+7 Hearts</code></pre>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>This program uses <code>playsound</code>. Install it with
+<code>pip install playsound</code> if you have not already. It plays
+<code>shuffle.wav</code>, <code>deal1.wav</code>,
+<code>deal2.wav</code>, and <code>deal3.wav</code> from the
+<code>sounds</code> folder. Run the program from the folder that holds
+the program and the <code>sounds</code> folder.</p>
+<h2 id="the-source-code-for-sound-cards">The Source Code for Sound
+Cards</h2>
+<p>Type this program and save it as <code>sound_cards.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>cards <span class="op">=</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>, <span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>, <span class="st">&quot;Ace&quot;</span>]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>clean_deck <span class="op">=</span> []</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> card <span class="kw">in</span> cards:</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> suit <span class="kw">in</span> [<span class="st">&quot;Clubs&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>, <span class="st">&quot;Hearts&quot;</span>, <span class="st">&quot;Spades&quot;</span>]:</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        clean_deck.append([card, suit])</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>deck <span class="op">=</span> clean_deck[:]  <span class="co"># copy a clean deck for use</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>random.shuffle(deck)  <span class="co"># Shuffle the deck.</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/shuffle.wav&quot;</span>)</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>count <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;How many cards do you want to deal? &quot;</span>))</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, count <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    sound <span class="op">=</span> random.choice([<span class="st">&quot;sounds/deal1.wav&quot;</span>, <span class="st">&quot;sounds/deal2.wav&quot;</span>, <span class="st">&quot;sounds/deal3.wav&quot;</span>])</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    ps.playsound(sound)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[i])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="fl">0.5</span>)</span></code></pre></div>
+<p>The first part, building the deck and copying it, is the same as in
+<code>cards.py</code>. If anything there is new to you, go back to that
+lesson first.</p>
+<h2 id="shuffling-with-sound">Shuffling with Sound</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>random.shuffle(deck)  <span class="co"># Shuffle the deck.</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/shuffle.wav&quot;</span>)</span></code></pre></div>
+<p>The deck is shuffled, and then the shuffle sound plays. The shuffle
+itself happens in a tiny fraction of a second, but the sound tells the
+player that it happened.</p>
+<h2 id="how-many-cards">How Many Cards?</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>count <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;How many cards do you want to deal? &quot;</span>))</span></code></pre></div>
+<p><code>input()</code> returns a string, such as <code>"3"</code>.
+<code>range()</code> needs a number, so <code>int()</code> converts it.
+The prompt ends with a question mark and a space, so the player’s answer
+does not run into the question.</p>
+<p>If the player types something that is not a number,
+<code>int()</code> causes an error and the program stops. Try typing
+<code>three</code> to hear it. A later exercise asks you to make this
+safer.</p>
+<h2 id="dealing-the-cards">Dealing the Cards</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">1</span>, count <span class="op">+</span> <span class="dv">1</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    sound <span class="op">=</span> random.choice([<span class="st">&quot;sounds/deal1.wav&quot;</span>, <span class="st">&quot;sounds/deal2.wav&quot;</span>, <span class="st">&quot;sounds/deal3.wav&quot;</span>])</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    ps.playsound(sound)</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span><span class="st">&#39; &#39;</span><span class="sc">.</span>join(deck[i])<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="fl">0.5</span>)</span></code></pre></div>
+<h3 id="a-random-sound">A Random Sound</h3>
+<p>The first line inside the loop picks one of three sound file names at
+random. <code>random.choice()</code> works on any list, including a list
+of file paths. Then <code>ps.playsound(sound)</code> plays the one it
+picked. Each card gets a slightly different sound.</p>
+<h3 id="range-with-two-arguments">range() with Two Arguments</h3>
+<p>Up to now you have given <code>range()</code> one number, and it has
+started at 0. You can also give it a start and a stop:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">1</span>, <span class="dv">4</span>))</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">0</span>, <span class="dv">4</span>))</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span></code></pre></div>
+<p>The start number is included. The stop number is not. So
+<code>range(1, count + 1)</code> gives the numbers 1 through
+<code>count</code>. If the player asked for 3 cards, <code>i</code> will
+be 1, then 2, then 3.</p>
+<h3 id="a-pause-between-cards">A Pause Between Cards</h3>
+<p><code>time.sleep(0.5)</code> waits half a second after each card.
+That gives the screen reader time to finish speaking the card before the
+next deal sound begins.</p>
+<h2 id="an-off-by-one-error">An Off-by-One Error</h2>
+<p>Here is a puzzle. The deck’s top card is <code>deck[0]</code>. Which
+cards does this loop deal?</p>
+<p><code>i</code> goes 1, 2, 3, so the loop deals <code>deck[1]</code>,
+<code>deck[2]</code>, and <code>deck[3]</code>. It never deals
+<code>deck[0]</code>, the top card. And if the player asks for 52 cards,
+the loop tries to deal <code>deck[52]</code>, which does not exist,
+because the last card is <code>deck[51]</code>. The program stops with
+an error:</p>
+<pre><code>IndexError: list index out of range</code></pre>
+<p>This kind of mistake is so common it has a name: an <em>off-by-one
+error</em>. It happens because people count from 1 and Python counts
+from 0. The <code>range()</code> was written to count from 1, like a
+person would, but the index needed to start at 0.</p>
+<p>There are two easy fixes. You can loop with
+<code>range(count)</code>, which gives 0 through <code>count - 1</code>.
+Or, even better for a card game, you can take cards off the deck as you
+deal them, with <code>pop()</code>:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> _ <span class="kw">in</span> <span class="bu">range</span>(count):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    card <span class="op">=</span> deck.pop()</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot; &quot;</span>.join(card))</span></code></pre></div>
+<p><code>pop()</code> removes the last item from a list and returns it.
+The card is gone from the deck, just like a real deal. You will see
+<code>pop()</code> in the Blackjack game.</p>
+<h2 id="summary">Summary</h2>
+<p>You dealt cards with sound. You learned that:</p>
+<ul>
+<li><code>random.choice()</code> can pick a random sound file, so
+repeated events sound more natural.</li>
+<li><code>range(start, stop)</code> counts from <code>start</code> up
+to, but not including, <code>stop</code>.</li>
+<li><code>time.sleep()</code> gives the screen reader time to finish
+speaking.</li>
+<li>An off-by-one error happens when counting from 1 and indexing from 0
+get mixed up.</li>
+<li><code>pop()</code> removes and returns the last item of a list.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Fix the off-by-one error so the first card dealt is the top card.
+Test it by dealing all 52 cards.</li>
+<li>Change the program to use <code>pop()</code> to deal. After dealing,
+print how many cards are left in the deck.</li>
+<li>Make each card sound like <code>Jack of Diamonds</code>.</li>
+<li>Number each card as it is dealt, such as
+<code>Card 1: Jack of Diamonds</code>.</li>
+<li>Do not let the player ask for more than 52 cards. Use a
+<code>while</code> loop to keep asking until the number is from 1 to
+52.</li>
+<li>Make the program safe if the player types something that is not a
+number. Hint: the <code>isdigit()</code> string method returns
+<code>True</code> if every character is a digit.</li>
+</ol>

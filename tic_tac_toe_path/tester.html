@@ -1,0 +1,157 @@
+<h1 id="planning-the-tic-tac-toe-board">Planning the Tic Tac Toe
+Board</h1>
+<p>Every Tic Tac Toe program in this folder starts with the same line.
+It makes a list called <code>game_state</code> that holds everything the
+game needs to remember: the nine squares of the board and a few extra
+settings.</p>
+<p>This lesson is about that one line. Before you write any game, you
+have to decide how to store its information. That choice is called the
+game’s <em>data design</em>, and a good one makes the rest of the code
+much simpler. You will also learn how to explore a list like this in the
+interactive shell.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Designing how a game stores its information</li>
+<li>A list that mixes strings and numbers</li>
+<li>Why the board starts at index 1</li>
+<li>Using the interactive shell with a file, <code>python -i</code></li>
+<li>Changing items in a list</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="the-source-code-for-tester">The Source Code for Tester</h2>
+<p>Type this line and save it as <code>tester.py</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span></code></pre></div>
+<p>When you run it, nothing is printed. The program only makes a list.
+The fun is in exploring it.</p>
+<h2 id="the-tic-tac-toe-board">The Tic Tac Toe Board</h2>
+<p>Tic Tac Toe is played on a grid of three rows and three columns. In
+these programs, the nine squares are numbered like a phone keypad, from
+the top left to the bottom right:</p>
+<ul>
+<li>Top row: 1, 2, 3</li>
+<li>Middle row: 4, 5, 6</li>
+<li>Bottom row: 7, 8, 9</li>
+</ul>
+<p>To make a move, a player types the number of an empty square. That
+works very well with a screen reader and a number pad. There is nothing
+to see and nothing to click.</p>
+<h2 id="what-is-in-game_state">What Is in game_state</h2>
+<p>The list has twelve items. Here is what each index holds, as
+described in the comments of the full game,
+<code>hard-tic.py</code>:</p>
+<ul>
+<li>Index 0: a setting for the game, such as which mark the player
+chose, <code>"X"</code> or <code>"O"</code>. Later programs also put
+<code>"R"</code> here when a game is over, and <code>"Q"</code> when the
+player wants to quit.</li>
+<li>Indexes 1 through 9: the nine squares of the board.</li>
+<li>Index 10: the difficulty level, for games against the computer.</li>
+<li>Index 11: the number of players, 1 or 2.</li>
+</ul>
+<h3 id="why-the-board-starts-at-index-1">Why the Board Starts at Index
+1</h3>
+<p>Python counts list indexes from 0, but the board’s squares are
+numbered from 1 to 9. If the board were at indexes 0 through 8, the
+program would have to subtract 1 every time a player typed a square, and
+it would be easy to get wrong.</p>
+<p>Instead, the board is at indexes 1 through 9. Index 0 is used for
+something else. Now square 5 is <code>game_state[5]</code>. The number
+the player types is the index. No math, no off-by-one errors.</p>
+<h3 id="empty-squares-hold-their-own-number">Empty Squares Hold Their
+Own Number</h3>
+<p>At the start, square 1 holds the number <code>1</code>, square 2
+holds <code>2</code>, and so on. When a player takes a square, the
+number is replaced with <code>"X"</code> or <code>"O"</code>.</p>
+<p>This is a clever design for two reasons. First, when the board is
+printed, each empty square says its own number, so the player always
+knows which numbers they can type. Second, no two empty squares are ever
+equal, because they all hold different numbers. That will matter a lot
+when you check for a winner: three squares in a row are a win only if
+they are equal, and empty squares can never be equal to each other.</p>
+<h3 id="a-list-of-mixed-types">A List of Mixed Types</h3>
+<p>This list holds both strings, like <code>"X"</code>, and numbers,
+like <code>1</code>. Python lets you mix types in one list. Some
+languages do not.</p>
+<h2 id="exploring-with-python--i">Exploring with python -i</h2>
+<p>You can run a file and then stay in the interactive shell with
+everything the file made. Type this at the command prompt:</p>
+<pre><code>python -i tester.py</code></pre>
+<p>The <code>-i</code> stands for “interactive.” The program runs, and
+then you get the <code>&gt;&gt;&gt;</code> prompt, with
+<code>game_state</code> ready to use. Try these:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">5</span>]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">0</span>]</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;X&#39;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>]</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]</span></code></pre></div>
+<p>The last one is a <em>slice</em>. <code>game_state[1:10]</code> gives
+you a new list with the items from index 1 up to, but not including,
+index 10. That is exactly the board. You will learn more about slices in
+the next few lessons.</p>
+<p>Now make a move. Put an X in the center square:</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">5</span>] <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>]</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="st">&#39;X&#39;</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]</span></code></pre></div>
+<p>And an O in the top left corner:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>] <span class="op">=</span> <span class="st">&quot;O&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;O&#39;</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="st">&#39;X&#39;</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]</span></code></pre></div>
+<p>Type <code>exit()</code> when you are done.</p>
+<p><code>python -i</code> is a great tool for any program. When
+something goes wrong, run the program with <code>-i</code>, and you can
+look at every variable afterwards to find out why.</p>
+<h2 id="summary">Summary</h2>
+<p>You planned how a Tic Tac Toe game stores its board. You learned
+that:</p>
+<ul>
+<li>Deciding how to store a game’s information is the first step in
+writing it.</li>
+<li>Putting the board at indexes 1 through 9 lets the square number be
+the index.</li>
+<li>Empty squares hold their own number, so they can be read out and are
+never equal to each other.</li>
+<li>A list can hold strings and numbers together.</li>
+<li><code>python -i file.py</code> runs a file and then opens the shell
+with its variables.</li>
+<li><code>game_state[1:10]</code> is a slice that gives you just the
+board.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Run <code>python -i tester.py</code>. Fill in the top row with X’s.
+Then check whether the three squares are equal with
+<code>game_state[1] == game_state[2] == game_state[3]</code>.</li>
+<li>In the shell, check whether the empty squares 4, 5, and 6 are equal.
+Why is the answer <code>False</code>?</li>
+<li>Use <code>game_state[1:10].count("X")</code> to count the X’s on the
+board.</li>
+<li>Add a comment above the line in <code>tester.py</code> that explains
+what each index holds.</li>
+<li>Think about it: what other ways could you store a Tic Tac Toe board?
+What would be harder or easier with each?</li>
+</ol>

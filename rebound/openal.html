@@ -1,0 +1,508 @@
+<h1 id="inside-openal.py-reading-a-library-you-did-not-write">Inside
+openal.py: Reading a Library You Did Not Write</h1>
+<p>The Rebound game moves the ball’s sound around your head using a file
+called <code>openal.py</code>. That file is about 4,000 lines long, and
+it was not written for Rebound. It is a <em>library</em>: code written
+by other people, for anyone to use. Its job is to let Python programs
+talk to <em>OpenAL</em>, a sound library written in the C programming
+language.</p>
+<p>You will not read all 4,000 lines in this lesson, and you do not need
+to. A big part of being a programmer is learning how to find your way
+around a large file, find the parts you need, and understand them well
+enough to use them and fix them. This lesson shows you how, with a
+screen reader, and explains the parts of <code>openal.py</code> that
+Rebound uses.</p>
+<p>This is the most advanced lesson in these materials.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>What a library and a wrapper are</li>
+<li>Reading a license</li>
+<li>Finding your way around a large file with a screen reader</li>
+<li>Calling C code from Python with <code>ctypes</code></li>
+<li>Loading a DLL</li>
+<li>Module-level objects that are made on import</li>
+<li>Classes that manage resources, and <code>delete()</code>
+methods</li>
+<li>Properties with <code>property()</code></li>
+<li>“Private” names that start with an underscore</li>
+<li>3D sound: listeners, sources, positions, distance, rolloff, and
+pitch</li>
+<li>Reading WAV files with the <code>wave</code> module</li>
+<li>A surprising bug: reading <code>sys.argv</code> inside a
+library</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="do-not-type-this-one-in">Do Not Type This One In</h2>
+<p>Unlike the other lessons, you should not type this file in. It is
+long, it was generated partly by a tool, and it already works. Instead,
+open it in your editor and follow along. The full file is in the
+<code>rebound</code> folder. This lesson shows only short pieces of
+it.</p>
+<h2 id="what-is-a-wrapper">What Is a Wrapper?</h2>
+<p>OpenAL is written in C, and on Windows it comes as a file called
+<code>OpenAL32.dll</code>. A <em>DLL</em>, or <em>dynamic link
+library</em>, is a file of compiled code that programs can load and use
+while they run. Python cannot use C code directly. It needs a
+translator.</p>
+<p><code>openal.py</code> is that translator. Code that makes a library
+written in one language usable from another is called a
+<em>wrapper</em>, or a <em>binding</em>. It “wraps” the C functions in
+Python functions and classes.</p>
+<p>The file has two layers:</p>
+<ol type="1">
+<li>A low-level layer that matches OpenAL’s C functions one for one,
+such as <code>alSourcePlay</code>. These are in the classes
+<code>lib_openal</code>, <code>lib_alc</code>, and
+<code>lib_efx</code>.</li>
+<li>A high-level layer of friendly Python classes, such as
+<code>Listener</code>, <code>LoadSound</code>, and <code>Player</code>,
+that use the low-level layer. Rebound only uses this layer.</li>
+</ol>
+<h2 id="finding-your-way-around">Finding Your Way Around</h2>
+<p>A file this long is hard to read from top to bottom with any tool,
+and especially by ear. Here are some techniques that work well with a
+screen reader.</p>
+<h3 id="search-for-classes-and-functions">Search for Classes and
+Functions</h3>
+<p>Use your editor’s Find command to search for <code>class</code>, with
+a space after it. Each match is the start of a class. In
+<code>openal.py</code> you will find these, among others:</p>
+<ul>
+<li><code>lib_openal</code>, <code>lib_alc</code>, and
+<code>lib_efx</code>, the low-level layer</li>
+<li><code>Listener</code>, the listener, or your ears</li>
+<li><code>LoadSound</code>, a sound loaded from a WAV file</li>
+<li><code>BufferSound</code>, a sound made from raw data</li>
+<li><code>Player</code>, a sound source that plays sounds</li>
+<li>Effects such as <code>reverb</code>, <code>echo</code>,
+<code>chorus</code>, and <code>distortion</code></li>
+<li>Filters such as <code>lowpass_filter</code></li>
+</ul>
+<p>Searching for <code>def</code> works the same way for functions and
+methods.</p>
+<h3 id="use-a-command-line-search">Use a Command-Line Search</h3>
+<p>You can also search from the command prompt. On Windows,
+<code>findstr</code> lists every line that matches, with its line
+number:</p>
+<pre><code>findstr /n /b &quot;class&quot; openal.py</code></pre>
+<p><code>/n</code> adds line numbers, and <code>/b</code> only matches
+at the beginning of a line. The result is a short list, one class per
+line, which is much easier to hear than the whole file. On Mac or Linux,
+<code>grep -n "^class" openal.py</code> does the same.</p>
+<h3 id="start-from-what-you-use">Start from What You Use</h3>
+<p>You do not need to understand the whole library. Start from the lines
+in Rebound that use it, and find only those parts:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>listener<span class="op">=</span>openal.Listener()</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>listener.distance_model<span class="op">=</span><span class="dv">5</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>listener.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">40</span>, <span class="dv">0</span>)</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>ball_sound<span class="op">=</span>openal.LoadSound(<span class="st">&#39;sounds/ball.wav&#39;</span>)</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>ball_source<span class="op">=</span>openal.Player()</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>ball_source.add(ball_sound)</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>ball_source.position<span class="op">=</span>(width<span class="op">/</span><span class="dv">2</span>, height<span class="op">-</span><span class="dv">50</span>, <span class="dv">0</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>ball_source.loop<span class="op">=</span><span class="va">True</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>ball_source.rolloff<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ball_source.reference_distance<span class="op">=</span><span class="fl">0.1</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>ball_source.play()</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>ball_source.pitch<span class="op">=</span>get_pitch(ball_position[<span class="dv">1</span>])</span></code></pre></div>
+<p>So you need <code>Listener</code>, <code>LoadSound</code>, and
+<code>Player</code>, and a few of their attributes and methods. That is
+a small part of 4,000 lines.</p>
+<h2 id="the-license">The License</h2>
+<p>The file begins with a long comment. It is a <em>license</em>: the
+legal terms for using this code. The code was originally part of
+<em>pyglet</em>, a Python library for games, written by Alex Holkner.
+This license, a type called a BSD license, lets anyone use and change
+the code, as long as they keep the copyright notice and do not use the
+authors’ names to promote their own products.</p>
+<p>Whenever you use code someone else wrote, check its license, and keep
+their notice. Credit matters. Rebound does the same, crediting its
+author at the top of <code>rebound.py</code>.</p>
+<p>After the license, a docstring explains that the low-level part was
+generated by a tool called <code>wrap.py</code> from OpenAL’s C header
+file, <code>al.h</code>, and then changed by hand. Much of the low-level
+code was written by a program, not a person, which is why it is so long
+and so repetitive.</p>
+<h2 id="loading-the-dll-with-ctypes">Loading the DLL with ctypes</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> ctypes</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> ctypes <span class="im">import</span> <span class="op">*</span></span></code></pre></div>
+<p><code>ctypes</code> is a module that comes with Python. It lets
+Python load DLLs and call the C functions inside them.</p>
+<p><code>from ctypes import *</code> imports <em>every</em> public name
+from <code>ctypes</code>. That saves typing, but it makes it hard to
+tell where a name came from, so most style guides advise against it.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> lib_openal(<span class="bu">object</span>):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="st">&#39;add_dll_directory&#39;</span> <span class="kw">in</span> <span class="bu">dir</span>(os):</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>            os.add_dll_directory(os.getcwd())</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._lib <span class="op">=</span> ctypes.CDLL(<span class="st">&#39;OpenAL32.dll&#39;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>._lib <span class="op">=</span> ctypes.CDLL(os.path.abspath(<span class="st">&#39;OpenAL32.dll&#39;</span>))</span></code></pre></div>
+<p><code>ctypes.CDLL()</code> loads a DLL and returns an object whose
+attributes are the C functions inside it.</p>
+<p>Newer versions of Python on Windows only load DLLs from certain safe
+folders. <code>os.add_dll_directory()</code> adds a folder to that list.
+<code>dir(os)</code> lists every name in the <code>os</code> module, so
+the <code>if</code> checks whether this Python has that function. Either
+way, the DLL is looked for in the current working directory. That is why
+you must run Rebound from the <code>rebound</code> folder.</p>
+<h3 id="describing-c-functions-to-python">Describing C Functions to
+Python</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alSourcePlay <span class="op">=</span> <span class="va">self</span>._lib.alSourcePlay</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alSourcePlay.restype <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.alSourcePlay.argtypes <span class="op">=</span> [<span class="va">self</span>.ALuint]</span></code></pre></div>
+<p>C is strict about types. Every argument and return value has a fixed
+type, such as a whole number or a decimal number of a certain size.
+Python is not strict in the same way, so <code>ctypes</code> needs to be
+told.</p>
+<ul>
+<li><code>restype</code> is the <em>return type</em>. <code>None</code>
+means the function returns nothing.</li>
+<li><code>argtypes</code> is a list of the argument types.
+<code>alSourcePlay</code> takes one <code>ALuint</code>, an unsigned
+whole number that identifies a sound source.</li>
+</ul>
+<p>The low-level classes do this for hundreds of functions. That is most
+of the file. When you hear long runs of nearly identical lines, you are
+in generated code, and you can usually skip ahead.</p>
+<h3 id="constants">Constants</h3>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.AL_PITCH <span class="op">=</span> <span class="dv">4099</span>    <span class="co"># /usr/include/AL/al.h:145</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.AL_POSITION <span class="op">=</span> <span class="dv">4100</span>     <span class="co"># /usr/include/AL/al.h:157</span></span></code></pre></div>
+<p>OpenAL uses numbers to name its settings. <code>AL_POSITION</code> is
+4100. These lines give the numbers readable names. The comments say
+where each was found in the C header file.</p>
+<h2 id="objects-made-on-import">Objects Made on Import</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="co">#initialize openal bindings</span></span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>al <span class="op">=</span> lib_openal()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>alc <span class="op">=</span> lib_alc()</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>efx <span class="op">=</span> lib_efx()</span></code></pre></div>
+<p>These three lines are not inside any class or function, so they run
+as soon as the module is imported. When Rebound says
+<code>import openal</code>, the DLL is loaded right away, and the
+objects <code>al</code>, <code>alc</code>, and <code>efx</code> are
+ready for the rest of the file to use.</p>
+<p>This means that if <code>OpenAL32.dll</code> is missing, the error
+happens on the <code>import openal</code> line itself, before any of
+your code runs. If you ever see an error on an <code>import</code> line,
+check whether the library needs a file that is missing.</p>
+<h2 id="the-listener-class">The Listener Class</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Listener(<span class="bu">object</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="co">#load device/context/listener</span></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.device <span class="op">=</span> alc.alcOpenDevice(<span class="va">None</span>)</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.context <span class="op">=</span> alc.alcCreateContext(<span class="va">self</span>.device, <span class="va">None</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        alc.alcMakeContextCurrent(<span class="va">self</span>.context)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>        alc.alcProcessContext(<span class="va">self</span>.context)</span></code></pre></div>
+<p>A listener is the position of the person hearing the sounds. In
+Rebound, it is your paddle.</p>
+<p>Making a <code>Listener</code> also opens the sound <em>device</em>,
+which is your sound card or headphones, and creates a <em>context</em>,
+which is OpenAL’s workspace. Passing <code>None</code> to
+<code>alcOpenDevice()</code> means “use the default device.” This is why
+a program must make a <code>Listener</code> before any sounds can
+play.</p>
+<p><code>(object)</code> after the class name is an older way to write a
+class. In Python 3, <code>class Listener:</code> means the same
+thing.</p>
+<p>Notice the comment, <code>#load device/context/listener</code>, is at
+the left edge, but the code around it is indented. Python does not care
+how comments are indented, but it is confusing to hear. Indentation is
+meant to show structure, and a comment at the wrong level makes it sound
+like the method has ended.</p>
+<h3 id="properties">Properties</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set listener position</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _set_position(<span class="va">self</span>,pos):</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._position <span class="op">=</span> pos</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        x,y,z <span class="op">=</span> <span class="bu">map</span>(<span class="bu">float</span>, pos)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        al.alListener3f(al.AL_POSITION, x, y, z)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _get_position(<span class="va">self</span>):</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>._position</span></code></pre></div>
+<p>and near the end of the class:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    position <span class="op">=</span> <span class="bu">property</span>(_get_position, _set_position,doc<span class="op">=</span><span class="st">&quot;&quot;&quot;get/set position&quot;&quot;&quot;</span>)</span></code></pre></div>
+<p>This is how <code>listener.position = (400, 560, 0)</code> in Rebound
+can tell OpenAL to move the listener, even though it looks like setting
+an ordinary attribute.</p>
+<p><code>property()</code> makes a <em>property</em>. A property looks
+like an attribute from the outside, but reading it calls a getter
+method, and setting it calls a setter method. So:</p>
+<ul>
+<li><code>listener.position = (400, 560, 0)</code> calls
+<code>_set_position((400, 560, 0))</code>.</li>
+<li><code>listener.position</code> calls
+<code>_get_position()</code>.</li>
+</ul>
+<p>The setter saves the new position, and then calls the C function
+<code>alListener3f()</code> to tell OpenAL. That is the whole trick of a
+good wrapper: it hides the C calls behind something that feels like
+normal Python.</p>
+<h3 id="underscores-mean-private">Underscores Mean “Private”</h3>
+<p>The getter and setter are named <code>_get_position</code> and
+<code>_set_position</code>, starting with an underscore. The saved value
+is <code>self._position</code>. In Python, a name that starts with one
+underscore is a signal: “This is for use inside the class. Do not use it
+from outside.” Python does not enforce this. It is a promise between
+programmers, like constants in capital letters.</p>
+<p>Users of the class should use the public property,
+<code>position</code>, and leave the underscore names alone.</p>
+<h3 id="map">map()</h3>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>        x,y,z <span class="op">=</span> <span class="bu">map</span>(<span class="bu">float</span>, pos)</span></code></pre></div>
+<p><code>map()</code> calls a function on every item of a list or tuple.
+Here it turns each of the three numbers into a decimal number, a
+<code>float</code>, because the C function needs floats. Then the three
+results are unpacked into <code>x</code>, <code>y</code>, and
+<code>z</code>.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x, y, z <span class="op">=</span> <span class="bu">map</span>(<span class="bu">float</span>, (<span class="dv">400</span>, <span class="dv">560</span>, <span class="dv">0</span>))</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> x</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a><span class="fl">400.0</span></span></code></pre></div>
+<h3 id="the-distance-model">The Distance Model</h3>
+<p><code>listener.distance_model = 5</code> in Rebound calls
+<code>_set_distance_model(5)</code>, which uses <code>if</code> and
+<code>elif</code> to turn the number into an OpenAL setting. Model 5 is
+<code>AL_EXPONENT_DISTANCE</code>. A distance model is the rule for how
+much quieter a sound gets as it moves farther from the listener. With
+the exponential model, the volume drops off quickly at first and then
+more slowly.</p>
+<h2 id="the-loadsound-class">The LoadSound Class</h2>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> LoadSound(<span class="bu">object</span>):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>,filename):</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.name <span class="op">=</span> filename</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">#load/set wav file</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="bu">len</span> (sys.argv) <span class="op">&lt;</span> <span class="dv">2</span>:</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;Usage: </span><span class="sc">%s</span><span class="st"> wavefile&quot;</span> <span class="op">%</span> os.path.basename(sys.argv[<span class="dv">0</span>]))</span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;    Using an example wav file...&quot;</span>)</span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a>            dirname <span class="op">=</span> os.path.dirname(os.path.realpath(<span class="va">__file__</span>))</span>
+<span id="cb13-9"><a href="#cb13-9" aria-hidden="true" tabindex="-1"></a>            fname <span class="op">=</span> os.path.join(dirname, filename)</span>
+<span id="cb13-10"><a href="#cb13-10" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb13-11"><a href="#cb13-11" aria-hidden="true" tabindex="-1"></a>            fname <span class="op">=</span> sys.argv[<span class="dv">1</span>]</span></code></pre></div>
+<p><code>LoadSound</code> reads a WAV file and copies its sound data
+into OpenAL. Before you read on, listen to the <code>if</code> statement
+carefully. Something is odd.</p>
+<h3 id="a-bug-hiding-in-a-library">A Bug Hiding in a Library</h3>
+<p><code>sys.argv</code> is the list of words typed on the command line.
+<code>sys.argv[0]</code> is the program’s name, and anything after it is
+extra. When you run <code>python rebound.py</code>,
+<code>sys.argv</code> is <code>["rebound.py"]</code>, which has fewer
+than 2 items, so the first block runs. It prints a “Usage” message,
+which you will hear in the command prompt every time a sound is loaded,
+and then builds the path to the file.</p>
+<p>But if you ran <code>python rebound.py fast</code>,
+<code>sys.argv[1]</code> would be <code>"fast"</code>, and
+<em>every</em> sound would try to load a file named <code>fast</code>,
+instead of the file the program asked for. The game would crash.</p>
+<p>This code was clearly copied from a small example program that took a
+sound file name on the command line. In an example, that makes sense. In
+a library, it is a bug. A library should only use the arguments it is
+given, and never read the command line or print messages of its own. The
+fix is to remove the <code>if</code> and always use the file name that
+was passed in.</p>
+<h3 id="where-the-file-is-found">Where the File Is Found</h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>            dirname <span class="op">=</span> os.path.dirname(os.path.realpath(<span class="va">__file__</span>))</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>            fname <span class="op">=</span> os.path.join(dirname, filename)</span></code></pre></div>
+<p><code>__file__</code> is the path of the current module,
+<code>openal.py</code>. <code>os.path.realpath()</code> makes it a full
+path, and <code>os.path.dirname()</code> takes off the file name,
+leaving the folder. So sound files are found relative to the folder
+<code>openal.py</code> is in, not the folder you ran the program
+from.</p>
+<p>That is a good way to find files that come with a program. It is more
+reliable than the <code>os.getcwd()</code> approach from the dice
+lessons, which depends on where you are when you run the program.</p>
+<h3 id="reading-a-wav-file">Reading a WAV File</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>        wavefp <span class="op">=</span> wave.<span class="bu">open</span>(fname)</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        channels <span class="op">=</span> wavefp.getnchannels()</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        bitrate <span class="op">=</span> wavefp.getsampwidth() <span class="op">*</span> <span class="dv">8</span></span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>        samplerate <span class="op">=</span> wavefp.getframerate()</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        wavbuf <span class="op">=</span> wavefp.readframes(wavefp.getnframes())</span></code></pre></div>
+<p>The <code>wave</code> module comes with Python and reads WAV files. A
+WAV file stores sound as a long list of numbers called <em>samples</em>.
+This code asks the file for:</p>
+<ul>
+<li>The number of <em>channels</em>: 1 for mono, 2 for stereo.</li>
+<li>The size of each sample in bytes, times 8 to get bits.</li>
+<li>The <em>sample rate</em>: how many samples per second, often
+44,100.</li>
+<li>All of the sample data, with <code>readframes()</code>.</li>
+</ul>
+<h3 id="a-dictionary-with-tuple-keys">A Dictionary with Tuple Keys</h3>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>        formatmap <span class="op">=</span> {</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">1</span>, <span class="dv">8</span>) : al.AL_FORMAT_MONO8,</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">8</span>) : al.AL_FORMAT_STEREO8,</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">1</span>, <span class="dv">16</span>): al.AL_FORMAT_MONO16,</span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">16</span>) : al.AL_FORMAT_STEREO16,</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        }</span>
+<span id="cb16-7"><a href="#cb16-7" aria-hidden="true" tabindex="-1"></a>        alformat <span class="op">=</span> formatmap[(channels, bitrate)]</span></code></pre></div>
+<p>Dictionary keys can be tuples. This dictionary matches a pair of
+channels and bits to the OpenAL format name. It is a neat replacement
+for four <code>if</code> statements.</p>
+<h3 id="positional-sound-needs-mono">Positional Sound Needs Mono</h3>
+<p>Here is something important about 3D sound. OpenAL can only place a
+<em>mono</em> sound in 3D space. A stereo sound already has its own left
+and right, so OpenAL plays it as it is, without moving it. If you
+replace <code>ball.wav</code> with a stereo file, the ball will stop
+moving around your head. Always use mono files for sounds that need a
+position.</p>
+<h3 id="freeing-the-sound">Freeing the Sound</h3>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.buf <span class="op">=</span> al.ALuint(<span class="dv">0</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>        al.alGenBuffers(<span class="dv">1</span>, <span class="va">self</span>.buf)</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>        al.alBufferData(<span class="va">self</span>.buf, alformat, wavbuf, <span class="bu">len</span>(wavbuf), samplerate)</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="co">#delete loaded sound</span></span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> delete(<span class="va">self</span>):</span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>        al.alDeleteBuffers(<span class="dv">1</span>, <span class="va">self</span>.buf)</span></code></pre></div>
+<p>The sound data is copied into an OpenAL <em>buffer</em>. The buffer
+lives inside the C library, outside of Python. Python cleans up its own
+objects automatically when they are no longer used, but it does not know
+about memory that a C library is holding. That is why the class has a
+<code>delete()</code> method, and why Rebound calls
+<code>ball_sound.delete()</code> at the end. Things a program must
+remember to give back, such as files, windows, sound devices, and
+buffers, are called <em>resources</em>.</p>
+<h2 id="the-player-class">The Player Class</h2>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Player(<span class="bu">object</span>):</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="co">#load default settings</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>    <span class="co">#load source player</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.source <span class="op">=</span> al.ALuint(<span class="dv">0</span>)</span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a>        al.alGenSources(<span class="dv">1</span>, <span class="va">self</span>.source)</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a>        ...</span></code></pre></div>
+<p>A <code>Player</code> is an OpenAL <em>source</em>: a point in space
+that plays sound. Its <code>__init__()</code> asks OpenAL for a new
+source and sets about two dozen attributes to their defaults.</p>
+<p>The methods Rebound uses are short:</p>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add(<span class="va">self</span>,sound):</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>        al.alSourceQueueBuffers(<span class="va">self</span>.source, <span class="dv">1</span>, sound.buf) <span class="co">#self.buf</span></span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.queue.append(sound)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> play(<span class="va">self</span>):</span>
+<span id="cb19-6"><a href="#cb19-6" aria-hidden="true" tabindex="-1"></a>        al.alSourcePlay(<span class="va">self</span>.source)</span></code></pre></div>
+<p><code>add()</code> gives the source a sound to play, and
+<code>play()</code> starts it.</p>
+<p>The settings Rebound changes are all properties, just like the
+listener’s <code>position</code>:</p>
+<ul>
+<li><code>position</code> places the source in 3D space. Rebound moves
+it with the ball every frame.</li>
+<li><code>pitch</code> changes the playback speed. 1.0 is normal, 2.0 is
+twice as fast and an octave higher. Rebound uses this to let you hear
+the ball’s height.</li>
+<li><code>loop</code> makes the sound repeat. Rebound’s ball sound loops
+forever.</li>
+<li><code>rolloff</code> is how fast the sound gets quieter with
+distance. 0 means it never gets quieter. Rebound uses a small value,
+0.1, so the ball fades only a little as it goes far away, and you never
+lose track of it.</li>
+<li><code>reference_distance</code> is the distance at which the sound
+is at full volume before it starts to fade.</li>
+<li><code>volume</code> sets the loudness, from 0.0 to 1.0.</li>
+</ul>
+<p>For example:</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="co">#set whether looping or not - true/false 1/0</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> _set_loop(<span class="va">self</span>,lo):</span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>._loop <span class="op">=</span> lo</span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a>        al.alSourcei(<span class="va">self</span>.source, al.AL_LOOPING, lo)</span></code></pre></div>
+<p>Every setter has the same shape: save the value in an underscore
+attribute, and call an OpenAL function to apply it. Once you have
+understood one, you understand them all. Recognizing patterns like this
+is what makes a large file manageable.</p>
+<h2 id="d-sound-for-games">3D Sound for Games</h2>
+<p>With just these few classes, you can do a lot in an audio game:</p>
+<ul>
+<li>Put the listener where the player is.</li>
+<li>Make a source for each thing the player needs to track: an enemy, a
+ball, a door, a goal.</li>
+<li>Move each source every frame to its object’s position.</li>
+<li>Use pitch, volume, or a looping sound to give extra information,
+such as height, speed, or danger.</li>
+</ul>
+<p>The listener’s position is in the same units as the game, here
+pixels. So the sound of the ball 400 pixels to the left of the paddle is
+placed far to the left. With headphones, many players can follow a
+moving sound very precisely.</p>
+<h2 id="summary">Summary</h2>
+<p>You explored a large library you did not write. You learned that:</p>
+<ul>
+<li>A wrapper lets one language use a library written in another.</li>
+<li>Always check the license of code you use, and keep its notice.</li>
+<li>Search for <code>class</code> and <code>def</code>, or use
+<code>findstr</code> or <code>grep</code>, to find your way around a big
+file. Start from the parts your program uses.</li>
+<li><code>ctypes</code> loads DLLs and calls C functions.
+<code>restype</code> and <code>argtypes</code> describe them.</li>
+<li>Code at the top level of a module runs when the module is
+imported.</li>
+<li><code>property()</code> makes an attribute that calls a getter and
+setter.</li>
+<li>A leading underscore marks a name as private by agreement.</li>
+<li><code>map()</code> calls a function on every item.</li>
+<li>The <code>wave</code> module reads WAV files.</li>
+<li>Dictionary keys can be tuples.</li>
+<li>Resources held by C libraries must be freed with methods like
+<code>delete()</code>.</li>
+<li>OpenAL places mono sounds in 3D space around a listener, with
+position, rolloff, reference distance, and pitch.</li>
+<li>A library should never read <code>sys.argv</code> or print messages
+of its own.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Use <code>findstr /n /b "class" openal.py</code> or your editor’s
+search to list every class in the file. How many effect classes are
+there?</li>
+<li>Find the <code>Player</code> class’s <code>_set_volume</code> method
+and its property line. Then, in Rebound, set
+<code>ball_source.volume = 0.5</code> and listen to the difference.</li>
+<li>Fix the <code>sys.argv</code> bug in <code>LoadSound</code> so it
+always loads the file it was given and does not print a usage
+message.</li>
+<li>In Rebound, try <code>ball_source.rolloff = 0</code> and then
+<code>ball_source.rolloff = 1</code>. How does the ball sound different
+as it moves away?</li>
+<li>Change <code>get_pitch()</code> in Rebound so the pitch goes from
+0.5 to 2.0 instead of 1.0 to 3.0. Which range is easier for you to
+follow?</li>
+<li>Find the <code>echo</code> class. Read its <code>__init__()</code>
+method and list its properties. What do you think each one changes?</li>
+<li>Write a short test program that makes a <code>Listener</code>, loads
+one sound into a <code>Player</code>, and moves the sound slowly from
+far left to far right with a loop and <code>time.sleep()</code>.
+Remember to call <code>delete()</code> on everything at the end.</li>
+</ol>

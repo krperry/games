@@ -1,0 +1,420 @@
+<h1 id="the-room-class">The Room Class</h1>
+<p>A cave adventure is a world of rooms. Each room has a title, a
+description, a list of exits that lead to other rooms, and sometimes an
+item lying on the ground. The <code>Room</code> class holds all of that,
+and it can describe itself to the player in words.</p>
+<p>This class introduces the <em>dictionary</em>, a way to look up a
+value by a name instead of a number. It is also a good place to practice
+reading code carefully, and to think about the assumptions a piece of
+code makes. A file in the same folder, <code>room.lnt</code>, shows the
+report from a tool that checks code for problems.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Dictionaries</li>
+<li>Looping over a dictionary with <code>items()</code></li>
+<li>Building a description string for a screen reader</li>
+<li><code>is None</code> and <code>is not None</code></li>
+<li>Changing a list while you loop over it</li>
+<li>Linters and what they report</li>
+<li>Tracing code and spotting the assumptions it makes</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="the-source-code-for-room">The Source Code for Room</h2>
+<p>Type this program and save it as <code>room.py</code> in the
+<code>cave</code> folder:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Class to contain the room information&quot;&quot;&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unit <span class="im">import</span> Unit</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Room(Unit):</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="co">    This class defines the room type dirived from Unit</span></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, location, title, desc):</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>([], title, desc)</span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> location</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits <span class="op">=</span> {<span class="st">&quot;north&quot;</span>: <span class="va">None</span>, <span class="st">&quot;east&quot;</span>: <span class="va">None</span>, <span class="st">&quot;south&quot;</span>: <span class="va">None</span>, <span class="st">&quot;west&quot;</span>: <span class="va">None</span>}</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_direction(<span class="va">self</span>, direction, location):</span>
+<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Set the location this a given exit leads to&quot;&quot;&quot;</span></span>
+<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits[direction] <span class="op">=</span> location</span>
+<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-23"><a href="#cb1-23" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_item(<span class="va">self</span>, item):</span>
+<span id="cb1-24"><a href="#cb1-24" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Add an item to this rooms contents&quot;&quot;&quot;</span></span>
+<span id="cb1-25"><a href="#cb1-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb1-26"><a href="#cb1-26" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items <span class="op">=</span> []</span>
+<span id="cb1-27"><a href="#cb1-27" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items.append(item)</span>
+<span id="cb1-28"><a href="#cb1-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-29"><a href="#cb1-29" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_item(<span class="va">self</span>, name):</span>
+<span id="cb1-30"><a href="#cb1-30" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;get an item from this room by given name&quot;&quot;&quot;</span></span>
+<span id="cb1-31"><a href="#cb1-31" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="va">self</span>.items[name]</span>
+<span id="cb1-32"><a href="#cb1-32" aria-hidden="true" tabindex="-1"></a>        <span class="kw">del</span> <span class="va">self</span>.items[name]</span>
+<span id="cb1-33"><a href="#cb1-33" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> i</span>
+<span id="cb1-34"><a href="#cb1-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-35"><a href="#cb1-35" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_room_string(<span class="va">self</span>):</span>
+<span id="cb1-36"><a href="#cb1-36" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Get rooms full description&quot;&quot;&quot;</span></span>
+<span id="cb1-37"><a href="#cb1-37" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
+<span id="cb1-38"><a href="#cb1-38" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>title<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>description<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb1-39"><a href="#cb1-39" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="ss">f&quot;You can walk </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>directions()<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>get_items_string()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb1-40"><a href="#cb1-40" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb1-41"><a href="#cb1-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-42"><a href="#cb1-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> directions(<span class="va">self</span>):</span>
+<span id="cb1-43"><a href="#cb1-43" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;return direction string&quot;&quot;&quot;</span></span>
+<span id="cb1-44"><a href="#cb1-44" aria-hidden="true" tabindex="-1"></a>        dir_str <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-45"><a href="#cb1-45" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> direction, room <span class="kw">in</span> <span class="va">self</span>.exits.items():</span>
+<span id="cb1-46"><a href="#cb1-46" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> room <span class="op">!=</span> <span class="va">None</span>:</span>
+<span id="cb1-47"><a href="#cb1-47" aria-hidden="true" tabindex="-1"></a>                dir_str <span class="op">+=</span> direction <span class="op">+</span> <span class="st">&quot;, &quot;</span></span>
+<span id="cb1-48"><a href="#cb1-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f&quot;[</span><span class="sc">{</span>dir_str<span class="sc">.</span>strip()<span class="sc">.</span>strip(<span class="st">&#39;,&#39;</span>)<span class="sc">}</span><span class="ss">]&quot;</span></span>
+<span id="cb1-49"><a href="#cb1-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-50"><a href="#cb1-50" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> has_exit(<span class="va">self</span>, direction):</span>
+<span id="cb1-51"><a href="#cb1-51" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Returns if this room has a given exit&quot;&quot;&quot;</span></span>
+<span id="cb1-52"><a href="#cb1-52" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.exits[direction]</span>
+<span id="cb1-53"><a href="#cb1-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-54"><a href="#cb1-54" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_items_string(<span class="va">self</span>):</span>
+<span id="cb1-55"><a href="#cb1-55" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Gets description of items in the room&quot;&quot;&quot;</span></span>
+<span id="cb1-56"><a href="#cb1-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb1-57"><a href="#cb1-57" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb1-58"><a href="#cb1-58" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> item <span class="kw">in</span> <span class="va">self</span>.items:</span>
+<span id="cb1-59"><a href="#cb1-59" aria-hidden="true" tabindex="-1"></a>            item_str <span class="op">=</span> item.get_title() <span class="op">+</span> <span class="st">&quot;is laying on the ground.</span><span class="ch">\n</span><span class="st">&quot;</span></span>
+<span id="cb1-60"><a href="#cb1-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> item_str</span>
+<span id="cb1-61"><a href="#cb1-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-62"><a href="#cb1-62" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> remove_item(<span class="va">self</span>, item):</span>
+<span id="cb1-63"><a href="#cb1-63" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Remove this item from room&quot;&quot;&quot;</span></span>
+<span id="cb1-64"><a href="#cb1-64" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb1-65"><a href="#cb1-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb1-66"><a href="#cb1-66" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(<span class="va">self</span>.items)):</span>
+<span id="cb1-67"><a href="#cb1-67" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.items[i].is_name(item):</span>
+<span id="cb1-68"><a href="#cb1-68" aria-hidden="true" tabindex="-1"></a>                tItem <span class="op">=</span> <span class="va">self</span>.items[i]</span>
+<span id="cb1-69"><a href="#cb1-69" aria-hidden="true" tabindex="-1"></a>                <span class="kw">del</span> <span class="va">self</span>.items[i]</span>
+<span id="cb1-70"><a href="#cb1-70" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.items) <span class="op">&lt;</span> <span class="dv">1</span>:</span>
+<span id="cb1-71"><a href="#cb1-71" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb1-72"><a href="#cb1-72" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">return</span> tItem</span>
+<span id="cb1-73"><a href="#cb1-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<h2 id="a-stray-line">A Stray Line</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unit <span class="im">import</span> Unit</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span></span></code></pre></div>
+<p>There is a line that holds only the number <code>1</code>. It is a
+complete Python statement that makes the number 1 and then throws it
+away. It does nothing. It was probably typed by accident. You can delete
+it.</p>
+<p>Lines like this are easy to miss by eye and easy to miss by ear.
+Tools called <em>linters</em>, which you will meet at the end of the
+lesson, are good at finding them.</p>
+<h2 id="the-room-constructor">The Room Constructor</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Room(Unit):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, location, title, desc):</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>([], title, desc)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.location <span class="op">=</span> location</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits <span class="op">=</span> {<span class="st">&quot;north&quot;</span>: <span class="va">None</span>, <span class="st">&quot;east&quot;</span>: <span class="va">None</span>, <span class="st">&quot;south&quot;</span>: <span class="va">None</span>, <span class="st">&quot;west&quot;</span>: <span class="va">None</span>}</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span></code></pre></div>
+<p><code>Room</code> inherits from <code>Unit</code>. Players never type
+a room’s name, so the room passes an empty list as its names.</p>
+<p><code>location</code> is a short id for the room, such as
+<code>"cave0"</code>. It lets the programmer tell rooms apart, but the
+game never says it out loud.</p>
+<h2 id="dictionaries">Dictionaries</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits <span class="op">=</span> {<span class="st">&quot;north&quot;</span>: <span class="va">None</span>, <span class="st">&quot;east&quot;</span>: <span class="va">None</span>, <span class="st">&quot;south&quot;</span>: <span class="va">None</span>, <span class="st">&quot;west&quot;</span>: <span class="va">None</span>}</span></code></pre></div>
+<p>This is a <em>dictionary</em>. A dictionary holds pairs. Each pair
+has a <em>key</em> and a <em>value</em>, joined by a colon. Pairs are
+separated by commas, and the whole thing is inside curly braces.</p>
+<p>A list looks up values by number: <code>my_list[0]</code>. A
+dictionary looks up values by key: <code>self.exits["north"]</code>.
+That is perfect for exits, because a direction name is much clearer than
+a number.</p>
+<p>Here, every direction starts with the value <code>None</code>,
+meaning there is no exit that way. The game will replace some of them
+with rooms.</p>
+<p>Try a dictionary in the shell:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ages <span class="op">=</span> {<span class="st">&quot;Ana&quot;</span>: <span class="dv">12</span>, <span class="st">&quot;Ben&quot;</span>: <span class="dv">14</span>}</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ages[<span class="st">&quot;Ana&quot;</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="dv">12</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ages[<span class="st">&quot;Cam&quot;</span>] <span class="op">=</span> <span class="dv">11</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ages</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>{<span class="st">&#39;Ana&#39;</span>: <span class="dv">12</span>, <span class="st">&#39;Ben&#39;</span>: <span class="dv">14</span>, <span class="st">&#39;Cam&#39;</span>: <span class="dv">11</span>}</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> ages[<span class="st">&quot;Dee&quot;</span>]</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a><span class="pp">KeyError</span>: <span class="st">&#39;Dee&#39;</span></span></code></pre></div>
+<p>Putting a value in with a new key adds a pair. Looking up a key that
+is not there causes a <code>KeyError</code>.</p>
+<p>With a screen reader, listen for the colons and commas to tell the
+keys and values apart. A dictionary written one pair per line is much
+easier to follow:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits <span class="op">=</span> {</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;north&quot;</span>: <span class="va">None</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;east&quot;</span>: <span class="va">None</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;south&quot;</span>: <span class="va">None</span>,</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="st">&quot;west&quot;</span>: <span class="va">None</span>,</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>        }</span></code></pre></div>
+<h2 id="setting-an-exit">Setting an Exit</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> set_direction(<span class="va">self</span>, direction, location):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Set the location this a given exit leads to&quot;&quot;&quot;</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.exits[direction] <span class="op">=</span> location</span></code></pre></div>
+<p>This puts a room in the dictionary under a direction. In the game,
+<code>rooms[0].set_direction("north", rooms[8])</code> means “going
+north from room 0 leads to room 8.”</p>
+<p>The parameter is named <code>location</code>, but it holds a whole
+<code>Room</code> object, not a location id. A name like
+<code>room</code> would be clearer.</p>
+<h2 id="describing-the-room">Describing the Room</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_room_string(<span class="va">self</span>):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Get rooms full description&quot;&quot;&quot;</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> (</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>            <span class="ss">f&quot;</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>title<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>description<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            <span class="op">+</span> <span class="ss">f&quot;You can walk </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>directions()<span class="sc">}</span><span class="ch">\n</span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>get_items_string()<span class="sc">}</span><span class="ch">\n</span><span class="ss">&quot;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>        )</span></code></pre></div>
+<p>This builds everything the player hears when they enter a room: the
+title, the description, the ways out, and any items. <code>\n</code>
+starts a new line, so each part is on its own line, and your screen
+reader can read them one at a time.</p>
+<p>The whole expression is in parentheses so it can be split over two
+lines. The two f-strings are joined with <code>+</code>.</p>
+<p>The method calls two other methods to build its parts. Each part is
+easier to fix when it is its own method.</p>
+<h2 id="listing-the-directions">Listing the Directions</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> directions(<span class="va">self</span>):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;return direction string&quot;&quot;&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        dir_str <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> direction, room <span class="kw">in</span> <span class="va">self</span>.exits.items():</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> room <span class="op">!=</span> <span class="va">None</span>:</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>                dir_str <span class="op">+=</span> direction <span class="op">+</span> <span class="st">&quot;, &quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="ss">f&quot;[</span><span class="sc">{</span>dir_str<span class="sc">.</span>strip()<span class="sc">.</span>strip(<span class="st">&#39;,&#39;</span>)<span class="sc">}</span><span class="ss">]&quot;</span></span></code></pre></div>
+<h3 id="looping-over-a-dictionary-with-items">Looping over a Dictionary
+with items()</h3>
+<p><code>self.exits.items()</code> gives you each key and value as a
+pair. The <code>for</code> loop takes them apart into two variables,
+<code>direction</code> and <code>room</code>, the same way
+<code>enumerate()</code> gave you an index and an item.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> exits <span class="op">=</span> {<span class="st">&quot;north&quot;</span>: <span class="st">&quot;hall&quot;</span>, <span class="st">&quot;south&quot;</span>: <span class="va">None</span>}</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> direction, room <span class="kw">in</span> exits.items():</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(direction, room)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>north hall</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>south <span class="va">None</span></span></code></pre></div>
+<p>Dictionaries keep their pairs in the order they were added, so the
+exits are always listed north, east, south, west.</p>
+<h3 id="is-none">is None</h3>
+<p>The <code>if</code> line checks <code>room != None</code>. That
+works, but Python programmers write <code>room is not None</code>
+instead. <code>is</code> checks whether two things are the very same
+object, and there is only one <code>None</code>, so <code>is</code> is
+the right test for it. The linter report for this file points this
+out.</p>
+<h3 id="cleaning-up-the-string">Cleaning Up the String</h3>
+<p>The loop adds a comma and space after every direction, so it might
+build <code>"north, east, "</code>. Then <code>strip()</code> removes
+the space at the end, and <code>strip(',')</code> removes the comma. The
+result goes in square brackets: <code>[north, east]</code>.</p>
+<p>The square brackets look like a list. By ear, your screen reader
+might say “left bracket north comma east right bracket,” which is a lot
+of noise. A plain sentence is easier to hear, such as
+<code>You can walk north or east.</code></p>
+<h2 id="does-the-room-have-an-exit">Does the Room Have an Exit?</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> has_exit(<span class="va">self</span>, direction):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Returns if this room has a given exit&quot;&quot;&quot;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.exits[direction]</span></code></pre></div>
+<p>This returns the room in that direction, or <code>None</code>. The
+docstring says it returns whether there is an exit, and since a room
+counts as <code>True</code> and <code>None</code> counts as
+<code>False</code>, it can be used that way.</p>
+<h2 id="items-in-a-room">Items in a Room</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> add_item(<span class="va">self</span>, item):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Add an item to this rooms contents&quot;&quot;&quot;</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.items <span class="op">=</span> []</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.items.append(item)</span></code></pre></div>
+<p>This works like <code>Player.add_item()</code>. The list is made the
+first time an item is added.</p>
+<h2 id="reading-the-rest-of-the-methods">Reading the Rest of the
+Methods</h2>
+<p>The cave game is designed with exactly one item, the little gold box,
+and it is placed in exactly one room. So a room holds either no items or
+one item. The rest of the <code>Room</code> methods are written with
+that design in mind. Read each one, and listen for what it assumes.</p>
+<h3 id="describing-the-item">Describing the Item</h3>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_items_string(<span class="va">self</span>):</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Gets description of items in the room&quot;&quot;&quot;</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> item <span class="kw">in</span> <span class="va">self</span>.items:</span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a>            item_str <span class="op">=</span> item.get_title() <span class="op">+</span> <span class="st">&quot;is laying on the ground.</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="er">&quot;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="er">        return item_str</span></span></code></pre></div>
+<p>If the room has no items, the method returns an empty string, so
+nothing extra is said. Otherwise it builds a sentence about the
+item.</p>
+<p>There is a real problem here that you can hear when you play: there
+is no space before <code>is</code>. The game says
+<code>a little Gold boxis laying on the ground.</code>, and a screen
+reader reads <code>boxis</code> as one strange word. The right word is
+also “lying,” not “laying.”</p>
+<p>Notice how the loop works. Each time through, <code>item_str</code>
+gets a brand new value, and the old one is thrown away. With one item,
+that is fine. This is a good habit to notice, though: setting a variable
+inside a loop keeps only the last value. If you ever want a loop to
+collect several things, start with an empty string before the loop and
+use <code>+=</code> inside it.</p>
+<h3 id="a-method-that-is-never-used">A Method That Is Never Used</h3>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_item(<span class="va">self</span>, name):</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;get an item from this room by given name&quot;&quot;&quot;</span></span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="va">self</span>.items[name]</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>        <span class="kw">del</span> <span class="va">self</span>.items[name]</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> i</span></code></pre></div>
+<p><code>self.items</code> is a list. A list needs a number for an
+index, but <code>name</code> is a string, so
+<code>self.items[name]</code> would cause a <code>TypeError</code>. This
+method treats the list as if it were a dictionary.</p>
+<p>The game never calls <code>get_item()</code>, so the problem never
+shows up. Code that is never used can hide mistakes for a long time.
+Since <code>remove_item()</code> does this job, <code>get_item()</code>
+can be deleted.</p>
+<h3 id="picking-up-the-item">Picking Up the Item</h3>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> remove_item(<span class="va">self</span>, item):</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Remove this item from room&quot;&quot;&quot;</span></span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">None</span></span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(<span class="va">self</span>.items)):</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.items[i].is_name(item):</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>                tItem <span class="op">=</span> <span class="va">self</span>.items[i]</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>                <span class="kw">del</span> <span class="va">self</span>.items[i]</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="bu">len</span>(<span class="va">self</span>.items) <span class="op">&lt;</span> <span class="dv">1</span>:</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>                    <span class="cf">return</span> tItem</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<p>The parameter <code>item</code> is the name the player typed, such as
+<code>"box"</code>. The method looks for an item with that name. When it
+finds one, it saves it in <code>tItem</code>, removes it from the list
+with <code>del</code>, and returns it.</p>
+<p><code>del</code> removes an item from a list by its index:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> things <span class="op">=</span> [<span class="st">&quot;a&quot;</span>, <span class="st">&quot;b&quot;</span>, <span class="st">&quot;c&quot;</span>]</span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="kw">del</span> things[<span class="dv">1</span>]</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> things</span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;a&#39;</span>, <span class="st">&#39;c&#39;</span>]</span></code></pre></div>
+<p>Trace it with the game’s one item. The room’s list holds the gold
+box. The player types <code>get box</code>. The loop finds the box at
+index 0, saves it, and deletes it. Now the list is empty, so
+<code>self.items</code> is set back to <code>None</code>, and the box is
+returned. It works.</p>
+<p>Listen carefully to the indentation of <code>return tItem</code>,
+though. It is inside the <code>if len(self.items) &lt; 1:</code> block.
+That means the method only returns the item when the room is left empty.
+That is always true in this game, because a room never holds more than
+one item. The code depends on the game’s design.</p>
+<p>Writing down assumptions like this is a good habit. A one-line
+comment such as <code># A room holds at most one item.</code> tells the
+next programmer, who might be you in a few months, what the code
+expects. If you ever change the design, the comment reminds you which
+methods to rewrite. To work with any number of items, the
+<code>return</code> would move out of the inner <code>if</code>, so the
+method returns as soon as it finds the item:</p>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="bu">len</span>(<span class="va">self</span>.items)):</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.items[i].is_name(item):</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>                found <span class="op">=</span> <span class="va">self</span>.items[i]</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>                <span class="kw">del</span> <span class="va">self</span>.items[i]</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a>                <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.items:</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>                    <span class="va">self</span>.items <span class="op">=</span> <span class="va">None</span></span>
+<span id="cb17-7"><a href="#cb17-7" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> found</span>
+<span id="cb17-8"><a href="#cb17-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">None</span></span></code></pre></div>
+<p>Returning right away also avoids a trap you should know about in
+general: changing a list while you loop over its indexes. After a
+<code>del</code>, the list is shorter, but a loop set up with
+<code>range()</code> still goes up to the old length.</p>
+<h2 id="the-linter-report">The Linter Report</h2>
+<p><code>room.lnt</code> is the output of <em>pylint</em>, a popular
+linter for Python. A linter reads your code without running it and
+reports problems, from real bugs to style advice. Each line of the
+report gives the file, the line and column, a code, and a message.</p>
+<p>The report in this folder was made from an older version of
+<code>room.py</code>, so the line numbers and names do not match the
+current file. You can see that the code was improved since then. Method
+names like <code>setDirection</code> were changed to
+<code>set_direction</code>, and docstrings were added. Some messages are
+about problems that are still there, such as:</p>
+<pre><code>room.py:37:15: C0121: Comparison &#39;self.exits[u] != None&#39; should be &#39;self.exits[u] is not None&#39; (singleton-comparison)</code></pre>
+<p>Linter reports are plain text, one problem per line, which makes them
+very easy to read with a screen reader. Many blind programmers rely on
+linters to catch the small mistakes that are hard to hear, like a
+missing space or a stray line.</p>
+<p>To make your own report, install pylint and run it on the file:</p>
+<pre><code>pip install pylint
+pylint room.py</code></pre>
+<h2 id="summary">Summary</h2>
+<p>You studied the <code>Room</code> class. You learned that:</p>
+<ul>
+<li>A dictionary holds key and value pairs in curly braces, and looks up
+a value by its key.</li>
+<li><code>items()</code> gives you each key and value in a
+<code>for</code> loop.</li>
+<li>Use <code>is None</code> and <code>is not None</code> to check for
+<code>None</code>.</li>
+<li><code>del</code> removes an item from a list by index.</li>
+<li>Setting a variable inside a loop replaces its old value each
+time.</li>
+<li>Watch where a <code>return</code> is indented. It decides when the
+method returns.</li>
+<li>Code often depends on the program’s design. A comment can record
+that.</li>
+<li>Changing a list while looping over it can cause bugs.</li>
+<li>Linters find problems by reading your code, and their reports are
+easy to hear.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Delete the stray <code>1</code> line and the <code>get_item()</code>
+method.</li>
+<li>Fix <code>get_items_string()</code> so it has a space before
+<code>is</code> and uses the word “lying.”</li>
+<li>Add a comment to <code>remove_item()</code> that says a room holds
+at most one item.</li>
+<li>Change <code>directions()</code> to use
+<code>is not None</code>.</li>
+<li>Change <code>directions()</code> to return a sentence such as
+<code>north, east, or south</code> without square brackets. Hint: put
+the directions in a list, then use <code>", ".join()</code>.</li>
+<li>Install pylint and run it on <code>room.py</code>. Read the report
+with your screen reader. Fix two of the problems it finds.</li>
+</ol>

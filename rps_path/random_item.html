@@ -1,0 +1,116 @@
+<h1 id="picking-a-random-rock-paper-or-scissors">Picking a Random Rock,
+Paper, or Scissors</h1>
+<p>Before you write a whole game of Rock, Paper, Scissors, you need the
+computer to make its move. In this short lesson, the computer picks
+rock, paper, or scissors at random and tells you what it picked.</p>
+<p>Building a big program out of small, tested pieces is one of the most
+useful habits in programming. This program is the first piece.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Docstrings</li>
+<li>Lists</li>
+<li><code>random.choice()</code></li>
+<li>Storing a function’s result in a variable</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-runs">Sample Runs</h2>
+<pre><code>Random item choice Rock</code></pre>
+<pre><code>Random item choice Scissors</code></pre>
+<h2 id="the-source-code-for-random-item">The Source Code for Random
+Item</h2>
+<p>Type this program and save it as <code>random_item.py</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Select a random item&quot;&quot;&quot;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;Scissors&quot;</span>]</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>random_item <span class="op">=</span> random.choice(items)</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Random item choice </span><span class="sc">{</span>random_item<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="how-the-program-works">How the Program Works</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Select a random item&quot;&quot;&quot;</span></span></code></pre></div>
+<p>The docstring says what the program does.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span></code></pre></div>
+<p>This imports the <code>random</code> module, which has functions for
+picking things by chance.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>items <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;Scissors&quot;</span>]</span></code></pre></div>
+<p>This makes a list of the three moves and stores it in
+<code>items</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>random_item <span class="op">=</span> random.choice(items)</span></code></pre></div>
+<p><code>random.choice()</code> returns one item from the list, picked
+at random. Each item has the same chance. The program stores the result
+in <code>random_item</code>.</p>
+<p>Storing the result in a variable is important. Once the computer has
+made its move, the program will need to use it more than once: to tell
+the player, and to decide who won. If you called
+<code>random.choice()</code> each time instead, you could get a
+different move each time.</p>
+<p>Try this in the shell to hear the difference:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> random</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> items <span class="op">=</span> [<span class="st">&quot;Rock&quot;</span>, <span class="st">&quot;Paper&quot;</span>, <span class="st">&quot;Scissors&quot;</span>]</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> move <span class="op">=</span> random.choice(items)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> move</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Paper&#39;</span></span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> move</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Paper&#39;</span></span>
+<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice(items)</span>
+<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Rock&#39;</span></span>
+<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> random.choice(items)</span>
+<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Paper&#39;</span></span></code></pre></div>
+<p>The variable keeps the same value. Calling the function again picks
+again.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Random item choice </span><span class="sc">{</span>random_item<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>Finally, the program prints the move in an f-string.</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p><code>Random item choice Rock</code> is understandable, but it sounds
+like a label, not a sentence. In a game you might say
+<code>The computer chose rock.</code> instead. A colon after
+<code>choice</code> would also help, because many screen readers pause a
+little at a colon.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote the computer’s half of Rock, Paper, Scissors. You learned
+that:</p>
+<ul>
+<li>Small programs can be pieces of a bigger one.</li>
+<li><code>random.choice()</code> picks one item from a list.</li>
+<li>Store a random result in a variable if you need to use it more than
+once.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change the message to <code>The computer chose Rock.</code></li>
+<li>Pick and print two random items, one for each of two computer
+players.</li>
+<li>Add <code>"Lizard"</code> and <code>"Spock"</code> to the list.</li>
+<li>Ask the player for their move with <code>input()</code> and print
+both moves, such as
+<code>You chose Rock. The computer chose Paper.</code> Do not worry
+about who wins yet.</li>
+</ol>

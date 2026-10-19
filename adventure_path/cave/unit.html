@@ -1,0 +1,248 @@
+<h1 id="classes-the-unit-blueprint">Classes: The Unit Blueprint</h1>
+<p>The cave adventure game is made of things: rooms you walk through, an
+item you can pick up, and a player who moves around. Each of these
+things has a name, a short title, and a longer description. In this
+lesson you will write a <em>class</em> called <code>Unit</code> that
+holds those three pieces of information and can answer one question: “Is
+this your name?”</p>
+<p><code>Unit</code> is small, but it is the foundation of the whole
+game. The <code>Room</code>, <code>Item</code>, and <code>Player</code>
+classes in the next lessons are all built on top of it. This lesson is
+your introduction to classes and objects, one of the most important
+ideas in Python.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>What classes and objects are</li>
+<li>Defining a class with <code>class</code></li>
+<li>The <code>__init__()</code> method</li>
+<li><code>self</code> and attributes</li>
+<li>Methods</li>
+<li>Making objects and calling their methods</li>
+<li>Splitting a program into several files</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="the-adventure-game-files">The Adventure Game Files</h2>
+<p>The cave game is split across five files, all in the
+<code>cave</code> folder:</p>
+<ul>
+<li><code>unit.py</code> has the <code>Unit</code> class, the base for
+everything else.</li>
+<li><code>item.py</code> has the <code>Item</code> class, for things you
+can pick up.</li>
+<li><code>player.py</code> has the <code>Player</code> class.</li>
+<li><code>room.py</code> has the <code>Room</code> class.</li>
+<li><code>cave.py</code> builds the cave and runs the game.</li>
+</ul>
+<p>Splitting a program into files keeps each file short and focused.
+With a screen reader, a short file is much easier to move around in than
+one very long one. Each class gets its own file, and
+<code>cave.py</code> imports them.</p>
+<h2 id="the-source-code-for-unit">The Source Code for Unit</h2>
+<p>Type this program and save it as <code>unit.py</code> in a folder
+named <code>cave</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Base class for player, room, and item&quot;&quot;&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Unit:</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co">    This class defines the basic Unit.</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, title, desc):</span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.names <span class="op">=</span> name</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.title <span class="op">=</span> title</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.description <span class="op">=</span> desc</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> is_name(<span class="va">self</span>, name):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;tests if this is the units name&quot;&quot;&quot;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="kw">in</span> <span class="va">self</span>.names:</span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+<p>Running <code>python unit.py</code> does nothing you can hear. The
+file only defines a class. It does not make any objects or print
+anything. To try it out, you will use the interactive shell.</p>
+<h2 id="what-is-a-class">What Is a Class?</h2>
+<p>You have used many kinds of values: strings, numbers, lists. Each
+kind is a <em>type</em>, and each type has its own methods. Strings have
+<code>upper()</code>. Lists have <code>append()</code>. A <em>class</em>
+lets you make your own type.</p>
+<p>A class is like a blueprint, or a form with blanks to fill in. The
+<code>Unit</code> class says: “Every unit has a list of names, a title,
+and a description, and it can tell you whether a word is one of its
+names.” The class itself is not a unit. It is the plan for making
+units.</p>
+<p>An <em>object</em> is one thing made from the class. A unit for the
+gold box and a unit for a lamp would be two different objects made from
+the same class. Each has its own names, title, and description. An
+object is also called an <em>instance</em> of its class.</p>
+<h2 id="defining-a-class">Defining a Class</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Unit:</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="co">    This class defines the basic Unit.</span></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span></code></pre></div>
+<p>The <code>class</code> keyword starts a class definition. After it
+comes the name, <code>Unit</code>, and a colon. Class names start with a
+capital letter and use no underscores, like <code>Unit</code> or
+<code>TreasureChest</code>. This style helps you tell a class from a
+function or variable when you hear the name.</p>
+<p>Everything indented under the <code>class</code> line belongs to the
+class. The first thing is a docstring that describes it.</p>
+<h2 id="the-init-method">The <strong>init</strong>() Method</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, name, title, desc):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.names <span class="op">=</span> name</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.title <span class="op">=</span> title</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.description <span class="op">=</span> desc</span></code></pre></div>
+<p>A function defined inside a class is called a <em>method</em>. This
+one has a special name: <code>__init__</code>, with two underscores
+before and after. Listen carefully for them. Your screen reader may say
+“underline underline init underline underline.” Programmers say “dunder
+init.”</p>
+<p>Python calls <code>__init__()</code> automatically every time a new
+object is made. Its job is to set the new object up. That is why the
+docstring calls it the <em>constructor</em>.</p>
+<h3 id="self">self</h3>
+<p>The first parameter of every method is <code>self</code>. It is the
+object the method is working on. When Python makes a new unit and calls
+<code>__init__()</code>, <code>self</code> is that brand new unit.</p>
+<p>You never pass <code>self</code> yourself. Python fills it in. So
+even though <code>__init__()</code> has four parameters, you make a unit
+with three arguments: the names, the title, and the description.</p>
+<h3 id="attributes">Attributes</h3>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.names <span class="op">=</span> name</span></code></pre></div>
+<p>A variable that starts with <code>self.</code> is an
+<em>attribute</em>. It is stored inside the object, and it stays there
+as long as the object exists. Each unit has its own <code>names</code>,
+<code>title</code>, and <code>description</code>.</p>
+<p>Compare that with an ordinary variable inside a function, which
+disappears when the function ends. The parameter <code>name</code> is
+gone when <code>__init__()</code> finishes, but <code>self.names</code>
+stays with the object.</p>
+<p>Notice that the parameter is called <code>name</code>, but the
+attribute is called <code>names</code>, plural. The game passes a
+<em>list</em> of names, because the player might call the same thing
+several ways. A gold box might answer to “gold box,” “box,” or “gold.”
+So the attribute’s plural name is the more accurate one.</p>
+<h2 id="the-is_name-method">The is_name() Method</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> is_name(<span class="va">self</span>, name):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;tests if this is the units name&quot;&quot;&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> name <span class="kw">in</span> <span class="va">self</span>.names:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+<p>This method answers one question: is the word the player typed one of
+this unit’s names? It uses <code>in</code> to check the list, and
+returns <code>True</code> or <code>False</code>.</p>
+<p>You could write the same method in one line, because
+<code>name in self.names</code> is already <code>True</code> or
+<code>False</code>:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> is_name(<span class="va">self</span>, name):</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;tests if this is the units name&quot;&quot;&quot;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> name <span class="kw">in</span> <span class="va">self</span>.names</span></code></pre></div>
+<p>Both versions work the same way.</p>
+<h2 id="trying-unit-in-the-shell">Trying Unit in the Shell</h2>
+<p>Open a command prompt in the <code>cave</code> folder and type:</p>
+<pre><code>python -i unit.py</code></pre>
+<p>The <code>-i</code> runs the file and then leaves you in the shell,
+with the <code>Unit</code> class ready to use. Now make a unit:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp <span class="op">=</span> Unit([<span class="st">&quot;lamp&quot;</span>, <span class="st">&quot;brass lamp&quot;</span>], <span class="st">&quot;a brass lamp&quot;</span>, <span class="st">&quot;An old brass lamp.&quot;</span>)</span></code></pre></div>
+<p>This calls the class like a function. Python makes a new, empty
+<code>Unit</code> object, calls <code>__init__()</code> with
+<code>self</code> set to that object and your three arguments, and then
+puts the finished object in <code>lamp</code>.</p>
+<p>Now look at its attributes. Use the object’s name, a period, and the
+attribute name:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.title</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;a brass lamp&#39;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.names</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;lamp&#39;</span>, <span class="st">&#39;brass lamp&#39;</span>]</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.description</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;An old brass lamp.&#39;</span></span></code></pre></div>
+<p>And call its method:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.is_name(<span class="st">&quot;lamp&quot;</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.is_name(<span class="st">&quot;brass lamp&quot;</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.is_name(<span class="st">&quot;box&quot;</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<p>Make a second unit, and you will hear that it has its own
+attributes:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> box <span class="op">=</span> Unit([<span class="st">&quot;box&quot;</span>], <span class="st">&quot;a wooden box&quot;</span>, <span class="st">&quot;A small wooden box.&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> box.title</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;a wooden box&#39;</span></span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.title</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;a brass lamp&#39;</span></span></code></pre></div>
+<h3 id="uppercase-and-lowercase">Uppercase and Lowercase</h3>
+<p>Try this:</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> lamp.is_name(<span class="st">&quot;Lamp&quot;</span>)</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<p><code>in</code> compares strings exactly, so a capital L does not
+match. In a game, players type in all kinds of ways. You will see this
+cause a real problem in the cave game, and an exercise asks you to fix
+it here, where it belongs.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote your first class. You learned that:</p>
+<ul>
+<li>A class is a blueprint for making objects. An object is one thing
+made from it.</li>
+<li><code>class Name:</code> starts a class. Class names start with a
+capital letter.</li>
+<li>A function inside a class is called a method.</li>
+<li><code>__init__()</code> runs automatically when an object is made,
+to set it up.</li>
+<li><code>self</code> is the object a method is working on. Python
+passes it for you.</li>
+<li>Attributes, like <code>self.title</code>, are stored in the
+object.</li>
+<li>You make an object by calling the class:
+<code>Unit(names, title, description)</code>.</li>
+<li>You use an object’s attributes and methods with a period:
+<code>lamp.title</code>, <code>lamp.is_name("lamp")</code>.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Rewrite <code>is_name()</code> to use one <code>return</code>
+line.</li>
+<li>Make <code>is_name()</code> ignore uppercase and lowercase. Hint:
+compare <code>name.lower()</code> with each name in the list made
+lowercase. A list comprehension can make the lowercase list.</li>
+<li>Add a method called <code>describe()</code> that returns the title
+and the description together in one string, such as
+<code>a brass lamp: An old brass lamp.</code></li>
+<li>Rename the <code>__init__()</code> parameter <code>name</code> to
+<code>names</code>, so the parameter and the attribute match. Make sure
+you change every place it is used.</li>
+<li>In the shell, make three units of your own and call
+<code>is_name()</code> on each.</li>
+</ol>

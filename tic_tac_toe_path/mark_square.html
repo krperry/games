@@ -1,0 +1,307 @@
+<h1 id="letting-players-mark-a-square">Letting Players Mark a
+Square</h1>
+<p>So far the program has marked squares by itself. In this lesson the
+players do it. You will write a function that places a mark on the board
+only if the square is empty, and a function that asks a player for a
+square and keeps asking until they choose one that is free.</p>
+<p>Along the way you will learn one of Python’s most useful tools, the
+<em>list comprehension</em>, which builds a new list from an old one in
+a single line.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Functions with parameters</li>
+<li>Functions that return <code>True</code> or <code>False</code></li>
+<li>Slices</li>
+<li>Converting numbers to strings with <code>str()</code></li>
+<li>List comprehensions with <code>if</code></li>
+<li>Checking input against a list of legal answers</li>
+<li>Single quotes inside double-quoted strings</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>X takes the center. Then O tries the center too, which is taken, and
+is asked again:</p>
+<pre><code> 1 | 2 | 3
+---|---|---
+ 4 | 5 | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;X&#39;: 5
+You placed an &#39;X&#39;  in square 5
+ 1 | 2 | 3
+---|---|---
+ 4 | X | 6
+---|---|---
+ 7 | 8 | 9
+Enter a position for &#39;O&#39;: 5
+incorrect position
+Enter a position for &#39;O&#39;: 1
+You placed an &#39;O&#39;  in square 1
+ O | 2 | 3
+---|---|---
+ 4 | X | 6
+---|---|---
+ 7 | 8 | 9</code></pre>
+<h2 id="the-source-code-for-mark-square">The Source Code for Mark
+Square</h2>
+<p>Type this program and save it as <code>mark_square.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Create functions to mark and display a spot by a player&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_board():</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;this function displays the board&quot;&quot;&quot;</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">1</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">2</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">3</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">4</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">5</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">6</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;---|---|---&quot;</span>)</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot; </span><span class="sc">{</span>game_state[<span class="dv">7</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">8</span>]<span class="sc">}</span><span class="ss"> | </span><span class="sc">{</span>game_state[<span class="dv">9</span>]<span class="sc">}</span><span class="ss"> &quot;</span>)</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mark_spot(position, mark):</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;a function to place a &#39;X&#39; or &#39;O&#39; and checkk if it is legal.</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co">    *  argument s:</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="co">    *  position = Where you want to put the piece*</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="co">    * mark &#39;X&#39; or &#39;O&#39;</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a><span class="co">    *  returns</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a><span class="co">    *  True for placed False for fail</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[position] <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]:</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        game_state[position] <span class="op">=</span> mark</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> player_input(mark):</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;this asks a player for a position and loops until it is legal</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="co">    Use the mark_spot function</span></span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> choice <span class="kw">not</span> <span class="kw">in</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;incorrect position&quot;</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>        choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>    mark_spot(<span class="bu">int</span>(choice), mark)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;You placed an &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;  in square </span><span class="sc">{</span><span class="bu">int</span>(choice)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>player_input(<span class="st">&quot;X&quot;</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>player_input(<span class="st">&quot;O&quot;</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>display_board()</span></code></pre></div>
+<p>The program has three functions: <code>display_board()</code>, which
+you know from the last lesson, and two new ones,
+<code>mark_spot()</code> and <code>player_input()</code>. The last five
+lines use them to let X and O each take one turn.</p>
+<h2 id="mark_spot-placing-a-mark">mark_spot(): Placing a Mark</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> mark_spot(position, mark):</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;a function to place a &#39;X&#39; or &#39;O&#39; and checkk if it is legal.</span></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="co">    ...</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> game_state[position] <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]:</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>        game_state[position] <span class="op">=</span> mark</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="va">False</span></span></code></pre></div>
+<h3 id="two-parameters">Two Parameters</h3>
+<p>This function has two <em>parameters</em>, <code>position</code> and
+<code>mark</code>, separated by a comma. When you call
+<code>mark_spot(5, "X")</code>, <code>position</code> gets 5 and
+<code>mark</code> gets <code>"X"</code>. The order of the arguments in
+the call matches the order of the parameters in the <code>def</code>
+line.</p>
+<h3 id="a-longer-docstring">A Longer Docstring</h3>
+<p>The docstring is several lines long. It explains what each parameter
+means and what the function returns. That is a good habit for any
+function that takes arguments. It has a couple of typos, “checkk” and
+“argument s,” which do not affect how the program runs.</p>
+<h3 id="checking-before-changing">Checking Before Changing</h3>
+<p>The <code>if</code> statement checks whether the square already holds
+an X or an O. If it does not, the square is empty, so the function puts
+the mark there.</p>
+<h3 id="returning-true-or-false">Returning True or False</h3>
+<p>After placing the mark, the function says <code>return True</code>.
+If the square was taken, the <code>if</code> block is skipped, and the
+function reaches <code>return False</code>.</p>
+<p>A function that returns <code>True</code> or <code>False</code> lets
+the code that called it know whether it worked. This program does not
+use the answer yet, but later programs do, such as the computer player
+in <code>hard-tic.py</code>, which uses it to find a square that is
+free.</p>
+<p>Notice that <code>return</code> ends the function right away. When
+the square is empty, <code>return True</code> runs, and the function
+never gets to <code>return False</code>. That is why there is no
+<code>else</code>. It is not needed.</p>
+<h2 id="player_input-asking-for-a-square">player_input(): Asking for a
+Square</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> player_input(mark):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> choice <span class="kw">not</span> <span class="kw">in</span> [<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;incorrect position&quot;</span>)</span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>        choice <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter a position for &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;: &quot;</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    mark_spot(<span class="bu">int</span>(choice), mark)</span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;You placed an &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;  in square </span><span class="sc">{</span><span class="bu">int</span>(choice)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This function asks a player for a square. It is the familiar “ask
+until the answer is good” pattern, but this time the list of good
+answers is built fresh each time. Let’s take that long
+<code>while</code> line apart.</p>
+<h3 id="quotes-inside-a-string">Quotes Inside a String</h3>
+<p>The prompt is <code>f"Enter a position for '{mark}': "</code>. The
+f-string uses double quotes, and inside it are single quotes around the
+mark. Single quotes inside double quotes are just ordinary characters,
+so the player hears <code>Enter a position for 'X':</code>. Depending on
+your settings, your screen reader may say “tick” or “apostrophe” around
+the X.</p>
+<h3 id="slices">Slices</h3>
+<p><code>game_state[1:10]</code> is a <em>slice</em>. A slice gives you
+a new list with part of the old one. The first number is where to start,
+and the second is where to stop. The stop index is not included.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state <span class="op">=</span> [<span class="st">&quot;X&quot;</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>, <span class="st">&quot;X&quot;</span>, <span class="dv">0</span>]</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>]</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>, <span class="st">&#39;X&#39;</span>, <span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>, <span class="dv">9</span>]</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> game_state[<span class="dv">1</span>:<span class="dv">4</span>]</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>[<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span></code></pre></div>
+<p>So <code>game_state[1:10]</code> is just the nine board squares,
+without the settings at index 0, 10, and 11.</p>
+<h3 id="str">str()</h3>
+<p><code>str()</code> turns a value into a string. The player types a
+string, such as <code>"5"</code>, but the empty squares hold numbers,
+such as <code>5</code>. To compare them, the program turns the numbers
+into strings.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">str</span>(<span class="dv">5</span>)</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;5&#39;</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;5&quot;</span> <span class="op">==</span> <span class="dv">5</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;5&quot;</span> <span class="op">==</span> <span class="bu">str</span>(<span class="dv">5</span>)</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<h3 id="list-comprehensions">List Comprehensions</h3>
+<p>Here is the heart of the line:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>[<span class="bu">str</span>(x) <span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>] <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]]</span></code></pre></div>
+<p>This is a <em>list comprehension</em>. It builds a new list by
+looping over another one, all inside square brackets. Read it in this
+order:</p>
+<ol type="1">
+<li><code>for x in game_state[1:10]</code>: go through each square.</li>
+<li><code>if x not in ["X", "O"]</code>: keep only squares that are not
+taken.</li>
+<li><code>str(x)</code>: for each one you keep, put its string version
+in the new list.</li>
+</ol>
+<p>So with an X in square 5, the result is
+<code>['1', '2', '3', '4', '6', '7', '8', '9']</code>. That is the list
+of every square a player could legally type.</p>
+<p>The same list could be built with a regular loop:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>legal <span class="op">=</span> []</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> x <span class="kw">in</span> game_state[<span class="dv">1</span>:<span class="dv">10</span>]:</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> x <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;X&quot;</span>, <span class="st">&quot;O&quot;</span>]:</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        legal.append(<span class="bu">str</span>(x))</span></code></pre></div>
+<p>The list comprehension does the same thing in one line. Try both in
+the shell to hear that they give the same result.</p>
+<p>List comprehensions are very common in Python, so it is worth getting
+used to them. When a long one is hard to follow by ear, try reading it
+in the order above: the <code>for</code> part first, then the
+<code>if</code> part, then the part at the front.</p>
+<h3 id="why-this-check-is-so-good">Why This Check Is So Good</h3>
+<p>Because the program checks the player’s answer against the list of
+free squares, every kind of mistake is caught by the same line:</p>
+<ul>
+<li>A square that is taken, like <code>5</code>, is not in the
+list.</li>
+<li>A number that is not on the board, like <code>0</code> or
+<code>10</code>, is not in the list.</li>
+<li>A word, like <code>five</code>, or an empty answer, is not in the
+list.</li>
+</ul>
+<p>Any of these makes the program say <code>incorrect position</code>
+and ask again. And by the time the loop ends, <code>choice</code> is
+sure to be a free square, so <code>int(choice)</code> cannot fail.</p>
+<h3 id="placing-the-mark">Placing the Mark</h3>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    mark_spot(<span class="bu">int</span>(choice), mark)</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;You placed an &#39;</span><span class="sc">{</span>mark<span class="sc">}</span><span class="ss">&#39;  in square </span><span class="sc">{</span><span class="bu">int</span>(choice)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p><code>int(choice)</code> turns the string back into a number to use
+as an index. Then the program tells the player what happened. Confirming
+each move out loud is very helpful for players who cannot see the board
+change.</p>
+<p>There are two spaces before <code>in square</code>. You probably
+cannot hear them, but they are a small typo.</p>
+<h2 id="taking-turns">Taking Turns</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>player_input(<span class="st">&quot;X&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>display_board()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>player_input(<span class="st">&quot;O&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>display_board()</span></code></pre></div>
+<p>The bottom of the program shows the board, lets X move, shows the
+board, lets O move, and shows the board again. Each function call is
+short and says what it does. In the next lesson you will put these turns
+in a loop so the game can go on until it is over.</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<ul>
+<li><code>incorrect position</code> tells the player they made a
+mistake, but not what to do next. A message like
+<code>That square is taken or not on the board. Choose an empty square from 1 to 9.</code>
+is more helpful.</li>
+<li>The game could read the free squares out loud when the player makes
+a mistake. You already have the list, so this is easy:
+<code>", ".join(legal)</code>.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>You let players mark the board, safely. You learned that:</p>
+<ul>
+<li>A function can take several parameters, separated by commas.</li>
+<li>A function can return <code>True</code> or <code>False</code> to say
+whether it worked.</li>
+<li><code>return</code> ends the function right away.</li>
+<li>A slice, like <code>game_state[1:10]</code>, gives you part of a
+list.</li>
+<li><code>str()</code> turns a number into a string.</li>
+<li>A list comprehension builds a new list from an old one in one line,
+with an optional <code>if</code> to keep only some items.</li>
+<li>Checking input against a list of legal answers catches every kind of
+mistake at once.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Remove the extra space before <code>in square</code>.</li>
+<li>Make the <code>incorrect position</code> message more helpful, and
+have it read the list of free squares.</li>
+<li>Add a third turn for X at the end of the program.</li>
+<li>In the shell, write a list comprehension that gives the squares that
+have been taken. Hint: change <code>not in</code> to
+<code>in</code>.</li>
+<li>Write a list comprehension that gives the number of every square
+from 1 to 9 times 2. Hint:
+<code>[x * 2 for x in range(1, 10)]</code>.</li>
+<li>Change <code>player_input()</code> so it uses the <code>True</code>
+or <code>False</code> that <code>mark_spot()</code> returns, and prints
+<code>Something went wrong</code> if it returns <code>False</code>. Can
+that ever happen?</li>
+</ol>

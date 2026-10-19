@@ -1,0 +1,135 @@
+<h1 id="checking-the-players-choice">Checking the Player’s Choice</h1>
+<p>Many games give the player a menu: press 1 for this, 2 for that, 3
+for something else. Before a game acts on a choice, it should check that
+the choice is one it knows about. In this short lesson you will ask the
+player to choose, check the answer, and respond.</p>
+<p>This little program also shows a mistake that is very common and very
+easy to miss by ear: forgetting the <code>f</code> on an f-string.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Getting a menu choice with <code>input()</code></li>
+<li>Checking a choice with <code>in</code></li>
+<li><code>if</code> and <code>else</code></li>
+<li>Why the numbers in the list are strings</li>
+<li>The missing <code>f</code> mistake</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-runs">Sample Runs</h2>
+<p>If the player types <code>2</code>:</p>
+<pre><code>Enter your choice 1, 2, or 32
+Your choice was: 2</code></pre>
+<p>If the player types <code>7</code>:</p>
+<pre><code>Enter your choice 1, 2, or 37
+7 was not one of the choices</code></pre>
+<h2 id="the-source-code-for-input-choice">The Source Code for Input
+Choice</h2>
+<p>Type this program and save it as <code>input_choice.py</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>choice <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Enter your choice 1, 2, or 3&quot;</span>)</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> choice <span class="kw">in</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>]:</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Your choice was: </span><span class="sc">{</span>choice<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>choice<span class="sc">}</span><span class="ss"> was not one of the choices&quot;</span>)</span></code></pre></div>
+<h2 id="asking-for-a-choice">Asking for a Choice</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>choice <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;Enter your choice 1, 2, or 3&quot;</span>)</span></code></pre></div>
+<p><code>input()</code> shows the prompt and returns what the player
+types, as a string. The string is stored in <code>choice</code>.</p>
+<p>The prompt has no space or colon at the end. When the player types
+<code>2</code>, the line reads
+<code>Enter your choice 1, 2, or 32</code>. A sighted player might see
+the cursor and understand, but a screen reader user hears “1, 2, or 32,”
+which is confusing. Always end a prompt with a colon and a space, such
+as <code>"Enter your choice 1, 2, or 3: "</code>.</p>
+<h2 id="checking-the-choice">Checking the Choice</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> choice <span class="kw">in</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>]:</span></code></pre></div>
+<p>The <code>in</code> operator checks whether <code>choice</code> is
+one of the items in the list.</p>
+<h3 id="why-are-the-numbers-in-quotes">Why Are the Numbers in
+Quotes?</h3>
+<p>The list holds <code>"1"</code>, <code>"2"</code>, and
+<code>"3"</code>, which are strings, not the numbers 1, 2, and 3. That
+is on purpose. <code>input()</code> always returns a string. The string
+<code>"2"</code> and the number <code>2</code> are not equal:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;2&quot;</span> <span class="op">==</span> <span class="dv">2</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;2&quot;</span> <span class="kw">in</span> [<span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>]</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;2&quot;</span> <span class="kw">in</span> [<span class="st">&quot;1&quot;</span>, <span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>]</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>By comparing strings with strings, the program never has to convert
+the answer to a number. It also means that if the player types something
+that is not a number at all, like <code>cat</code>, nothing breaks.
+<code>"cat"</code> is simply not in the list.</p>
+<h2 id="the-two-messages">The Two Messages</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Your choice was: </span><span class="sc">{</span>choice<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="cf">else</span>:</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>choice<span class="sc">}</span><span class="ss"> was not one of the choices&quot;</span>)</span></code></pre></div>
+<p>If the choice is in the list, the first <code>print()</code> runs.
+Otherwise, the <code>else</code> block runs.</p>
+<h3 id="both-strings-need-the-f">Both Strings Need the f</h3>
+<p>Both <code>print()</code> lines use f-strings, so
+<code>{choice}</code> is replaced with what the player typed. An earlier
+version of this program left the <code>f</code> off the second line:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="st">&quot;</span><span class="sc">{choice}</span><span class="st"> was not one of the choices&quot;</span>)</span></code></pre></div>
+<p>Without the <code>f</code>, Python does not fill in the curly braces.
+It prints them as plain characters, so the player heard “left brace
+choice right brace was not one of the choices” instead of the number
+they typed.</p>
+<p>This mistake is easy to make and easy to miss, because the two lines
+sound almost the same. With a screen reader, it helps to listen to the
+first few characters of each string, or to search your code for
+<code>print("</code> lines that contain a brace. If you ever hear a
+brace in your program’s output, look for a missing <code>f</code>.</p>
+<h2 id="summary">Summary</h2>
+<p>You checked a player’s menu choice. You learned that:</p>
+<ul>
+<li><code>in</code> checks whether a value is in a list.</li>
+<li><code>input()</code> returns a string, so compare it with strings
+like <code>"1"</code>, not numbers like <code>1</code>.</li>
+<li>A prompt should end with a colon and a space.</li>
+<li>If you hear curly braces in your output, you probably forgot the
+<code>f</code> in an f-string.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Take the <code>f</code> off the second <code>print()</code> line and
+run the program with a bad choice. Listen to what the player hears. Then
+put the <code>f</code> back.</li>
+<li>Add a colon and a space to the end of the prompt.</li>
+<li>Make the menu clearer. Before the <code>input()</code> line, print
+three lines that say what each choice means, such as
+<code>1. Play a game</code>, <code>2. Hear the rules</code>, and
+<code>3. Quit</code>.</li>
+<li>Use a <code>while</code> loop so the program keeps asking until the
+player types 1, 2, or 3.</li>
+<li>Use <code>if</code> and <code>else</code> with <code>==</code> so
+the program says something different for each choice. Hint: if you know
+about <code>elif</code>, use it. If not, you will learn it in the Rock,
+Paper, Scissors lesson.</li>
+</ol>

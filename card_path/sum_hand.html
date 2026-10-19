@@ -1,0 +1,234 @@
+<h1 id="adding-up-a-blackjack-hand">Adding Up a Blackjack Hand</h1>
+<p>In Blackjack, the goal is to get cards that add up as close to 21 as
+you can without going over. Adding up a hand sounds easy, but there is a
+twist: an Ace can be worth 11 or 1, whichever is better for you. In this
+lesson you will write a function that adds up any hand correctly, Aces
+and all.</p>
+<p>You will also <em>test</em> the function. The program runs the
+function on five hands where you already know the right answer, and
+prints both. If they match, the function works.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Writing a function that takes an argument</li>
+<li>Returning a value with <code>return</code></li>
+<li><code>if</code>, <code>elif</code>, and <code>else</code></li>
+<li>Converting a string to a number with <code>int()</code></li>
+<li><code>+=</code> and <code>-=</code></li>
+<li><code>while</code> with <code>and</code></li>
+<li>Numbers as conditions</li>
+<li>Testing a function with known answers</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-cards-are-counted-in-blackjack">How Cards Are Counted in
+Blackjack</h2>
+<ul>
+<li>Cards 2 through 9 are worth their number.</li>
+<li>10, Jack, Queen, and King are each worth 10.</li>
+<li>An Ace is worth 11, unless that would put the hand over 21. Then it
+is worth
+<ol type="1">
+<li></li>
+</ol></li>
+</ul>
+<p>For example, an Ace and a 3 is 14, because the Ace counts as 11. But
+an Ace, a 3, and a 10 would be 24 with the Ace as 11, which is over 21.
+So the Ace counts as 1, and the hand is 14.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code>Test hand 1 sum: 14, should be 14
+Test hand 2 sum: 21, should be 21
+Test hand 3 sum: 14, should be 14
+Test hand 4 sum: 15, should be 15
+Test hand 5 sum: 20, should be 20</code></pre>
+<p>Every test matches. The function works.</p>
+<h2 id="the-source-code-for-sum-hand">The Source Code for Sum Hand</h2>
+<p>Type this program and save it as <code>sum_hand.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;A method to sum a card hand with test hands&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>test_hand_1 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>]]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>test_hand_2 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;7&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>test_hand_3 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>test_hand_4 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>], [<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>]]</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>test_hand_5 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;5&quot;</span>, <span class="st">&quot;Hearts&quot;</span>], [<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>]]</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sum_hand(hand):</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    <span class="bu">sum</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    aces <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>]:</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="bu">int</span>(card[<span class="dv">0</span>])</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>]:</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">10</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            aces <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">11</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="bu">sum</span> <span class="op">&gt;</span> <span class="dv">21</span> <span class="kw">and</span> aces:</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sum</span> <span class="op">-=</span> <span class="dv">10</span></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        aces <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 1 sum: </span><span class="sc">{</span>sum_hand(test_hand_1)<span class="sc">}</span><span class="ss">, should be 14&quot;</span>)</span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 2 sum: </span><span class="sc">{</span>sum_hand(test_hand_2)<span class="sc">}</span><span class="ss">, should be 21&quot;</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 3 sum: </span><span class="sc">{</span>sum_hand(test_hand_3)<span class="sc">}</span><span class="ss">, should be 14&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 4 sum: </span><span class="sc">{</span>sum_hand(test_hand_4)<span class="sc">}</span><span class="ss">, should be 15&quot;</span>)</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 5 sum: </span><span class="sc">{</span>sum_hand(test_hand_5)<span class="sc">}</span><span class="ss">, should be 20&quot;</span>)</span></code></pre></div>
+<h2 id="the-test-hands">The Test Hands</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>test_hand_1 <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>]]</span></code></pre></div>
+<p>Each hand is a list of cards, and each card is a list of a rank and a
+suit, just like in the deck from <code>cards.py</code>. There are five
+test hands. Each one checks a different situation:</p>
+<ol type="1">
+<li>Ace and 3. The Ace should be 11, for 14.</li>
+<li>Ace, 3, and 7. The Ace should be 11, for exactly 21.</li>
+<li>Ace, 3, and 10. The Ace must drop to 1, for 14.</li>
+<li>Two Aces, a 3, and a 10. Both Aces must drop to 1, for 15.</li>
+<li>Two Aces, a 3, and a 5. One Ace stays 11 and one drops to 1, for
+20.</li>
+</ol>
+<p>Good tests check the tricky cases, not just the easy ones. Here the
+tricky part is Aces, so most of the tests are about Aces.</p>
+<h2 id="defining-a-function-with-an-argument">Defining a Function with
+an Argument</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sum_hand(hand):</span></code></pre></div>
+<p>In the <code>main.py</code> lesson you defined a function with empty
+parentheses. This function has a <em>parameter</em>, <code>hand</code>,
+inside its parentheses. A parameter is a variable that gets its value
+when the function is called. When the program calls
+<code>sum_hand(test_hand_1)</code>, the value of
+<code>test_hand_1</code> is put into <code>hand</code> for that
+call.</p>
+<p>That is what makes functions so useful. You write the code once, and
+then you can use it on any hand.</p>
+<h2 id="counting-the-cards">Counting the Cards</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="bu">sum</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>    aces <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>]:</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="bu">int</span>(card[<span class="dv">0</span>])</span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>]:</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">10</span></span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>            aces <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">11</span></span></code></pre></div>
+<p>The function keeps two counts. <code>sum</code> is the total so far.
+<code>aces</code> is the number of Aces in the hand.</p>
+<p>The <code>for</code> loop looks at each card. <code>card[0]</code> is
+the rank, such as <code>"7"</code> or <code>"King"</code>.</p>
+<h3 id="if-elif-and-else">if, elif, and else</h3>
+<p>The loop checks three cases:</p>
+<ul>
+<li>If the rank is 2 through 9, it adds the number. The rank is a
+string, so <code>int(card[0])</code> turns <code>"7"</code> into
+<code>7</code> first.</li>
+<li>Else if the rank is 10 or a face card, it adds 10.</li>
+<li>Else, the card must be an Ace. It adds 11 and counts the Ace.</li>
+</ul>
+<p>Only one of the three blocks runs for each card.</p>
+<h3 id="a-note-on-the-name-sum">A Note on the Name sum</h3>
+<p>Python has a built-in function called <code>sum()</code> that adds up
+a list of numbers. This program uses <code>sum</code> as a variable
+name, which hides the built-in function inside <code>sum_hand()</code>.
+It works, because this function never needs the built-in one, but it is
+a habit to avoid. A name such as <code>total</code> is safer. You will
+fix this in an exercise.</p>
+<h2 id="fixing-the-aces">Fixing the Aces</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="bu">sum</span> <span class="op">&gt;</span> <span class="dv">21</span> <span class="kw">and</span> aces:</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sum</span> <span class="op">-=</span> <span class="dv">10</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>        aces <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span></span></code></pre></div>
+<p>Every Ace was counted as 11. If the total is over 21, the program
+changes one Ace from 11 to 1 by subtracting 10. It keeps doing that
+until the total is 21 or less, or until it runs out of Aces to
+change.</p>
+<h3 id="numbers-as-conditions">Numbers as Conditions</h3>
+<p>The condition is <code>sum &gt; 21 and aces</code>. The second part
+is just a number. When Python uses a number as a condition,
+<code>0</code> counts as <code>False</code> and any other number counts
+as <code>True</code>. So <code>and aces</code> means “and there is at
+least one Ace left to change.”</p>
+<p>Let’s walk through test hand 4: Ace, 3, 10, Ace.</p>
+<ul>
+<li>After the <code>for</code> loop, <code>sum</code> is 11 + 3 + 10 +
+11 = 35, and <code>aces</code> is 2.</li>
+<li>35 is over 21 and <code>aces</code> is 2, so subtract 10.
+<code>sum</code> is 25, <code>aces</code> is 1.</li>
+<li>25 is over 21 and <code>aces</code> is 1, so subtract 10.
+<code>sum</code> is 15, <code>aces</code> is 0.</li>
+<li>15 is not over 21, so the loop stops.</li>
+</ul>
+<p>The answer is 15. Walking through code by hand like this, with real
+numbers, is called <em>tracing</em>. It is one of the best ways to
+understand code, and it works just as well by ear as by sight.</p>
+<h3 id="return">return</h3>
+<p><code>return sum</code> ends the function and sends the value of
+<code>sum</code> back to whoever called it. The call
+<code>sum_hand(test_hand_4)</code> becomes the value
+<code>15</code>.</p>
+<h2 id="running-the-tests">Running the Tests</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Test hand 1 sum: </span><span class="sc">{</span>sum_hand(test_hand_1)<span class="sc">}</span><span class="ss">, should be 14&quot;</span>)</span></code></pre></div>
+<p>Each of these lines calls the function inside an f-string and prints
+the result next to the answer it should be. When you listen to the
+output, you only need to check that the two numbers on each line
+match.</p>
+<p>This is the simplest kind of testing, and it is very powerful. Later,
+when you change <code>sum_hand()</code>, you can run this program again
+and know right away if you broke something.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote and tested a function that adds up a Blackjack hand. You
+learned that:</p>
+<ul>
+<li>A function’s parameter gets its value from the argument in the
+call.</li>
+<li><code>return</code> sends a value back from a function.</li>
+<li><code>if</code>, <code>elif</code>, and <code>else</code> pick one
+of several cases.</li>
+<li><code>int()</code> turns a string of digits into a number.</li>
+<li><code>0</code> counts as <code>False</code> in a condition, and
+other numbers count as <code>True</code>.</li>
+<li>Tracing code with real numbers helps you understand it.</li>
+<li>Testing with known answers tells you whether a function works.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Rename the variable <code>sum</code> to <code>total</code> inside
+the function. Run the tests to make sure it still works.</li>
+<li>Add a test hand with three Aces and a 9. What should the total be?
+Add a line that tests it.</li>
+<li>Add a test hand with a King, a Queen, and a 5. What should it
+be?</li>
+<li>Trace test hand 5 out loud or in a text file, the way the lesson
+traced hand
+<ol start="4" type="1">
+<li></li>
+</ol></li>
+<li>Make the test lines say <code>pass</code> or <code>FAIL</code>
+instead of making you compare the numbers. Hint: use
+<code>if sum_hand(test_hand_1) == 14:</code>.</li>
+</ol>

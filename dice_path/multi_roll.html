@@ -1,0 +1,211 @@
+<h1 id="rolling-many-dice">Rolling Many Dice</h1>
+<p>Some dice games, such as Yahtzee, roll five dice at once. You could
+copy the roll line five times, but there is a better way. In this lesson
+you will use a <code>for</code> loop to repeat a line as many times as
+you want.</p>
+<p>You will also learn a safer way to tell <code>playsound</code> where
+your sound file is, using the <code>os</code> module.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li><code>for</code> loops and the <code>range()</code> function</li>
+<li>Constants</li>
+<li>The <code>os</code> module, <code>os.getcwd()</code>, and
+<code>os.path.join()</code></li>
+<li>Full paths and relative paths</li>
+<li>Comments at the end of a line</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>You hear the dice sound, and then five numbers, each on its own
+line:</p>
+<pre><code>1
+1
+1
+3
+2</code></pre>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>This program uses the <code>playsound</code> module, so install it
+with <code>pip install playsound</code> if you have not already. It
+plays <code>dice.wav</code> from the <code>sounds</code> folder. Run the
+program from the folder that holds both the program and the
+<code>sounds</code> folder.</p>
+<h2 id="the-source-code-for-multi-roll">The Source Code for Multi
+Roll</h2>
+<p>Type this program and save it as <code>multi_roll.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="co"># Paths for all sounds.  playsound requires full paths to work</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>CURRENT_DIRECTORY <span class="op">=</span> os.getcwd()  <span class="co"># gets the scripts full working directory</span></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>DICE_SOUND <span class="op">=</span> os.path.join(CURRENT_DIRECTORY, <span class="st">&quot;SOUNDS&quot;</span>, <span class="st">&quot;dice.wav&quot;</span>)</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>ps.playsound(DICE_SOUND)</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="the-os-module">The os Module</h2>
+<p>The program imports three modules. You know <code>random</code> and
+<code>playsound</code>. The new one is <code>os</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> os</span></code></pre></div>
+<p><code>os</code> stands for “operating system.” The operating system
+is the main program that runs your computer, such as Windows, macOS, or
+Linux. The <code>os</code> module has functions for working with files,
+folders, and other parts of the computer.</p>
+<h2 id="full-paths">Full Paths</h2>
+<p>The comment above the next lines says that <code>playsound</code>
+needs full paths. A <em>full path</em>, also called an <em>absolute
+path</em>, names every folder starting from the top of the drive, such
+as:</p>
+<pre><code>C:\Users\Sam\python\dice_path\sounds\dice.wav</code></pre>
+<p>A <em>relative path</em>, such as <code>sounds/dice.wav</code>,
+starts from whatever folder you are in. Some versions of
+<code>playsound</code> have trouble with relative paths, so this program
+builds a full path.</p>
+<h3 id="os.getcwd">os.getcwd()</h3>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>CURRENT_DIRECTORY <span class="op">=</span> os.getcwd()  <span class="co"># gets the scripts full working directory</span></span></code></pre></div>
+<p><code>os.getcwd()</code> stands for “get current working directory.”
+<em>Directory</em> is another word for folder. The current working
+directory is the folder you were in when you ran the program. The
+function returns its full path as a string.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="im">import</span> os</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> os.getcwd()</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;C:</span><span class="ch">\\</span><span class="co">Users</span><span class="ch">\\</span><span class="co">Sam</span><span class="ch">\\</span><span class="co">python</span><span class="ch">\\</span><span class="co">dice_path&#39;</span></span></code></pre></div>
+<p>On Windows, the shell shows each backslash twice. That is just how
+Python displays a backslash inside a string. The real path has one
+backslash between each folder.</p>
+<p>The comment at the end of the line says it gets the script’s
+directory. That is only true if you run the program from the folder it
+is saved in. If you run it from some other folder,
+<code>os.getcwd()</code> returns that other folder. So you still need to
+run the program from its own folder.</p>
+<h3 id="comments-at-the-end-of-a-line">Comments at the End of a
+Line</h3>
+<p>That line also shows that a comment does not have to be on its own
+line. It can come after code. Python runs the code and ignores
+everything from the <code>#</code> on. Many programmers put two spaces
+before the <code>#</code> to make it easier to see where the code
+ends.</p>
+<h3 id="os.path.join">os.path.join()</h3>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>DICE_SOUND <span class="op">=</span> os.path.join(CURRENT_DIRECTORY, <span class="st">&quot;SOUNDS&quot;</span>, <span class="st">&quot;dice.wav&quot;</span>)</span></code></pre></div>
+<p><code>os.path.join()</code> glues folder and file names together into
+one path. It puts the right separator between them for your computer, a
+backslash on Windows and a forward slash on Mac and Linux. You can give
+it as many pieces as you need.</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> os.path.join(<span class="st">&quot;C:</span><span class="ch">\\</span><span class="st">Users</span><span class="ch">\\</span><span class="st">Sam&quot;</span>, <span class="st">&quot;sounds&quot;</span>, <span class="st">&quot;dice.wav&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;C:</span><span class="ch">\\</span><span class="co">Users</span><span class="ch">\\</span><span class="co">Sam</span><span class="ch">\\</span><span class="co">sounds</span><span class="ch">\\</span><span class="co">dice.wav&#39;</span></span></code></pre></div>
+<p>Using <code>os.path.join()</code> instead of typing slashes yourself
+means your program works on any computer.</p>
+<h3 id="a-hidden-problem">A Hidden Problem</h3>
+<p>Look closely at the folder name in that line: <code>"SOUNDS"</code>,
+in capital letters. The real folder is named <code>sounds</code>, in
+lowercase. On Windows, file and folder names are not case sensitive, so
+the program works. On a Mac or Linux they usually are, and the program
+would not find the file. Fixing this is one of the exercises. It is a
+good reminder to spell file names exactly.</p>
+<h2 id="constants">Constants</h2>
+<p>The variables <code>CURRENT_DIRECTORY</code> and
+<code>DICE_SOUND</code> are written in all capital letters. That is a
+signal to anyone reading the code. A variable named in capitals is a
+<em>constant</em>: it is set once, at the top of the program, and never
+changed.</p>
+<p>Python does not stop you from changing a constant. The capital
+letters are a promise between programmers. Putting important settings,
+such as file paths, in constants at the top makes them easy to find and
+change later.</p>
+<h2 id="the-for-loop">The for Loop</h2>
+<p>Here is the new way to repeat code:</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">5</span>):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>A <code>for</code> loop runs its block once for each item in a group
+of items. Listen for the indentation: the <code>print()</code> line is
+indented, so it is the block that repeats.</p>
+<h3 id="the-range-function">The range() Function</h3>
+<p><code>range(5)</code> makes a group of five numbers: 0, 1, 2, 3, and
+4. Like string indexes, it starts counting at 0, so it stops at 4, one
+less than 5.</p>
+<p>You can see the numbers by turning the range into a list:</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">list</span>(<span class="bu">range</span>(<span class="dv">5</span>))</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>, <span class="dv">3</span>, <span class="dv">4</span>]</span></code></pre></div>
+<h3 id="the-loop-variable">The Loop Variable</h3>
+<p>Each time through the loop, Python puts the next number into the
+variable <code>i</code>. The first time, <code>i</code> is 0. The second
+time, it is 1, and so on. Try it:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> i <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="ss">f&quot;Time number </span><span class="sc">{</span>i<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>Time number <span class="dv">0</span></span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>Time number <span class="dv">1</span></span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>Time number <span class="dv">2</span></span></code></pre></div>
+<p>In the shell, when a line ends with a colon, the prompt changes to
+three dots, <code>...</code>. That means Python is waiting for the
+indented block. Type four spaces, then the line. When you are done with
+the block, press Enter on an empty line.</p>
+<p>This program does not use <code>i</code> inside the loop. It only
+needs to repeat five times. Some programmers name a loop variable
+<code>_</code>, the underscore, to show that it is not used. You will
+see that in later programs.</p>
+<h3 id="for-or-while">for or while?</h3>
+<p>You have now seen two kinds of loops. Use a <code>for</code> loop
+when you know how many times to repeat, such as five dice. Use a
+<code>while</code> loop when you want to repeat until something happens,
+such as the player typing a good answer.</p>
+<h2 id="summary">Summary</h2>
+<p>You rolled five dice with a loop. You learned that:</p>
+<ul>
+<li>A <code>for</code> loop runs its block once for each item.</li>
+<li><code>range(5)</code> gives the numbers 0 through 4.</li>
+<li>The <code>os</code> module works with files and folders.</li>
+<li><code>os.getcwd()</code> returns the folder you ran the program
+from.</li>
+<li><code>os.path.join()</code> builds a path with the right
+separators.</li>
+<li>Names in all capitals are constants that should not change.</li>
+<li>A comment can come at the end of a line of code.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change <code>"SOUNDS"</code> to <code>"sounds"</code> so the program
+works on every computer.</li>
+<li>Change the program to roll ten dice.</li>
+<li>Change the loop so it prints the die number with each roll, such as
+<code>Die 1: 4</code>. Hint: use <code>i</code> in the f-string, and
+remember it starts at 0.</li>
+<li>Add a variable named <code>total</code> before the loop, set to
+<code>0</code>. Inside the loop, store each roll in a variable, add it
+to <code>total</code>, and print it. After the loop, print the
+total.</li>
+<li>Ask the player how many dice to roll. Hint: <code>input()</code>
+returns a string, and <code>range()</code> needs a number.
+<code>int("5")</code> turns the string <code>"5"</code> into the number
+<code>5</code>.</li>
+</ol>

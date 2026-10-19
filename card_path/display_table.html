@@ -1,0 +1,226 @@
+<h1 id="showing-the-blackjack-table">Showing the Blackjack Table</h1>
+<p>In a Blackjack game, the player needs to know what is on the table:
+the dealer’s cards, their own cards, and the total for each. In this
+lesson you will write functions that turn a hand into words and read out
+the whole table.</p>
+<p>This program builds on <code>sum_hand.py</code>. It uses the same
+<code>sum_hand()</code> function and adds two more. Together, these
+three functions are most of what the Blackjack game needs.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Functions that call other functions</li>
+<li>Building a string in a loop</li>
+<li>Global variables</li>
+<li>The tab character, <code>\t</code></li>
+<li>Printing a blank line</li>
+<li>Testing by changing the data and running again</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<pre><code>Dealer: Ace Clubs 3 Spades  Total: 14
+Player: Ace Clubs 3 Spades 7 Hearts     Total: 21
+
+Dealer: Ace Clubs 3 Spades 10 Hearts    Total: 14
+Player: Ace Clubs 3 Spades 10 Hearts Ace Diamonds   Total: 15</code></pre>
+<p>There are tab characters between the parts of each line. Some screen
+readers say “tab” there. Others just pause, or say nothing at all.</p>
+<h2 id="the-source-code-for-display-table">The Source Code for Display
+Table</h2>
+<p>Type this program and save it as <code>display_table.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;A method to sum a card hand with test hands&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>]]</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;7&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> sum_hand(hand):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="bu">sum</span> <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    aces <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;2&quot;</span>, <span class="st">&quot;3&quot;</span>, <span class="st">&quot;4&quot;</span>, <span class="st">&quot;5&quot;</span>, <span class="st">&quot;6&quot;</span>, <span class="st">&quot;7&quot;</span>, <span class="st">&quot;8&quot;</span>, <span class="st">&quot;9&quot;</span>]:</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="bu">int</span>(card[<span class="dv">0</span>])</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> card[<span class="dv">0</span>] <span class="kw">in</span> [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Jack&quot;</span>, <span class="st">&quot;Queen&quot;</span>, <span class="st">&quot;King&quot;</span>]:</span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">10</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>            aces <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            <span class="bu">sum</span> <span class="op">+=</span> <span class="dv">11</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="bu">sum</span> <span class="op">&gt;</span> <span class="dv">21</span> <span class="kw">and</span> aces:</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="bu">sum</span> <span class="op">-=</span> <span class="dv">10</span></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        aces <span class="op">-=</span> <span class="dv">1</span></span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> <span class="bu">sum</span></span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hand_string(hand):</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        s <span class="op">+=</span> <span class="st">&quot; &quot;</span>.join(card) <span class="op">+</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> s</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_table():</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(dealer_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(dealer_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Player:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(player_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(player_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>display_table()</span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a><span class="co"># blank line</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>], [<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>]]</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>display_table()</span></code></pre></div>
+<h2 id="the-hands">The Hands</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>]]</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;7&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span></code></pre></div>
+<p>These are two test hands. In a real game they would come from the
+deck, but for now they are typed in so you know what the totals should
+be.</p>
+<h2 id="sum_hand">sum_hand()</h2>
+<p>The <code>sum_hand()</code> function is the same one you wrote in the
+last lesson. It adds up a hand and handles Aces. If you have not done
+that lesson, go back and do it first.</p>
+<h2 id="turning-a-hand-into-words">Turning a Hand into Words</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> hand_string(hand):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    s <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        s <span class="op">+=</span> <span class="st">&quot; &quot;</span>.join(card) <span class="op">+</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">return</span> s</span></code></pre></div>
+<p>This function builds a string that names every card in a hand.</p>
+<h3 id="building-a-string-in-a-loop">Building a String in a Loop</h3>
+<p><code>s</code> starts as an empty string. Each time through the loop,
+the program adds one card to the end of it. <code>" ".join(card)</code>
+turns <code>["Ace", "Clubs"]</code> into <code>"Ace Clubs"</code>, and
+then <code>+ " "</code> adds a space after it so the next card does not
+run into it.</p>
+<p><code>+=</code> works on strings, too. It sticks the new string onto
+the end:</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">+=</span> <span class="st">&quot;Ace Clubs &quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s <span class="op">+=</span> <span class="st">&quot;3 Spades &quot;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> s</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Ace Clubs 3 Spades &#39;</span></span></code></pre></div>
+<p>Notice there is an extra space at the very end. You usually cannot
+hear a trailing space, but it is there.</p>
+<h3 id="making-it-easier-to-hear">Making It Easier to Hear</h3>
+<p><code>Ace Clubs 3 Spades 7 Hearts</code> is hard to follow by ear.
+Where does one card end and the next begin? Is it “Clubs 3” or “3
+Spades”? A comma between cards, and the word “of,” make a big
+difference: <code>Ace of Clubs, 3 of Spades, 7 of Hearts</code>.</p>
+<p><code>join()</code> can do both at once. You will try this in the
+exercises:</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>]]</span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> names <span class="op">=</span> []</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> card <span class="kw">in</span> hand:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>...     names.append(<span class="st">&quot; of &quot;</span>.join(card))</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;, &quot;</span>.join(names)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;Ace of Clubs, 3 of Spades&#39;</span></span></code></pre></div>
+<h2 id="reading-the-table">Reading the Table</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> display_table():</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Dealer:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(dealer_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(dealer_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Player:</span><span class="ch">\t</span><span class="sc">{</span>hand_string(player_hand)<span class="sc">}</span><span class="ch">\t</span><span class="ss">Total: </span><span class="sc">{</span>sum_hand(player_hand)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h3 id="functions-that-call-functions">Functions That Call
+Functions</h3>
+<p><code>display_table()</code> calls <code>hand_string()</code> and
+<code>sum_hand()</code> inside its f-strings. Each function does one
+small job well, and bigger functions put them together. That is how good
+programs are built. If there is a bug in adding up hands, you know to
+look in <code>sum_hand()</code>. If the cards sound wrong, you look in
+<code>hand_string()</code>.</p>
+<h3 id="global-variables">Global Variables</h3>
+<p><code>display_table()</code> has no parameters, but it uses
+<code>dealer_hand</code> and <code>player_hand</code>. Those variables
+were made outside any function, at the top of the file. A variable made
+outside any function is a <em>global variable</em>. Any function in the
+file can read it.</p>
+<p>That is convenient, but it can make programs harder to understand,
+because you cannot tell from the <code>def</code> line what the function
+depends on. Another way would be to pass the hands in as arguments:
+<code>def display_table(dealer_hand, player_hand):</code>. You will see
+more about this in later lessons.</p>
+<h3 id="the-tab-character">The Tab Character</h3>
+<p><code>\t</code> inside a string is a <em>tab</em> character. The
+backslash and the letter t together stand for one character. On screen,
+a tab lines things up in columns, so the totals line up under each
+other.</p>
+<p>By ear, a tab may be read as “tab,” as a pause, or as nothing.
+Columns are a visual idea. For a screen reader user, punctuation that
+makes a natural pause, such as a comma or a period, works better. For
+example:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Dealer has </span><span class="sc">{</span>hand_string(dealer_hand)<span class="sc">}</span><span class="ss">. Total: </span><span class="sc">{</span>sum_hand(dealer_hand)<span class="sc">}</span><span class="ss">.&quot;</span>)</span></code></pre></div>
+<p>There are other backslash characters, too. The most common is
+<code>\n</code>, which starts a new line.</p>
+<h2 id="testing-with-different-hands">Testing with Different Hands</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>display_table()</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="co"># blank line</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>dealer_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>]]</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>player_hand <span class="op">=</span> [[<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Clubs&quot;</span>], [<span class="st">&quot;3&quot;</span>, <span class="st">&quot;Spades&quot;</span>], [<span class="st">&quot;10&quot;</span>, <span class="st">&quot;Hearts&quot;</span>], [<span class="st">&quot;Ace&quot;</span>, <span class="st">&quot;Diamonds&quot;</span>]]</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>display_table()</span></code></pre></div>
+<p>The program shows the table once, prints a blank line, puts new hands
+in the global variables, and shows the table again. Because
+<code>display_table()</code> reads the global variables each time it is
+called, the second call reads the new hands.</p>
+<p><code>print("")</code> prints an empty line. It makes a clear break
+between the two tests, and it gives the screen reader a moment of
+silence.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote functions that read the Blackjack table out loud. You
+learned that:</p>
+<ul>
+<li>Small functions that each do one job can be combined into bigger
+ones.</li>
+<li>You can build a string bit by bit with <code>+=</code>.</li>
+<li>A global variable is made outside any function, and functions can
+read it.</li>
+<li><code>\t</code> is a tab character, and <code>\n</code> is a new
+line.</li>
+<li>Tabs line up columns on screen but may not help by ear.</li>
+<li><code>print("")</code> prints a blank line.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change <code>hand_string()</code> so the cards sound like
+<code>Ace of Clubs, 3 of Spades, 7 of Hearts</code>.</li>
+<li>Change <code>display_table()</code> to use periods instead of tabs,
+as shown in the lesson. Which do you like better with your screen
+reader?</li>
+<li>Give <code>display_table()</code> two parameters,
+<code>dealer</code> and <code>player</code>, and pass the hands in when
+you call it. Does it still work?</li>
+<li>Add a third test that shows a hand that has gone over 21.</li>
+<li>Write a function called <code>say_card(card)</code> that returns one
+card as a string, such as <code>"Ace of Clubs"</code>. Use it inside
+<code>hand_string()</code>.</li>
+</ol>

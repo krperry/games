@@ -1,0 +1,403 @@
+<h1 id="rock-paper-scissors">Rock, Paper, Scissors</h1>
+<p>In this lesson you will write a complete game of Rock, Paper,
+Scissors against the computer. The game keeps score, lets you play as
+many rounds as you like, and counts “1, 2, 3” with dramatic pauses
+before the computer shows its move.</p>
+<p>This is the first game in these lessons with its code inside a
+<code>main()</code> function. It also uses <code>elif</code> to choose
+between more than two options, and <code>and</code> to combine
+conditions.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>A <code>main()</code> function and
+<code>if __name__ == "__main__":</code></li>
+<li><code>while True:</code> loops that run forever</li>
+<li>Ending a program with <code>sys.exit()</code></li>
+<li>Chaining a method onto a function call</li>
+<li>Empty strings count as <code>False</code></li>
+<li><code>elif</code> statements</li>
+<li>The <code>and</code> operator</li>
+<li>Checking a list of conditions with <code>True in [...]</code></li>
+<li>Keeping score</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play-rock-paper-scissors">How to Play Rock, Paper,
+Scissors</h2>
+<p>Each player picks rock, paper, or scissors at the same time.</p>
+<ul>
+<li>Rock breaks scissors, so rock wins.</li>
+<li>Scissors cut paper, so scissors win.</li>
+<li>Paper covers rock, so paper wins.</li>
+<li>If both players pick the same thing, it is a tie.</li>
+</ul>
+<h2 id="sample-run">Sample Run</h2>
+<p>What the player types comes after the <code>&gt;</code> prompt. Here
+the player types <code>x</code> by mistake once.</p>
+<pre><code>0 Wins, 0 Losses, 0 Ties
+Enter your move: (R)ock (P)aper (S)cissors or (Q)uit
+&gt; r
+ROCK versus...
+1...
+2...
+3...
+ROCK
+It&#39;s a tie!
+0 Wins, 0 Losses, 1 Ties
+Enter your move: (R)ock (P)aper (S)cissors or (Q)uit
+&gt; x
+Type one of R, P, S, or Q.
+&gt; s
+SCISSORS versus...
+1...
+2...
+3...
+ROCK
+You lose!
+0 Wins, 1 Losses, 1 Ties
+Enter your move: (R)ock (P)aper (S)cissors or (Q)uit
+&gt; q
+Thanks for playing!</code></pre>
+<h2 id="the-source-code-for-rock-paper-scissors">The Source Code for
+Rock, Paper, Scissors</h2>
+<p>Type this program and save it as <code>rps.py</code>. It does not use
+sound files, so it can go in any folder.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Rock, Paper, Scissors&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main game function&quot;&quot;&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Scoring variables</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>    wins <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    losses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    ties <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:  <span class="co"># Main game loop.</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        player_move <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> player_move <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;R&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;S&quot;</span>]:</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> player_move:</span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Type one of R, P, S, or Q.&quot;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>wins<span class="sc">}</span><span class="ss"> Wins, </span><span class="sc">{</span>losses<span class="sc">}</span><span class="ss"> Losses, </span><span class="sc">{</span>ties<span class="sc">}</span><span class="ss"> Ties&quot;</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Enter your move: (R)ock (P)aper (S)cissors or (Q)uit&quot;</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;&gt; &quot;</span>).upper()</span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> player_move <span class="op">==</span> <span class="st">&quot;Q&quot;</span>:</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Thanks for playing!&quot;</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>                sys.exit()</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Display what the player chose:</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> player_move <span class="op">==</span> <span class="st">&quot;R&quot;</span>:</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;ROCK versus...&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;ROCK&quot;</span></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> player_move <span class="op">==</span> <span class="st">&quot;P&quot;</span>:</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;PAPER versus...&quot;</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;PAPER&quot;</span></span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> player_move <span class="op">==</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;SCISSORS versus...&quot;</span>)</span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;SCISSORS&quot;</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Count to three with dramatic pauses:</span></span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;1...&quot;</span>)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;2...&quot;</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;3...&quot;</span>)</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Display what the computer chose:</span></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        computer_move <span class="op">=</span> random.choice([<span class="st">&quot;ROCK&quot;</span>, <span class="st">&quot;PAPER&quot;</span>, <span class="st">&quot;SCISSORS&quot;</span>])</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(computer_move)</span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>        <span class="co"># Display and record the win/loss/tie:</span></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> player_move <span class="op">==</span> computer_move:</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;It&#39;s a tie!&quot;</span>)</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            ties <span class="op">=</span> ties <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">True</span> <span class="kw">in</span> [</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span>),</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span>),</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span>),</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>        ]:</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You win!&quot;</span>)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>            wins <span class="op">=</span> wins <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You lose!&quot;</span>)</span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> losses <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a>    main()</span></code></pre></div>
+<h2 id="how-the-program-is-organized">How the Program Is Organized</h2>
+<p>Almost all of the code is inside the <code>main()</code> function.
+The last two lines call <code>main()</code> when you run the file. If
+you did the <code>main.py</code> lesson, you know this pattern. Inside
+<code>main()</code>, the program has four parts:</p>
+<ol type="1">
+<li>Set the scores to zero.</li>
+<li>Get the player’s move. Keep asking until it is good, or quit.</li>
+<li>Say the player’s move, count to three, and say the computer’s
+move.</li>
+<li>Decide who won and add to the score. Then go back to step 2.</li>
+</ol>
+<h2 id="importing-sys">Importing sys</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> sys</span></code></pre></div>
+<p>You know <code>random</code> and <code>time</code>. The
+<code>sys</code> module, short for “system,” has tools for working with
+Python itself. This program uses <code>sys.exit()</code>, which ends the
+program right away.</p>
+<h2 id="setting-up-the-score">Setting Up the Score</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">def</span> main():</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main game function&quot;&quot;&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Scoring variables</span></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>    wins <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    losses <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    ties <span class="op">=</span> <span class="dv">0</span></span></code></pre></div>
+<p>The first line in the body of <code>main()</code> is a docstring for
+the function. Like a file’s docstring, it describes what the function
+does.</p>
+<p>The three variables hold the score. They are set to zero once, before
+the game loop starts, so they keep counting across rounds.</p>
+<h2 id="the-game-loop-while-true">The Game Loop: while True</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> <span class="va">True</span>:  <span class="co"># Main game loop.</span></span></code></pre></div>
+<p>A <code>while</code> loop runs as long as its condition is
+<code>True</code>. Here the condition <em>is</em> <code>True</code>, so
+it is always true. This loop would run forever. Programmers use
+<code>while True:</code> when there is no simple condition for stopping,
+and the program will leave the loop some other way. Here, that way is
+<code>sys.exit()</code>, when the player types <code>Q</code>.</p>
+<p>If you ever start a program with an endless loop by accident, press
+Control+C in the command prompt to stop it.</p>
+<h2 id="getting-the-players-move">Getting the Player’s Move</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>        player_move <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> player_move <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;R&quot;</span>, <span class="st">&quot;P&quot;</span>, <span class="st">&quot;S&quot;</span>]:</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> player_move:</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Type one of R, P, S, or Q.&quot;</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>wins<span class="sc">}</span><span class="ss"> Wins, </span><span class="sc">{</span>losses<span class="sc">}</span><span class="ss"> Losses, </span><span class="sc">{</span>ties<span class="sc">}</span><span class="ss"> Ties&quot;</span>)</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Enter your move: (R)ock (P)aper (S)cissors or (Q)uit&quot;</span>)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;&gt; &quot;</span>).upper()</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> player_move <span class="op">==</span> <span class="st">&quot;Q&quot;</span>:</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                <span class="bu">print</span>(<span class="st">&quot;Thanks for playing!&quot;</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                sys.exit()</span></code></pre></div>
+<p>This is the “ask until the answer is good” loop you know from the
+coin game, with some clever additions.</p>
+<h3 id="empty-strings-count-as-false">Empty Strings Count as False</h3>
+<p>Look at <code>if player_move:</code>. There is no comparison here,
+just a variable. When Python uses a string as a condition, an empty
+string counts as <code>False</code> and any other string counts as
+<code>True</code>.</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">bool</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">bool</span>(<span class="st">&quot;x&quot;</span>)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p><code>bool()</code> shows you whether a value counts as
+<code>True</code> or <code>False</code>.</p>
+<p>The first time through the loop, <code>player_move</code> is the
+empty string, so the <code>else</code> block runs. It reads the score
+and the full instructions. If the player types something that is not
+<code>R</code>, <code>P</code>, <code>S</code>, or <code>Q</code>, the
+loop runs again. This time <code>player_move</code> holds what they
+typed, which is not empty, so the program says the shorter message,
+<code>Type one of R, P, S, or Q.</code></p>
+<p>This is good design for the ear. The player hears the full menu once
+per round, and a short correction if they make a mistake. They do not
+have to listen to the whole menu again.</p>
+<h3 id="chaining-a-method-onto-a-function-call">Chaining a Method onto a
+Function Call</h3>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="bu">input</span>(<span class="st">&quot;&gt; &quot;</span>).upper()</span></code></pre></div>
+<p><code>input()</code> returns a string, and strings have an
+<code>upper()</code> method. So you can call <code>upper()</code> right
+on the result of <code>input()</code>, all in one line. Python calls
+<code>input()</code> first, then calls <code>upper()</code> on what it
+returned. Doing several calls in a row like this is called
+<em>chaining</em>.</p>
+<p>The prompt is a greater-than sign and a space. It is short, which is
+nice once the player knows the game. Your screen reader will say
+“greater” before the player types.</p>
+<h3 id="quitting-with-sys.exit">Quitting with sys.exit()</h3>
+<p>If the player typed <code>Q</code>, the program says goodbye and
+calls <code>sys.exit()</code>. The program ends right there, from inside
+both loops.</p>
+<h2 id="saying-the-players-move">Saying the Player’s Move</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> player_move <span class="op">==</span> <span class="st">&quot;R&quot;</span>:</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;ROCK versus...&quot;</span>)</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;ROCK&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> player_move <span class="op">==</span> <span class="st">&quot;P&quot;</span>:</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;PAPER versus...&quot;</span>)</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;PAPER&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> player_move <span class="op">==</span> <span class="st">&quot;S&quot;</span>:</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;SCISSORS versus...&quot;</span>)</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>            player_move <span class="op">=</span> <span class="st">&quot;SCISSORS&quot;</span></span></code></pre></div>
+<h3 id="elif-statements">elif Statements</h3>
+<p><code>elif</code> is short for “else if.” It lets you check more than
+two possibilities. Python checks the <code>if</code> condition first. If
+it is <code>False</code>, Python checks the first <code>elif</code>. If
+that is <code>False</code>, it checks the next <code>elif</code>, and so
+on. As soon as one condition is <code>True</code>, Python runs that
+block and skips all the rest. At most one block runs.</p>
+<p>Listen for the indentation. The <code>if</code> and both
+<code>elif</code> lines are at the same level. Each has two indented
+lines under it.</p>
+<p>Each block also changes <code>player_move</code> from one letter to
+the full word, such as <code>"ROCK"</code>. That way it can be compared
+with the computer’s move, which is also a full word.</p>
+<h2 id="counting-to-three">Counting to Three</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;1...&quot;</span>)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;2...&quot;</span>)</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span>
+<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;3...&quot;</span>)</span>
+<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.25</span>)</span></code></pre></div>
+<p>These pauses build suspense, the way people count “rock, paper,
+scissors, shoot” out loud. The three dots after each number make many
+screen readers pause a little, too.</p>
+<h2 id="the-computers-move">The Computer’s Move</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>        computer_move <span class="op">=</span> random.choice([<span class="st">&quot;ROCK&quot;</span>, <span class="st">&quot;PAPER&quot;</span>, <span class="st">&quot;SCISSORS&quot;</span>])</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(computer_move)</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span></code></pre></div>
+<p>The computer picks at random, just like in
+<code>random_item.py</code>. The result is stored so it can be printed
+and then compared.</p>
+<h2 id="deciding-who-won">Deciding Who Won</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> player_move <span class="op">==</span> computer_move:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;It&#39;s a tie!&quot;</span>)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>            ties <span class="op">=</span> ties <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> <span class="va">True</span> <span class="kw">in</span> [</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span>),</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span>),</span>
+<span id="cb12-7"><a href="#cb12-7" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span>),</span>
+<span id="cb12-8"><a href="#cb12-8" aria-hidden="true" tabindex="-1"></a>        ]:</span>
+<span id="cb12-9"><a href="#cb12-9" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You win!&quot;</span>)</span>
+<span id="cb12-10"><a href="#cb12-10" aria-hidden="true" tabindex="-1"></a>            wins <span class="op">=</span> wins <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb12-11"><a href="#cb12-11" aria-hidden="true" tabindex="-1"></a>        <span class="cf">else</span>:</span>
+<span id="cb12-12"><a href="#cb12-12" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="st">&quot;You lose!&quot;</span>)</span>
+<span id="cb12-13"><a href="#cb12-13" aria-hidden="true" tabindex="-1"></a>            losses <span class="op">=</span> losses <span class="op">+</span> <span class="dv">1</span></span></code></pre></div>
+<p>First, if both moves are the same, it is a tie.</p>
+<h3 id="the-and-operator">The and Operator</h3>
+<p>Each of the three lines in the list uses <code>and</code>. An
+<code>and</code> expression is <code>True</code> only if <em>both</em>
+sides are <code>True</code>.</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="va">True</span> <span class="kw">and</span> <span class="va">True</span></span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="va">True</span> <span class="kw">and</span> <span class="va">False</span></span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb13-5"><a href="#cb13-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> player_move <span class="op">=</span> <span class="st">&quot;ROCK&quot;</span></span>
+<span id="cb13-6"><a href="#cb13-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> computer_move <span class="op">=</span> <span class="st">&quot;SCISSORS&quot;</span></span>
+<span id="cb13-7"><a href="#cb13-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> player_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span></span>
+<span id="cb13-8"><a href="#cb13-8" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>So
+<code>(player_move == "ROCK" and computer_move == "SCISSORS")</code> is
+<code>True</code> only when the player picked rock and the computer
+picked scissors. That is one way to win. The other two lines are the
+other two ways to win.</p>
+<h3 id="true-in-a-list">True in a List</h3>
+<p>The program puts the three win checks in a list. Python works out
+each one, so the list becomes something like
+<code>[False, True, False]</code>. Then <code>True in [...]</code> asks
+whether any of them is <code>True</code>. If any is, the player won.</p>
+<p>This is a neat trick, but it is not the most common way to write it.
+Most Python programmers would use <code>or</code> to join the three
+checks:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>        <span class="cf">elif</span> (</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a>            (player_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>            <span class="kw">or</span> (player_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;ROCK&quot;</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a>            <span class="kw">or</span> (player_move <span class="op">==</span> <span class="st">&quot;SCISSORS&quot;</span> <span class="kw">and</span> computer_move <span class="op">==</span> <span class="st">&quot;PAPER&quot;</span>)</span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>        ):</span></code></pre></div>
+<p>Both work the same way. The list is split over several lines, one win
+per line, which is easier to read with a screen reader than one very
+long line.</p>
+<h3 id="losing">Losing</h3>
+<p>If it is not a tie and the player did not win, the computer must have
+won. So the <code>else</code> block does not need to check anything.</p>
+<h3 id="keeping-score">Keeping Score</h3>
+<p><code>wins = wins + 1</code> adds one to <code>wins</code>. You could
+also write <code>wins += 1</code>. Both do the same thing.</p>
+<p>After this, the loop goes back to the top, and the player hears the
+new score.</p>
+<h2 id="designing-for-the-ear">Designing for the Ear</h2>
+<p>This game does several things well for players who listen:</p>
+<ul>
+<li>The full menu is read at the start of each round. A short message is
+read if the player makes a mistake.</li>
+<li>The score is read before each round, so the player always knows
+where they stand.</li>
+<li>Pauses and the “1, 2, 3” count give the player time to listen.</li>
+<li>Moves are said in capital letters, which some screen readers say
+with more emphasis.</li>
+</ul>
+<p>One thing could be better. The score says <code>1 Wins</code> and
+<code>1 Losses</code>, which sounds odd. You will fix that in an
+exercise.</p>
+<h2 id="summary">Summary</h2>
+<p>You wrote a complete game of Rock, Paper, Scissors. You learned
+that:</p>
+<ul>
+<li><code>while True:</code> makes a loop that runs until something like
+<code>sys.exit()</code> stops it.</li>
+<li><code>sys.exit()</code> ends the program right away.</li>
+<li>You can chain a method onto a function call, as in
+<code>input("&gt; ").upper()</code>.</li>
+<li>An empty string counts as <code>False</code> in a condition.</li>
+<li><code>elif</code> checks another condition when the ones before it
+were <code>False</code>.</li>
+<li><code>and</code> is <code>True</code> only when both sides are
+<code>True</code>.</li>
+<li><code>True in [...]</code> checks whether any condition in a list is
+<code>True</code>.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Change <code>ties = ties + 1</code> and the other two score lines to
+use <code>+=</code>.</li>
+<li>Make the score sound right for one, such as <code>1 Win</code>
+instead of <code>1 Wins</code>. Hint: use <code>if</code> and
+<code>else</code> to pick the word before you print.</li>
+<li>Rewrite the win check to use <code>or</code> instead of
+<code>True in [...]</code>.</li>
+<li>Add sounds. Play one sound for a win, another for a loss, and
+another for a tie. You can use <code>playsound</code> from the coin and
+dice lessons.</li>
+<li>Let the player type the whole word, such as <code>rock</code>, as
+well as the letter. Hint: compare only the first letter,
+<code>player_move[0]</code>, but watch out for an empty answer.</li>
+<li>Add Lizard and Spock. Lizard poisons Spock and eats paper. Spock
+smashes scissors and vaporizes rock. Rock crushes lizard. Scissors
+decapitate lizard. Paper disproves Spock. How many win checks do you
+need now?</li>
+</ol>

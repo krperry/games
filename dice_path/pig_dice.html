@@ -1,0 +1,665 @@
+<h1 id="pig-a-dice-game-for-many-players">Pig: A Dice Game for Many
+Players</h1>
+<p>Pig is a simple dice game with a hard choice at its heart. On your
+turn you roll a die again and again, adding up points. You can stop
+whenever you like and keep what you have. But if you roll a 1, you lose
+every point you earned that turn. Do you play it safe or push your
+luck?</p>
+<p>This program is much longer than the ones before it. It handles from
+two to ten players, keeps everyone’s score, takes turns, and decides who
+wins. You will use almost everything you have learned so far, and some
+new tools as well.</p>
+<p>The program also has a few bugs. That is normal. Real programs almost
+always do. At the end of the lesson you will track them down and fix
+them.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Turning a string into a number with <code>int()</code></li>
+<li>Comparison operators: <code>&lt;</code>, <code>&gt;</code>,
+<code>&gt;=</code>, and <code>!=</code></li>
+<li>The <code>or</code> and <code>not</code> operators</li>
+<li>Making a list of a given size with <code>*</code></li>
+<li>Changing an item in a list by its index</li>
+<li><code>enumerate()</code></li>
+<li>The <code>time</code> module and <code>time.sleep()</code></li>
+<li>The <code>+=</code> and <code>-=</code> operators</li>
+<li>The <code>%</code> (modulo) operator for taking turns</li>
+<li>Loops inside loops</li>
+<li><code>continue</code> and <code>break</code></li>
+<li>Flag variables</li>
+<li>Finding and fixing bugs</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="how-to-play-pig">How to Play Pig</h2>
+<ul>
+<li>Two to ten people can play.</li>
+<li>A die is rolled to choose who goes first.</li>
+<li>On your turn, you roll one die. The number you roll is added to your
+score.</li>
+<li>After each roll you choose to roll again or stop.</li>
+<li>If you stop, you keep your points and the next player takes a
+turn.</li>
+<li>If you roll a 1, your turn is over and you lose all the points you
+earned this turn. Points from earlier turns are safe.</li>
+<li>The first player to reach 100 points wins.</li>
+</ul>
+<h2 id="sample-run">Sample Run</h2>
+<p>Here is the beginning of a game. The player first types
+<code>1</code>, which is not allowed, so the program asks again. To keep
+it short, only the first few turns are shown.</p>
+<pre><code>How many players are playing:  (2-10)1
+How many players are playing:  (2-10)2
+Enter player 1 name:  Ana
+Enter player 2 name:  Ben
+Players:
+1. Ana
+2. Ben
+Rolling a 2 sided die to choose the player to start.
+1 was rolled.  Ana rolls first.
+Ana rolls a: 4
+The scores are:
+Ana Score: 4
+Ben Score: 0
+
+Ana do you want to roll again?  (Y)es / (No):  y
+Ana rolls a: 6
+The scores are:
+Ana Score: 10
+Ben Score: 0
+
+Ana do you want to roll again?  (Y)es / (No):  y
+Ana rolls a: 1
+Pig Tails you lose this rounds points.
+The scores are:
+Ana Score: 0
+Ben Score: 0
+
+Switching to Bens turn. and rolling.
+Ben rolls a: 1
+Pig Tails you lose this rounds points.
+The scores are:
+Ana Score: 0
+Ben Score: 0
+
+Switching to Anas turn. and rolling.
+Ana rolls a: 5
+The scores are:
+Ana Score: 5
+Ben Score: 0
+
+Ana do you want to roll again?  (Y)es / (No):  n
+Switching to Bens turn. and rolling.</code></pre>
+<p>The game uses the dice sound each time someone rolls, and short
+pauses so the players can follow along by ear.</p>
+<h2 id="planning-the-program">Planning the Program</h2>
+<p>The folder for this program has two text files that were used to plan
+it. <code>pig.txt</code> has the rules. <code>pig_steps.txt</code> has a
+list of steps the program needs, written in plain English, in no special
+order:</p>
+<ul>
+<li>Get how many players for the game.</li>
+<li>Get the names of the players.</li>
+<li>Choose who the first player is by rolling a die.</li>
+<li>Roll the die for the player.</li>
+<li>Add the roll to the total for this turn and to the player’s
+score.</li>
+<li>Display the players and scores.</li>
+<li>Check to see if someone wins.</li>
+<li>Ask the player if they want to roll again.</li>
+<li>Change to the next player.</li>
+<li>Display a winning message.</li>
+<li>Load the random, time, and sound modules.</li>
+</ul>
+<p>Writing the steps down first, before any code, is a great habit. Once
+you have the list, put the steps in order. Then notice which ones
+repeat. “Roll the die” repeats many times in one turn, and turns repeat
+until someone wins. Things that repeat become loops.</p>
+<p>Here is the plan in order:</p>
+<ol type="1">
+<li>Load the modules.</li>
+<li>Ask how many players. Keep asking until the answer is from 2 to
+10.</li>
+<li>Ask for each player’s name.</li>
+<li>Say the players’ names.</li>
+<li>Roll to choose the first player.</li>
+<li>Until someone wins:
+<ol type="1">
+<li>Roll the die. Add the roll to the turn total and the player’s
+score.</li>
+<li>If the roll is 1, take away the turn total and move to the next
+player.</li>
+<li>Say everyone’s score, and check whether anyone has 100.</li>
+<li>If someone has won, say so and stop.</li>
+<li>Ask the player whether to roll again. If not, move to the next
+player.</li>
+</ol></li>
+</ol>
+<h2 id="the-source-code-for-pig">The Source Code for Pig</h2>
+<p>This program plays sounds, so install <code>playsound</code> with
+<code>pip install playsound</code> if you have not already. Type the
+program and save it as <code>pig_dice.py</code> in the folder that holds
+the <code>sounds</code> folder.</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Fun simple Pig dice game</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>number_players <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> number_players <span class="op">&lt;</span> <span class="dv">2</span> <span class="kw">or</span> number_players <span class="op">&gt;</span> <span class="dv">10</span>:</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>    number_players <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;How many players are playing:  (2-10)&quot;</span>))</span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>player_names <span class="op">=</span> [<span class="st">&quot;&quot;</span>] <span class="op">*</span> number_players</span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>player_scores <span class="op">=</span> [<span class="dv">0</span>] <span class="op">*</span> number_players</span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, _ <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>    player_names[i] <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter player </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> name:  &quot;</span>)</span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a><span class="co"># display players</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Players:&quot;</span>)</span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> index, name <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>index<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a><span class="co"># choose starting player</span></span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> random.randint(<span class="dv">0</span>, number_players <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Rolling a </span><span class="sc">{</span>number_players<span class="sc">}</span><span class="ss"> sided die to choose the player to start.&quot;</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="fl">1.5</span>)</span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> random.randint(<span class="dv">0</span>, number_players <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>index <span class="op">+</span><span class="dv">1</span> <span class="sc">}</span><span class="ss"> was rolled.  </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> rolls first.&quot;</span>)</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>winner <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">not</span> winner:</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>    total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>    again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> again.upper() <span class="op">!=</span> <span class="st">&quot;N&quot;</span>:</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>        roll <span class="op">=</span> random.randint(<span class="dv">1</span>, <span class="dv">6</span>)</span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>        total_round <span class="op">+=</span> roll</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        player_scores[index] <span class="op">+=</span> roll</span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a>        ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> rolls a: </span><span class="sc">{</span>roll<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> roll <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Pig Tails you lose this rounds points.&quot;</span>)</span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a>            time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a>            player_scores[index] <span class="op">-=</span> total_round</span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a>            index <span class="op">=</span> (index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> number_players</span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;The scores are: &quot;</span>)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> player_scores[i] <span class="op">&gt;=</span> <span class="dv">100</span>:</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a>                winner <span class="op">=</span> i</span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> Score: </span><span class="sc">{</span>player_scores[i]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="dv">1</span>)</span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> roll <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Switching to </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss">s turn. and rolling.&quot;</span>)</span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a>            total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a>            <span class="cf">continue</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> winner:</span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> Wins!&quot;</span>)</span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a>            <span class="cf">break</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a>        time.sleep(<span class="fl">0.5</span>)</span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a>        again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">while</span> again.upper() <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;N&quot;</span>]:</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            again <span class="op">=</span> <span class="bu">input</span>(</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>                <span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> do you want to roll again?  (Y)es / (No):  &quot;</span></span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a>            )</span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> again.upper() <span class="op">==</span> <span class="st">&quot;N&quot;</span>:</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>            index <span class="op">=</span> (index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> number_players</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>            <span class="bu">print</span>(<span class="ss">f&quot;Switching to </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss">s turn. and rolling.&quot;</span>)</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>            total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>            time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>The program does not use any functions of its own. It runs from top
+to bottom, with loops to repeat the parts that repeat. You will learn to
+break programs like this into functions in later lessons.</p>
+<h2 id="importing-the-time-module">Importing the time Module</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> time</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span></code></pre></div>
+<p>The new module is <code>time</code>. It has functions that deal with
+time. This program uses just one of them, <code>time.sleep()</code>.</p>
+<h3 id="pausing-with-time.sleep">Pausing with time.sleep()</h3>
+<p><code>time.sleep()</code> pauses the program for the number of
+seconds you give it. The number can have a decimal point, so
+<code>time.sleep(0.5)</code> pauses for half a second.</p>
+<p>Pauses matter a lot in a game played by ear. Without them, the roll,
+the scores, and the next question would all be printed at once, and the
+screen reader would race through them. A short pause after each event
+gives the player time to hear it and understand it before the next thing
+happens.</p>
+<h2 id="asking-for-the-number-of-players">Asking for the Number of
+Players</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>number_players <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> number_players <span class="op">&lt;</span> <span class="dv">2</span> <span class="kw">or</span> number_players <span class="op">&gt;</span> <span class="dv">10</span>:</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    number_players <span class="op">=</span> <span class="bu">int</span>(<span class="bu">input</span>(<span class="st">&quot;How many players are playing:  (2-10)&quot;</span>))</span></code></pre></div>
+<h3 id="converting-a-string-to-a-number-with-int">Converting a String to
+a Number with int()</h3>
+<p><code>input()</code> always returns a string. Even if the player
+types <code>4</code>, the program gets the string <code>"4"</code>. You
+cannot compare a string with the number 2 using <code>&lt;</code>, so
+the program changes the string into a number with
+<code>int()</code>.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">int</span>(<span class="st">&quot;4&quot;</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="dv">4</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">int</span>(<span class="st">&quot;4&quot;</span>) <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;4&quot;</span> <span class="op">+</span> <span class="dv">1</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>Traceback (most recent call last):</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  ...</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a><span class="pp">TypeError</span>: can only concatenate <span class="bu">str</span> (<span class="kw">not</span> <span class="st">&quot;int&quot;</span>) to <span class="bu">str</span></span></code></pre></div>
+<p>The line <code>int(input(...))</code> has one function call inside
+another. Python works from the inside out. First it calls
+<code>input()</code> and gets a string. Then it passes that string to
+<code>int()</code> and gets a number.</p>
+<h3 id="comparison-operators">Comparison Operators</h3>
+<p>You already know <code>==</code>, which checks whether two values are
+the same. Here are the others. Each one gives <code>True</code> or
+<code>False</code>:</p>
+<ul>
+<li><code>&lt;</code> less than</li>
+<li><code>&gt;</code> greater than</li>
+<li><code>&lt;=</code> less than or equal to</li>
+<li><code>&gt;=</code> greater than or equal to</li>
+<li><code>!=</code> not equal to</li>
+</ul>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">3</span> <span class="op">&lt;</span> <span class="dv">2</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">12</span> <span class="op">&gt;</span> <span class="dv">10</span></span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">100</span> <span class="op">&gt;=</span> <span class="dv">100</span></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;N&quot;</span> <span class="op">!=</span> <span class="st">&quot;Y&quot;</span></span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>With a screen reader, listen carefully for these. “Less” and
+“greater” are easy to mix up when they are read as symbols. Some people
+find it helps to think of <code>&lt;</code> as “is smaller than” and
+<code>&gt;</code> as “is bigger than.”</p>
+<h3 id="the-or-operator">The or Operator</h3>
+<p>The <code>while</code> condition uses <code>or</code> to join two
+comparisons:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>number_players <span class="op">&lt;</span> <span class="dv">2</span> <span class="kw">or</span> number_players <span class="op">&gt;</span> <span class="dv">10</span></span></code></pre></div>
+<p>An <code>or</code> expression is <code>True</code> if either side is
+<code>True</code>. So the loop keeps going if the number is too small
+<em>or</em> too big. It stops only when the number is from 2 to 10.</p>
+<p><code>number_players</code> starts at <code>0</code> so the loop runs
+at least once, the same trick you used with the empty string in the coin
+guessing game.</p>
+<h2 id="making-lists-for-names-and-scores">Making Lists for Names and
+Scores</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>player_names <span class="op">=</span> [<span class="st">&quot;&quot;</span>] <span class="op">*</span> number_players</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>player_scores <span class="op">=</span> [<span class="dv">0</span>] <span class="op">*</span> number_players</span></code></pre></div>
+<p>Multiplying a list by a number makes a new, longer list with the
+items repeated.</p>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> [<span class="st">&quot;&quot;</span>] <span class="op">*</span> <span class="dv">3</span></span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;&#39;</span>, <span class="st">&#39;&#39;</span>, <span class="st">&#39;&#39;</span>]</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> [<span class="dv">0</span>] <span class="op">*</span> <span class="dv">4</span></span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>[<span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>, <span class="dv">0</span>]</span></code></pre></div>
+<p>So if there are three players, <code>player_names</code> starts as
+three empty strings, and <code>player_scores</code> starts as three
+zeros. The two lists line up. Player 0’s name is
+<code>player_names[0]</code> and player 0’s score is
+<code>player_scores[0]</code>. Lists that line up like this are
+sometimes called <em>parallel lists</em>.</p>
+<h2 id="getting-the-names-with-enumerate">Getting the Names with
+enumerate()</h2>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, _ <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    player_names[i] <span class="op">=</span> <span class="bu">input</span>(<span class="ss">f&quot;Enter player </span><span class="sc">{</span>i<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss"> name:  &quot;</span>)</span></code></pre></div>
+<h3 id="changing-a-list-item">Changing a List Item</h3>
+<p>You can put a new value into one spot in a list by using its index on
+the left side of <code>=</code>:</p>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> names <span class="op">=</span> [<span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>, <span class="st">&quot;&quot;</span>]</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> names[<span class="dv">1</span>] <span class="op">=</span> <span class="st">&quot;Ben&quot;</span></span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> names</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>[<span class="st">&#39;&#39;</span>, <span class="st">&#39;Ben&#39;</span>, <span class="st">&#39;&#39;</span>]</span></code></pre></div>
+<h3 id="enumerate">enumerate()</h3>
+<p>When you loop over a list, you usually get each item. Sometimes you
+also need to know the item’s index. <code>enumerate()</code> gives you
+both. Each time through the loop you get two values: the index and the
+item. You name both in the <code>for</code> line, separated by a
+comma.</p>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">for</span> index, name <span class="kw">in</span> <span class="bu">enumerate</span>([<span class="st">&quot;Ana&quot;</span>, <span class="st">&quot;Ben&quot;</span>, <span class="st">&quot;Cam&quot;</span>]):</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(index, name)</span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span> Ana</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span> Ben</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span> Cam</span></code></pre></div>
+<p>In the name loop, the item is an empty string that will be replaced,
+so the program does not need it. It names that variable <code>_</code>,
+an underscore. That is a signal to readers that the value is
+ignored.</p>
+<h3 id="counting-from-one-for-people">Counting from One for People</h3>
+<p>Python counts from 0, but people count from 1. The prompt says
+<code>Enter player {i+1} name:</code>, so the first player hears “player
+1,” not “player 0.” The <code>+1</code> happens inside the curly braces.
+You can put math inside an f-string, not just variable names.</p>
+<h2 id="announcing-the-players">Announcing the Players</h2>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;Players:&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> index, name <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb13-3"><a href="#cb13-3" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>index<span class="op">+</span><span class="dv">1</span><span class="sc">}</span><span class="ss">. </span><span class="sc">{</span>name<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb13-4"><a href="#cb13-4" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>This loop uses both values from <code>enumerate()</code> to read out
+a numbered list, and then pauses for one second.</p>
+<h2 id="choosing-who-goes-first">Choosing Who Goes First</h2>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> random.randint(<span class="dv">0</span>, number_players <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;Rolling a </span><span class="sc">{</span>number_players<span class="sc">}</span><span class="ss"> sided die to choose the player to start.&quot;</span>)</span>
+<span id="cb14-3"><a href="#cb14-3" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="fl">1.5</span>)</span>
+<span id="cb14-4"><a href="#cb14-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb14-5"><a href="#cb14-5" aria-hidden="true" tabindex="-1"></a>index <span class="op">=</span> random.randint(<span class="dv">0</span>, number_players <span class="op">-</span> <span class="dv">1</span>)</span>
+<span id="cb14-6"><a href="#cb14-6" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span></code></pre></div>
+<p>The variable <code>index</code> will hold the index of the player
+whose turn it is. For three players, the indexes are 0, 1, and 2, so the
+program picks a random number from 0 to
+<code>number_players - 1</code>.</p>
+<p>Did you notice that the same <code>randint()</code> line appears
+twice? The first result is thrown away, because the second line puts a
+new value in <code>index</code>. The first line does no harm, but it
+does nothing useful either. Programs often collect leftover lines like
+this as they are changed. Removing it is one of the exercises.</p>
+<div class="sourceCode" id="cb15"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>index <span class="op">+</span><span class="dv">1</span> <span class="sc">}</span><span class="ss"> was rolled.  </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> rolls first.&quot;</span>)</span></code></pre></div>
+<p>Again, <code>index + 1</code> turns the index into a number people
+expect. The player’s name comes from
+<code>player_names[index]</code>.</p>
+<h2 id="the-main-game-loop">The Main Game Loop</h2>
+<p>Now for the heart of the game. There are two loops, one inside the
+other:</p>
+<div class="sourceCode" id="cb16"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a>winner <span class="op">=</span> <span class="va">False</span></span>
+<span id="cb16-2"><a href="#cb16-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> <span class="kw">not</span> winner:</span>
+<span id="cb16-3"><a href="#cb16-3" aria-hidden="true" tabindex="-1"></a>    total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb16-4"><a href="#cb16-4" aria-hidden="true" tabindex="-1"></a>    again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb16-5"><a href="#cb16-5" aria-hidden="true" tabindex="-1"></a>    <span class="cf">while</span> again.upper() <span class="op">!=</span> <span class="st">&quot;N&quot;</span>:</span>
+<span id="cb16-6"><a href="#cb16-6" aria-hidden="true" tabindex="-1"></a>        ...</span></code></pre></div>
+<h3 id="flag-variables-and-not">Flag Variables and not</h3>
+<p><code>winner</code> is a <em>flag</em>. A flag is a variable that
+remembers whether something has happened. It starts as
+<code>False</code>, because no one has won yet. When someone wins, the
+program changes it.</p>
+<p><code>not</code> flips a Boolean. <code>not False</code> is
+<code>True</code>, and <code>not True</code> is <code>False</code>. So
+<code>while not winner:</code> reads naturally as “while there is no
+winner.”</p>
+<h3 id="loops-inside-loops">Loops Inside Loops</h3>
+<p>Each time the <em>outer loop</em> runs, one player takes one whole
+turn. Each time the <em>inner loop</em> runs, the current player rolls
+the die once. A turn has many rolls, and a game has many turns.</p>
+<p>When you read nested loops with a screen reader, listen to the
+indentation. The outer <code>while</code> is at zero spaces. The inner
+<code>while</code> is at four spaces. The lines inside the inner loop
+are at eight spaces. When you hear the indentation drop back to four,
+you have left the inner loop.</p>
+<p>At the start of each turn, the outer loop sets
+<code>total_round</code>, the points earned this turn, back to 0. It
+also sets <code>again</code> to an empty string so the inner loop will
+run.</p>
+<p>The inner loop keeps going while <code>again.upper() != "N"</code>,
+meaning until the player says no.</p>
+<h2 id="rolling-the-die">Rolling the Die</h2>
+<div class="sourceCode" id="cb17"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a>roll <span class="op">=</span> random.randint(<span class="dv">1</span>, <span class="dv">6</span>)</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>total_round <span class="op">+=</span> roll</span>
+<span id="cb17-3"><a href="#cb17-3" aria-hidden="true" tabindex="-1"></a>player_scores[index] <span class="op">+=</span> roll</span>
+<span id="cb17-4"><a href="#cb17-4" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span>
+<span id="cb17-5"><a href="#cb17-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> rolls a: </span><span class="sc">{</span>roll<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb17-6"><a href="#cb17-6" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<h3 id="the-and---operators">The += and -= Operators</h3>
+<p><code>total_round += roll</code> is a short way to write
+<code>total_round = total_round + roll</code>. It adds the roll to
+whatever is already in <code>total_round</code>. There is also
+<code>-=</code>, which subtracts.</p>
+<div class="sourceCode" id="cb18"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> score <span class="op">=</span> <span class="dv">10</span></span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> score <span class="op">+=</span> <span class="dv">4</span></span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> score</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a><span class="dv">14</span></span>
+<span id="cb18-5"><a href="#cb18-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> score <span class="op">-=</span> <span class="dv">6</span></span>
+<span id="cb18-6"><a href="#cb18-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> score</span>
+<span id="cb18-7"><a href="#cb18-7" aria-hidden="true" tabindex="-1"></a><span class="dv">8</span></span></code></pre></div>
+<p>The roll is added in two places. <code>total_round</code> keeps track
+of this turn only. <code>player_scores[index]</code> is the player’s
+whole score. The program needs both, because a roll of 1 takes away only
+this turn’s points.</p>
+<h2 id="rolling-a-1">Rolling a 1</h2>
+<div class="sourceCode" id="cb19"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> roll <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Pig Tails you lose this rounds points.&quot;</span>)</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span>
+<span id="cb19-4"><a href="#cb19-4" aria-hidden="true" tabindex="-1"></a>    player_scores[index] <span class="op">-=</span> total_round</span>
+<span id="cb19-5"><a href="#cb19-5" aria-hidden="true" tabindex="-1"></a>    index <span class="op">=</span> (index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> number_players</span></code></pre></div>
+<p>If the roll is 1, the program subtracts the points from this turn,
+including the 1 that was just added. Then it moves to the next
+player.</p>
+<h3 id="taking-turns-with">Taking Turns with %</h3>
+<p>The <code>%</code> sign is the <em>modulo</em> operator. It gives the
+remainder after division.</p>
+<div class="sourceCode" id="cb20"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">7</span> <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb20-2"><a href="#cb20-2" aria-hidden="true" tabindex="-1"></a><span class="dv">1</span></span>
+<span id="cb20-3"><a href="#cb20-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">6</span> <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb20-4"><a href="#cb20-4" aria-hidden="true" tabindex="-1"></a><span class="dv">0</span></span>
+<span id="cb20-5"><a href="#cb20-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="dv">2</span> <span class="op">%</span> <span class="dv">3</span></span>
+<span id="cb20-6"><a href="#cb20-6" aria-hidden="true" tabindex="-1"></a><span class="dv">2</span></span></code></pre></div>
+<p><code>(index + 1) % number_players</code> is a classic trick for
+taking turns in a circle. With three players, watch what happens:</p>
+<ul>
+<li>Index 0 becomes <code>1 % 3</code>, which is 1.</li>
+<li>Index 1 becomes <code>2 % 3</code>, which is 2.</li>
+<li>Index 2 becomes <code>3 % 3</code>, which is 0.</li>
+</ul>
+<p>After the last player, it wraps back around to the first. You will
+use this trick in many games.</p>
+<h2 id="announcing-the-scores">Announcing the Scores</h2>
+<div class="sourceCode" id="cb21"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb21-1"><a href="#cb21-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;The scores are: &quot;</span>)</span>
+<span id="cb21-2"><a href="#cb21-2" aria-hidden="true" tabindex="-1"></a><span class="cf">for</span> i, name <span class="kw">in</span> <span class="bu">enumerate</span>(player_names):</span>
+<span id="cb21-3"><a href="#cb21-3" aria-hidden="true" tabindex="-1"></a>    <span class="cf">if</span> player_scores[i] <span class="op">&gt;=</span> <span class="dv">100</span>:</span>
+<span id="cb21-4"><a href="#cb21-4" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> i</span>
+<span id="cb21-5"><a href="#cb21-5" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>name<span class="sc">}</span><span class="ss"> Score: </span><span class="sc">{</span>player_scores[i]<span class="sc">}</span><span class="ss">&quot;</span>)</span>
+<span id="cb21-6"><a href="#cb21-6" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="st">&quot;&quot;</span>)</span>
+<span id="cb21-7"><a href="#cb21-7" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>This loop reads every player’s name and score. While it is at it, it
+checks whether anyone has 100 or more. If someone does, it stores that
+player’s index in <code>winner</code>. Hold on to that idea. It is the
+source of the biggest bug in the program.</p>
+<p><code>print("")</code> prints an empty line. It gives the screen
+reader a short break between the scores and the next message.</p>
+<h2 id="continue-and-break">continue and break</h2>
+<div class="sourceCode" id="cb22"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> roll <span class="op">==</span> <span class="dv">1</span>:</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Switching to </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss">s turn. and rolling.&quot;</span>)</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>    total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a>    <span class="cf">continue</span></span>
+<span id="cb22-5"><a href="#cb22-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="#cb22-6" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> winner:</span>
+<span id="cb22-7"><a href="#cb22-7" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> Wins!&quot;</span>)</span>
+<span id="cb22-8"><a href="#cb22-8" aria-hidden="true" tabindex="-1"></a>    <span class="cf">break</span></span>
+<span id="cb22-9"><a href="#cb22-9" aria-hidden="true" tabindex="-1"></a>time.sleep(<span class="fl">0.5</span>)</span></code></pre></div>
+<p><code>continue</code> jumps straight back to the top of the loop it
+is in, skipping the rest of the block. Here, after a 1, the program has
+already moved to the next player, so it skips the “roll again?”
+question. Back at the top of the inner loop, <code>again</code> is not
+<code>"N"</code>, so the loop runs again and the new player rolls right
+away. That is why the message says “and rolling.”</p>
+<p><code>break</code> ends the loop it is in right away. Python jumps to
+the first line after the loop. Here, when someone wins, the program says
+so and breaks out of the inner loop. Then the outer loop checks
+<code>not winner</code>, finds that there is a winner, and the game is
+over.</p>
+<p>Both <code>continue</code> and <code>break</code> affect only the
+innermost loop they are in.</p>
+<h2 id="asking-to-roll-again">Asking to Roll Again</h2>
+<div class="sourceCode" id="cb23"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb23-1"><a href="#cb23-1" aria-hidden="true" tabindex="-1"></a>again <span class="op">=</span> <span class="st">&quot;&quot;</span></span>
+<span id="cb23-2"><a href="#cb23-2" aria-hidden="true" tabindex="-1"></a><span class="cf">while</span> again.upper() <span class="kw">not</span> <span class="kw">in</span> [<span class="st">&quot;Y&quot;</span>, <span class="st">&quot;N&quot;</span>]:</span>
+<span id="cb23-3"><a href="#cb23-3" aria-hidden="true" tabindex="-1"></a>    again <span class="op">=</span> <span class="bu">input</span>(</span>
+<span id="cb23-4"><a href="#cb23-4" aria-hidden="true" tabindex="-1"></a>        <span class="ss">f&quot;</span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss"> do you want to roll again?  (Y)es / (No):  &quot;</span></span>
+<span id="cb23-5"><a href="#cb23-5" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb23-6"><a href="#cb23-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb23-7"><a href="#cb23-7" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> again.upper() <span class="op">==</span> <span class="st">&quot;N&quot;</span>:</span>
+<span id="cb23-8"><a href="#cb23-8" aria-hidden="true" tabindex="-1"></a>    index <span class="op">=</span> (index <span class="op">+</span> <span class="dv">1</span>) <span class="op">%</span> number_players</span>
+<span id="cb23-9"><a href="#cb23-9" aria-hidden="true" tabindex="-1"></a>    <span class="bu">print</span>(<span class="ss">f&quot;Switching to </span><span class="sc">{</span>player_names[index]<span class="sc">}</span><span class="ss">s turn. and rolling.&quot;</span>)</span>
+<span id="cb23-10"><a href="#cb23-10" aria-hidden="true" tabindex="-1"></a>    total_round <span class="op">=</span> <span class="dv">0</span></span>
+<span id="cb23-11"><a href="#cb23-11" aria-hidden="true" tabindex="-1"></a>    time.sleep(<span class="dv">1</span>)</span></code></pre></div>
+<p>This is a third loop, inside the inner loop. It is the same “ask
+until the answer is good” pattern you used in the coin game.</p>
+<p>The call to <code>input()</code> is split across three lines. Python
+lets you break a line inside parentheses, which helps keep long lines
+short. The prompt ends with a space, so the player’s answer does not run
+into the word “No.”</p>
+<p>If the player says no, the program moves to the next player. Then,
+back at the top of the inner loop, <code>again</code> is
+<code>"N"</code>, so the inner loop ends. The outer loop starts a new
+turn with <code>total_round</code> and <code>again</code> reset.</p>
+<h2 id="finding-the-bugs">Finding the Bugs</h2>
+<p>Now that you understand the program, you can find its bugs. A bug is
+any place where a program does something its author did not intend.</p>
+<h3 id="bug-1-player-1-can-never-win">Bug 1: Player 1 Can Never Win</h3>
+<p>Remember how the program records a winner:</p>
+<div class="sourceCode" id="cb24"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> player_scores[i] <span class="op">&gt;=</span> <span class="dv">100</span>:</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>    winner <span class="op">=</span> i</span></code></pre></div>
+<p>and later checks it:</p>
+<div class="sourceCode" id="cb25"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb25-1"><a href="#cb25-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> winner:</span></code></pre></div>
+<p>When Python uses a number as a condition, <code>0</code> counts as
+<code>False</code> and any other number counts as <code>True</code>. Try
+it:</p>
+<div class="sourceCode" id="cb26"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb26-1"><a href="#cb26-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="cf">if</span> <span class="dv">0</span>:</span>
+<span id="cb26-2"><a href="#cb26-2" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">&quot;yes&quot;</span>)</span>
+<span id="cb26-3"><a href="#cb26-3" aria-hidden="true" tabindex="-1"></a>... <span class="cf">else</span>:</span>
+<span id="cb26-4"><a href="#cb26-4" aria-hidden="true" tabindex="-1"></a>...     <span class="bu">print</span>(<span class="st">&quot;no&quot;</span>)</span>
+<span id="cb26-5"><a href="#cb26-5" aria-hidden="true" tabindex="-1"></a>...</span>
+<span id="cb26-6"><a href="#cb26-6" aria-hidden="true" tabindex="-1"></a>no</span></code></pre></div>
+<p>The first player’s index is 0. When the first player reaches 100,
+<code>winner</code> is set to 0, which counts as <code>False</code>. The
+game does not end. It keeps going, and the first player’s score keeps
+growing past 100 with no winner. Every other player’s index is 1 or
+more, so they can win.</p>
+<p>This is a classic bug. One clean fix is to store <code>True</code>
+instead of the index:</p>
+<div class="sourceCode" id="cb27"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> player_scores[i] <span class="op">&gt;=</span> <span class="dv">100</span>:</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>    winner <span class="op">=</span> <span class="va">True</span></span></code></pre></div>
+<p>The program already knows who won. It is the current player,
+<code>player_names[index]</code>, because only the current player’s
+score changes.</p>
+<h3 id="bug-2-typing-a-word-crashes-the-program">Bug 2: Typing a Word
+Crashes the Program</h3>
+<p>If the player types <code>two</code> or just presses Enter at the
+first question, <code>int()</code> cannot turn it into a number:</p>
+<pre><code>ValueError: invalid literal for int() with base 10: &#39;two&#39;</code></pre>
+<p>The program stops with an error. You will learn a tool for handling
+errors like this, called <code>try</code> and <code>except</code>, in a
+later lesson. For now, you can check the string first with the
+<code>isdigit()</code> method, which returns <code>True</code> if every
+character is a digit:</p>
+<div class="sourceCode" id="cb29"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;4&quot;</span>.isdigit()</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;two&quot;</span>.isdigit()</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="st">&quot;&quot;</span>.isdigit()</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a><span class="va">False</span></span></code></pre></div>
+<h3 id="small-things-for-the-ear">Small Things for the Ear</h3>
+<p>Some messages could sound better:</p>
+<ul>
+<li><code>f"Pig Tails you lose this rounds points."</code> is an
+f-string with no braces. It works, but the <code>f</code> is not
+needed.</li>
+<li><code>Bens turn</code> should be <code>Ben's turn</code>, and
+<code>rounds points</code> should be <code>round's points</code>.</li>
+<li><code>Switching to Ben's turn. and rolling.</code> has a period in
+the middle of the sentence. A screen reader will pause there.</li>
+<li>The prompt <code>(Y)es / (No)</code> would be clearer as
+<code>(Y)es / (N)o</code>, or just <code>Type Y or N:</code>.</li>
+</ul>
+<h2 id="summary">Summary</h2>
+<p>Pig is the biggest program you have written so far. You learned
+that:</p>
+<ul>
+<li>Planning in plain English first makes a big program easier to
+write.</li>
+<li><code>int()</code> turns a string of digits into a number.</li>
+<li><code>&lt;</code>, <code>&gt;</code>, <code>&lt;=</code>,
+<code>&gt;=</code>, <code>==</code>, and <code>!=</code> compare
+values.</li>
+<li><code>or</code> is <code>True</code> if either side is
+<code>True</code>. <code>not</code> flips <code>True</code> and
+<code>False</code>.</li>
+<li><code>[0] * 4</code> makes a list of four zeros.</li>
+<li><code>enumerate()</code> gives you each item’s index and value.</li>
+<li><code>time.sleep()</code> pauses, which gives players time to
+listen.</li>
+<li><code>+=</code> and <code>-=</code> add to or subtract from a
+variable.</li>
+<li><code>(index + 1) % count</code> moves to the next player and wraps
+around.</li>
+<li><code>continue</code> jumps to the top of a loop. <code>break</code>
+leaves it.</li>
+<li>A flag variable remembers whether something has happened.</li>
+<li><code>0</code> counts as <code>False</code> in a condition, which
+can cause sneaky bugs.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Fix Bug 1 so that the first player can win. Test it by changing the
+winning score from 100 to 10 so games are short.</li>
+<li>Remove the extra <code>randint()</code> line that is thrown
+away.</li>
+<li>Fix the apostrophes and the stray period in the messages.</li>
+<li>Make the winning score a constant named <code>WINNING_SCORE</code>
+at the top of the program, and use it in place of <code>100</code>.</li>
+<li>Fix Bug 2 using <code>isdigit()</code>. Hint: read the answer into a
+variable first, check it, and only call <code>int()</code> if it is all
+digits.</li>
+<li>Tell the player their turn total after each roll, such as
+<code>This turn: 12 points.</code> This helps the player decide whether
+to keep going.</li>
+<li>Add a different sound that plays when someone rolls a 1.</li>
+</ol>

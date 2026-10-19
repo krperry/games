@@ -1,0 +1,106 @@
+<h1 id="rolling-a-die-with-sound">Rolling a Die with Sound</h1>
+<p>In this lesson you will add the sound of dice rattling to your die
+roll program. If you did the coin lessons, this will feel familiar. It
+is the same idea you used to add sound to the coin flip. That is how
+programming often works: once you learn a trick, you can use it again
+and again.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Reusing what you already know</li>
+<li>Installing and importing <code>playsound</code></li>
+<li>The order of statements in a program</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="sample-run">Sample Run</h2>
+<p>When you run the program, you hear dice rolling. When the sound
+stops, you hear a number from 1 to 6:</p>
+<pre><code>5</code></pre>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>This program uses the <code>playsound</code> module. If you have not
+installed it yet, type this at the command prompt:</p>
+<pre><code>pip install playsound</code></pre>
+<p>If that gives you errors, try
+<code>pip install playsound==1.2.2</code>.</p>
+<p>The program plays the file <code>dice.wav</code> from a folder named
+<code>sounds</code>. The <code>sounds</code> folder must be in the same
+folder as your program, and you must run the program from that
+folder.</p>
+<h2 id="the-source-code-for-sound-roll">The Source Code for Sound
+Roll</h2>
+<p>Type this program and save it as <code>sound_roll.py</code>:</p>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<h2 id="how-the-program-works">How the Program Works</h2>
+<p>The program has two import lines and then two lines that do the
+work.</p>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> random</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> playsound <span class="im">as</span> ps</span></code></pre></div>
+<p>The first imports the <code>random</code> module so you can use
+<code>randint()</code>. The second imports the <code>playsound</code>
+module with the shorter name <code>ps</code>.</p>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>ps.playsound(<span class="st">&quot;sounds/dice.wav&quot;</span>)</span></code></pre></div>
+<p>This plays the dice sound. <code>playsound()</code> waits until the
+sound is finished before the program goes on.</p>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="bu">print</span>(<span class="ss">f&quot;</span><span class="sc">{</span>random<span class="sc">.</span>randint(<span class="dv">1</span>,<span class="dv">6</span>)<span class="sc">}</span><span class="ss">&quot;</span>)</span></code></pre></div>
+<p>This rolls the die and prints the result, just like in
+<code>roll.py</code>.</p>
+<h2 id="order-matters">Order Matters</h2>
+<p>Python runs your statements from top to bottom. The sound line comes
+first, so the player hears the dice, and then hears the number. That is
+how a real dice roll works. You shake the dice, they land, and then you
+look.</p>
+<p>If you swapped the two lines, the player would hear the number first
+and then the dice sound. The number would be read by the screen reader
+at the same time the sound starts, which is harder to hear, and the
+order would not make sense.</p>
+<p>When you design a game for the ear, think about the order of events.
+Each sound or message should come at the moment it makes sense.</p>
+<h2 id="summary">Summary</h2>
+<p>This program combined two things you already knew how to do. You
+learned that:</p>
+<ul>
+<li>Once you know how to do something in one program, you can use it in
+others.</li>
+<li>Python runs statements in order, from top to bottom.</li>
+<li>The order of sounds and messages shapes how the game feels to the
+player.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Add a docstring to the top of the program.</li>
+<li>Change the program to print a full sentence, such as
+<code>You rolled a 5.</code></li>
+<li>Swap the two last lines so the number prints before the sound. Run
+it. Then swap them back.</li>
+<li>Roll two dice. Play the sound once, then print both numbers and
+their total. Hint: store each roll in its own variable, such as
+<code>die1</code> and <code>die2</code>, and add them with
+<code>+</code>.</li>
+</ol>

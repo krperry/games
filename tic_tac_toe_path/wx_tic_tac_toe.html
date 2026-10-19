@@ -1,0 +1,545 @@
+<h1 id="tic-tac-toe-in-a-window-with-wxpython">Tic Tac Toe in a Window
+with wxPython</h1>
+<p>In the last lesson you built Tic Tac Toe in a window with PySide6. In
+this lesson you will build the same game with a different toolkit,
+<em>wxPython</em>. The two programs have the same class, the same
+methods, and the same game logic. Only the toolkit parts are
+different.</p>
+<p>Seeing the same program written with two toolkits shows you which
+ideas belong to GUI programming in general, and which belong to one
+toolkit. It also gives you a choice. wxPython uses each operating
+system’s own buttons and windows, which many screen reader users find
+very dependable.</p>
+<p>If you have not done the PySide6 lesson, read it first. This lesson
+explains what is different and does not repeat everything.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Installing and importing wxPython</li>
+<li><code>wx.App</code>, <code>wx.Frame</code>, and
+<code>wx.Panel</code></li>
+<li>Sizers for layout</li>
+<li>Binding events with <code>Bind()</code></li>
+<li>Event handlers that receive an event object</li>
+<li><code>wx.MessageDialog</code> and <code>Destroy()</code></li>
+<li>Native controls and accessibility</li>
+<li>Comparing two toolkits</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="getting-ready">Getting Ready</h2>
+<p>Install wxPython with:</p>
+<pre><code>pip install wxPython</code></pre>
+<p>Notice the capital P in the name you install. In your program, you
+import it as plain <code>wx</code>.</p>
+<h2 id="how-to-play">How to Play</h2>
+<p>Run <code>python wx_tic_tac_toe.py</code>. A window titled “Tic Tac
+Toe” opens with nine buttons in a grid. Press Tab to move between
+buttons and Space to take a square. X goes first. When someone wins, or
+the board fills up, a dialog tells you, and then another asks whether to
+play again.</p>
+<h2 id="the-source-code-for-wx-tic-tac-toe">The Source Code for wx Tic
+Tac Toe</h2>
+<p>Type this program and save it as <code>wx_tic_tac_toe.py</code>:</p>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;WX GUI of Tic Tac Toe&quot;&quot;&quot;</span></span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wx</span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TicTacToe(wx.Frame):</span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;Main class representing the Tic Tac Toe game window.&quot;&quot;&quot;</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a><span class="co">        Initialize the TicTacToe object.</span></span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a><span class="co">        Sets up the game window, initializes the game state, and creates the game board.</span></span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="va">None</span>, title<span class="op">=</span><span class="st">&quot;Tic Tac Toe&quot;</span>, size<span class="op">=</span>(<span class="dv">300</span>, <span class="dv">300</span>))</span>
+<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        panel <span class="op">=</span> wx.Panel(<span class="va">self</span>)</span>
+<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        vbox <span class="op">=</span> wx.BoxSizer(wx.VERTICAL)</span>
+<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.buttons <span class="op">=</span> []</span>
+<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        grid_sizer <span class="op">=</span> wx.GridSizer(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span>
+<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>            button_row <span class="op">=</span> []</span>
+<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>                button <span class="op">=</span> wx.Button(panel, label<span class="op">=</span><span class="st">&quot; &quot;</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">100</span>))</span>
+<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>                button.Bind(wx.EVT_BUTTON, <span class="va">self</span>.make_button_click_handler(row, col))</span>
+<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>                button_row.append(button)</span>
+<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>                grid_sizer.Add(button, <span class="dv">0</span>, wx.EXPAND)</span>
+<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons.append(button_row)</span>
+<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        vbox.Add(grid_sizer, proportion<span class="op">=</span><span class="dv">1</span>, flag<span class="op">=</span>wx.EXPAND)</span>
+<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>        panel.SetSizer(vbox)</span>
+<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-42"><a href="#cb2-42" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_button_click_handler(<span class="va">self</span>, row, col):</span>
+<span id="cb2-43"><a href="#cb2-43" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-44"><a href="#cb2-44" aria-hidden="true" tabindex="-1"></a><span class="co">        Create a button click handler function.</span></span>
+<span id="cb2-45"><a href="#cb2-45" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-46"><a href="#cb2-46" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-47"><a href="#cb2-47" aria-hidden="true" tabindex="-1"></a><span class="co">            row (int): The row index of the clicked button.</span></span>
+<span id="cb2-48"><a href="#cb2-48" aria-hidden="true" tabindex="-1"></a><span class="co">            col (int): The column index of the clicked button.</span></span>
+<span id="cb2-49"><a href="#cb2-49" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-50"><a href="#cb2-50" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-51"><a href="#cb2-51" aria-hidden="true" tabindex="-1"></a><span class="co">            function: The button click handler function.</span></span>
+<span id="cb2-52"><a href="#cb2-52" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-53"><a href="#cb2-53" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> handler(event):</span>
+<span id="cb2-54"><a href="#cb2-54" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.on_button_click(row, col)</span>
+<span id="cb2-55"><a href="#cb2-55" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-56"><a href="#cb2-56" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> handler</span>
+<span id="cb2-57"><a href="#cb2-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-58"><a href="#cb2-58" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_button_click(<span class="va">self</span>, row, col):</span>
+<span id="cb2-59"><a href="#cb2-59" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-60"><a href="#cb2-60" aria-hidden="true" tabindex="-1"></a><span class="co">        Handle button click events.</span></span>
+<span id="cb2-61"><a href="#cb2-61" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-62"><a href="#cb2-62" aria-hidden="true" tabindex="-1"></a><span class="co">        Updates the game state when a button is clicked.</span></span>
+<span id="cb2-63"><a href="#cb2-63" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-64"><a href="#cb2-64" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-65"><a href="#cb2-65" aria-hidden="true" tabindex="-1"></a><span class="co">            row (int): The row index of the clicked button.</span></span>
+<span id="cb2-66"><a href="#cb2-66" aria-hidden="true" tabindex="-1"></a><span class="co">            col (int): The column index of the clicked button.</span></span>
+<span id="cb2-67"><a href="#cb2-67" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-68"><a href="#cb2-68" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-69"><a href="#cb2-69" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-70"><a href="#cb2-70" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-71"><a href="#cb2-71" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> row <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> col</span>
+<span id="cb2-72"><a href="#cb2-72" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-73"><a href="#cb2-73" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.board[index] <span class="op">==</span> <span class="st">&quot; &quot;</span>:</span>
+<span id="cb2-74"><a href="#cb2-74" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.board[index] <span class="op">=</span> <span class="va">self</span>.current_player</span>
+<span id="cb2-75"><a href="#cb2-75" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].SetLabel(<span class="va">self</span>.current_player)</span>
+<span id="cb2-76"><a href="#cb2-76" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-77"><a href="#cb2-77" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> <span class="va">self</span>.check_winner():</span>
+<span id="cb2-78"><a href="#cb2-78" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_winner()</span>
+<span id="cb2-79"><a href="#cb2-79" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb2-80"><a href="#cb2-80" aria-hidden="true" tabindex="-1"></a>            <span class="cf">elif</span> <span class="st">&quot; &quot;</span> <span class="kw">not</span> <span class="kw">in</span> <span class="va">self</span>.board:</span>
+<span id="cb2-81"><a href="#cb2-81" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.show_draw()</span>
+<span id="cb2-82"><a href="#cb2-82" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.reset_board()</span>
+<span id="cb2-83"><a href="#cb2-83" aria-hidden="true" tabindex="-1"></a>            <span class="cf">else</span>:</span>
+<span id="cb2-84"><a href="#cb2-84" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;O&quot;</span> <span class="cf">if</span> <span class="va">self</span>.current_player <span class="op">==</span> <span class="st">&quot;X&quot;</span> <span class="cf">else</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-85"><a href="#cb2-85" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-86"><a href="#cb2-86" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> check_winner(<span class="va">self</span>):</span>
+<span id="cb2-87"><a href="#cb2-87" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-88"><a href="#cb2-88" aria-hidden="true" tabindex="-1"></a><span class="co">        Check for a winning combination on the game board.</span></span>
+<span id="cb2-89"><a href="#cb2-89" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-90"><a href="#cb2-90" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-91"><a href="#cb2-91" aria-hidden="true" tabindex="-1"></a><span class="co">            bool: True if there is a winner, False otherwise.</span></span>
+<span id="cb2-92"><a href="#cb2-92" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-93"><a href="#cb2-93" aria-hidden="true" tabindex="-1"></a>        winning_combinations <span class="op">=</span> [</span>
+<span id="cb2-94"><a href="#cb2-94" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">1</span>, <span class="dv">2</span>),</span>
+<span id="cb2-95"><a href="#cb2-95" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">3</span>, <span class="dv">4</span>, <span class="dv">5</span>),</span>
+<span id="cb2-96"><a href="#cb2-96" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">6</span>, <span class="dv">7</span>, <span class="dv">8</span>),  <span class="co"># Rows</span></span>
+<span id="cb2-97"><a href="#cb2-97" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">3</span>, <span class="dv">6</span>),</span>
+<span id="cb2-98"><a href="#cb2-98" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">1</span>, <span class="dv">4</span>, <span class="dv">7</span>),</span>
+<span id="cb2-99"><a href="#cb2-99" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">5</span>, <span class="dv">8</span>),  <span class="co"># Columns</span></span>
+<span id="cb2-100"><a href="#cb2-100" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">0</span>, <span class="dv">4</span>, <span class="dv">8</span>),</span>
+<span id="cb2-101"><a href="#cb2-101" aria-hidden="true" tabindex="-1"></a>            (<span class="dv">2</span>, <span class="dv">4</span>, <span class="dv">6</span>),  <span class="co"># Diagonals</span></span>
+<span id="cb2-102"><a href="#cb2-102" aria-hidden="true" tabindex="-1"></a>        ]</span>
+<span id="cb2-103"><a href="#cb2-103" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-104"><a href="#cb2-104" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> combo <span class="kw">in</span> winning_combinations:</span>
+<span id="cb2-105"><a href="#cb2-105" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (</span>
+<span id="cb2-106"><a href="#cb2-106" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.board[combo[<span class="dv">0</span>]]</span>
+<span id="cb2-107"><a href="#cb2-107" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">1</span>]]</span>
+<span id="cb2-108"><a href="#cb2-108" aria-hidden="true" tabindex="-1"></a>                <span class="op">==</span> <span class="va">self</span>.board[combo[<span class="dv">2</span>]]</span>
+<span id="cb2-109"><a href="#cb2-109" aria-hidden="true" tabindex="-1"></a>                <span class="op">!=</span> <span class="st">&quot; &quot;</span></span>
+<span id="cb2-110"><a href="#cb2-110" aria-hidden="true" tabindex="-1"></a>            ):</span>
+<span id="cb2-111"><a href="#cb2-111" aria-hidden="true" tabindex="-1"></a>                <span class="cf">return</span> <span class="va">True</span></span>
+<span id="cb2-112"><a href="#cb2-112" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-113"><a href="#cb2-113" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">False</span></span>
+<span id="cb2-114"><a href="#cb2-114" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-115"><a href="#cb2-115" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_winner(<span class="va">self</span>):</span>
+<span id="cb2-116"><a href="#cb2-116" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-117"><a href="#cb2-117" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box announcing the winner.</span></span>
+<span id="cb2-118"><a href="#cb2-118" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-119"><a href="#cb2-119" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-120"><a href="#cb2-120" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-121"><a href="#cb2-121" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-122"><a href="#cb2-122" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> <span class="ss">f&quot;Player </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>current_player<span class="sc">}</span><span class="ss"> wins!&quot;</span></span>
+<span id="cb2-123"><a href="#cb2-123" aria-hidden="true" tabindex="-1"></a>        dlg <span class="op">=</span> wx.MessageDialog(<span class="va">self</span>, winner, <span class="st">&quot;Winner!&quot;</span>, wx.OK)</span>
+<span id="cb2-124"><a href="#cb2-124" aria-hidden="true" tabindex="-1"></a>        dlg.ShowModal()</span>
+<span id="cb2-125"><a href="#cb2-125" aria-hidden="true" tabindex="-1"></a>        dlg.Destroy()</span>
+<span id="cb2-126"><a href="#cb2-126" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-127"><a href="#cb2-127" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ask_play_again(<span class="va">self</span>, title, message):</span>
+<span id="cb2-128"><a href="#cb2-128" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-129"><a href="#cb2-129" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box asking if the players want to play again.</span></span>
+<span id="cb2-130"><a href="#cb2-130" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-131"><a href="#cb2-131" aria-hidden="true" tabindex="-1"></a><span class="co">        Args:</span></span>
+<span id="cb2-132"><a href="#cb2-132" aria-hidden="true" tabindex="-1"></a><span class="co">            title (str): Title of the message box.</span></span>
+<span id="cb2-133"><a href="#cb2-133" aria-hidden="true" tabindex="-1"></a><span class="co">            message (str): Message to be displayed in the message box.</span></span>
+<span id="cb2-134"><a href="#cb2-134" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-135"><a href="#cb2-135" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-136"><a href="#cb2-136" aria-hidden="true" tabindex="-1"></a><span class="co">            bool: True if the players want to play again, False otherwise.</span></span>
+<span id="cb2-137"><a href="#cb2-137" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-138"><a href="#cb2-138" aria-hidden="true" tabindex="-1"></a>        dlg <span class="op">=</span> wx.MessageDialog(<span class="va">self</span>, message, title, wx.YES_NO <span class="op">|</span> wx.ICON_QUESTION)</span>
+<span id="cb2-139"><a href="#cb2-139" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> dlg.ShowModal()</span>
+<span id="cb2-140"><a href="#cb2-140" aria-hidden="true" tabindex="-1"></a>        dlg.Destroy()</span>
+<span id="cb2-141"><a href="#cb2-141" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result <span class="op">==</span> wx.ID_YES</span>
+<span id="cb2-142"><a href="#cb2-142" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-143"><a href="#cb2-143" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_draw(<span class="va">self</span>):</span>
+<span id="cb2-144"><a href="#cb2-144" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-145"><a href="#cb2-145" aria-hidden="true" tabindex="-1"></a><span class="co">        Display a message box announcing a draw.</span></span>
+<span id="cb2-146"><a href="#cb2-146" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-147"><a href="#cb2-147" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-148"><a href="#cb2-148" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-149"><a href="#cb2-149" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-150"><a href="#cb2-150" aria-hidden="true" tabindex="-1"></a>        dlg <span class="op">=</span> wx.MessageDialog(</span>
+<span id="cb2-151"><a href="#cb2-151" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>, <span class="st">&quot;It&#39;s a draw!</span><span class="ch">\n</span><span class="st">Better luck next time!&quot;</span>, <span class="st">&quot;It&#39;s a draw!&quot;</span>, wx.OK</span>
+<span id="cb2-152"><a href="#cb2-152" aria-hidden="true" tabindex="-1"></a>        )</span>
+<span id="cb2-153"><a href="#cb2-153" aria-hidden="true" tabindex="-1"></a>        dlg.ShowModal()</span>
+<span id="cb2-154"><a href="#cb2-154" aria-hidden="true" tabindex="-1"></a>        dlg.Destroy()</span>
+<span id="cb2-155"><a href="#cb2-155" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-156"><a href="#cb2-156" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> reset_board(<span class="va">self</span>):</span>
+<span id="cb2-157"><a href="#cb2-157" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb2-158"><a href="#cb2-158" aria-hidden="true" tabindex="-1"></a><span class="co">        Reset the game board.</span></span>
+<span id="cb2-159"><a href="#cb2-159" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-160"><a href="#cb2-160" aria-hidden="true" tabindex="-1"></a><span class="co">        Asks players if they want to play again. If yes, the game is reset; otherwise, the window is closed.</span></span>
+<span id="cb2-161"><a href="#cb2-161" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-162"><a href="#cb2-162" aria-hidden="true" tabindex="-1"></a><span class="co">        Returns:</span></span>
+<span id="cb2-163"><a href="#cb2-163" aria-hidden="true" tabindex="-1"></a><span class="co">            None</span></span>
+<span id="cb2-164"><a href="#cb2-164" aria-hidden="true" tabindex="-1"></a><span class="co">        &quot;&quot;&quot;</span></span>
+<span id="cb2-165"><a href="#cb2-165" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.ask_play_again(<span class="st">&quot;Restart Game?&quot;</span>, <span class="st">&quot;Do you want to play again?&quot;</span>):</span>
+<span id="cb2-166"><a href="#cb2-166" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.Destroy()</span>
+<span id="cb2-167"><a href="#cb2-167" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-168"><a href="#cb2-168" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb2-169"><a href="#cb2-169" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].SetLabel(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb2-170"><a href="#cb2-170" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb2-171"><a href="#cb2-171" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span>
+<span id="cb2-172"><a href="#cb2-172" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb2-173"><a href="#cb2-173" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb2-174"><a href="#cb2-174" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Start the application and display the Tic Tac Toe game window.</span></span>
+<span id="cb2-175"><a href="#cb2-175" aria-hidden="true" tabindex="-1"></a>    app <span class="op">=</span> wx.App(<span class="va">False</span>)</span>
+<span id="cb2-176"><a href="#cb2-176" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> TicTacToe()</span>
+<span id="cb2-177"><a href="#cb2-177" aria-hidden="true" tabindex="-1"></a>    frame.Show(<span class="va">True</span>)</span>
+<span id="cb2-178"><a href="#cb2-178" aria-hidden="true" tabindex="-1"></a>    app.MainLoop()</span></code></pre></div>
+<h2 id="the-same-shape-as-the-pyside6-version">The Same Shape as the
+PySide6 Version</h2>
+<p>Move through the program with your screen reader’s “next function” or
+search command, and you will find the same methods as in
+<code>pyside_tic_tac_toe.py</code>:</p>
+<ul>
+<li><code>__init__()</code> builds the window and the buttons.</li>
+<li><code>make_button_click_handler()</code> makes a handler for each
+button.</li>
+<li><code>on_button_click()</code> makes a move, checks for a win or
+draw, and switches players.</li>
+<li><code>check_winner()</code> checks the eight winning lines.</li>
+<li><code>show_winner()</code>, <code>ask_play_again()</code>, and
+<code>show_draw()</code> show dialogs.</li>
+<li><code>reset_board()</code> starts a new game or closes the
+window.</li>
+</ul>
+<p><code>check_winner()</code> is exactly the same in both programs,
+word for word. It does not use the toolkit at all. It only looks at
+<code>self.board</code>. Code that does not depend on the toolkit can
+move from one toolkit to another without changes. That is a good reason
+to keep game rules separate from the code that draws the window.</p>
+<h2 id="importing-wx">Importing wx</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> wx</span></code></pre></div>
+<p>wxPython puts everything in one module, <code>wx</code>. Every class
+and constant starts with <code>wx.</code>, such as
+<code>wx.Button</code> and <code>wx.OK</code>. The PySide6 version
+imported each name separately with <code>from ... import</code>. Both
+styles are common.</p>
+<h2 id="the-frame">The Frame</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> TicTacToe(wx.Frame):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>):</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(<span class="va">None</span>, title<span class="op">=</span><span class="st">&quot;Tic Tac Toe&quot;</span>, size<span class="op">=</span>(<span class="dv">300</span>, <span class="dv">300</span>))</span></code></pre></div>
+<p>In wxPython, a top-level window is called a <em>frame</em>.
+<code>TicTacToe</code> inherits from <code>wx.Frame</code>, just as the
+PySide6 version inherited from <code>QMainWindow</code>.</p>
+<p>This time <code>super().__init__()</code> gets arguments. The first,
+<code>None</code>, means this window has no parent window. It is the
+main window. The other two are <em>keyword arguments</em>:
+<code>title="Tic Tac Toe"</code> and <code>size=(300, 300)</code>. A
+keyword argument gives the name of the parameter along with the value.
+That makes the call easy to understand when you hear it, because each
+value is labeled.</p>
+<p>The size is a tuple of width and height. Tuples are explained in the
+<code>easy_check.py</code> lesson.</p>
+<h2 id="panels-and-sizers">Panels and Sizers</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>        panel <span class="op">=</span> wx.Panel(<span class="va">self</span>)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        vbox <span class="op">=</span> wx.BoxSizer(wx.VERTICAL)</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.buttons <span class="op">=</span> []</span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>        grid_sizer <span class="op">=</span> wx.GridSizer(<span class="dv">3</span>, <span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">5</span>)</span></code></pre></div>
+<p>A <code>wx.Panel</code> goes inside the frame and holds the controls.
+Panels also handle moving between controls with the Tab key, so putting
+controls on a panel is important for keyboard users.</p>
+<p>What Qt calls a <em>layout</em>, wxPython calls a <em>sizer</em>.
+<code>wx.BoxSizer(wx.VERTICAL)</code> stacks things vertically, like
+<code>QVBoxLayout</code>. <code>wx.GridSizer(3, 3, 5, 5)</code> makes a
+grid with 3 rows and 3 columns, and a gap of 5 pixels between rows and
+between columns, like <code>QGridLayout</code>.</p>
+<h2 id="making-the-buttons">Making the Buttons</h2>
+<div class="sourceCode" id="cb6"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>        i <span class="op">=</span> <span class="dv">1</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>            button_row <span class="op">=</span> []</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                button <span class="op">=</span> wx.Button(panel, label<span class="op">=</span><span class="st">&quot; &quot;</span>, size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">100</span>))</span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                button.Bind(wx.EVT_BUTTON, <span class="va">self</span>.make_button_click_handler(row, col))</span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                button_row.append(button)</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                grid_sizer.Add(button, <span class="dv">0</span>, wx.EXPAND)</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                i <span class="op">+=</span> <span class="dv">1</span></span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons.append(button_row)</span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>        vbox.Add(grid_sizer, proportion<span class="op">=</span><span class="dv">1</span>, flag<span class="op">=</span>wx.EXPAND)</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>        panel.SetSizer(vbox)</span></code></pre></div>
+<p>The loops are the same as the PySide6 version. For each button:</p>
+<ul>
+<li><code>wx.Button(panel, label=" ", size=(100, 100))</code> makes a
+button on the panel, with a space for its label, at 100 by 100
+pixels.</li>
+<li><code>Bind()</code> connects an event to a handler.
+<code>wx.EVT_BUTTON</code> is the event a button sends when it is
+pressed. This is the same idea as Qt’s
+<code>button.clicked.connect()</code>.</li>
+<li><code>grid_sizer.Add(button, 0, wx.EXPAND)</code> puts the button in
+the next spot in the grid. <code>wx.EXPAND</code> makes the button grow
+to fill its spot.</li>
+</ul>
+<p>Unlike the Qt grid, which was told the row and column of each button,
+the wx grid sizer just fills in the spots in order: left to right, top
+to bottom.</p>
+<p>The variable <code>i</code> counts from 1 to 9, but it is never used.
+In the PySide6 version, it was used to set each button’s accessible
+description. Here that line is missing, so <code>i</code> is left over.
+You will put it to use in the exercises.</p>
+<p>At the end, the grid is added to the vertical sizer, and the sizer is
+given to the panel. <code>proportion=1</code> and
+<code>flag=wx.EXPAND</code> make the grid fill the window and grow when
+the window grows.</p>
+<h2 id="event-handlers-get-an-event">Event Handlers Get an Event</h2>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> make_button_click_handler(<span class="va">self</span>, row, col):</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>        <span class="kw">def</span> handler(event):</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.on_button_click(row, col)</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> handler</span></code></pre></div>
+<p>This is the same closure trick as in the PySide6 version, which gives
+each button a handler that remembers its own row and column. If closures
+are new to you, see that lesson.</p>
+<p>There is one difference. In wxPython, every event handler receives an
+<em>event object</em> as an argument. It holds details about what
+happened, such as which control sent it. So <code>handler()</code> has a
+parameter named <code>event</code>. The handler does not use it, but it
+must accept it, or wxPython will give an error when it calls the
+handler.</p>
+<h2 id="handling-a-click">Handling a Click</h2>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> on_button_click(<span class="va">self</span>, row, col):</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>        index <span class="op">=</span> row <span class="op">*</span> <span class="dv">3</span> <span class="op">+</span> col</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="va">self</span>.board[index] <span class="op">==</span> <span class="st">&quot; &quot;</span>:</span>
+<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.board[index] <span class="op">=</span> <span class="va">self</span>.current_player</span>
+<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.buttons[row][col].SetLabel(<span class="va">self</span>.current_player)</span>
+<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>            ...</span></code></pre></div>
+<p>This is the same as the PySide6 version, but wxPython’s method is
+named <code>SetLabel()</code> instead of <code>setText()</code>.
+wxPython methods start with a capital letter, and Qt methods start with
+a lowercase one.</p>
+<p>This version does not have the <code>setFocus()</code> trick. On
+Windows, wxPython buttons are real Windows buttons, and most screen
+readers notice when a focused native button’s label changes, so the new
+mark is usually read without any extra code. If your screen reader does
+not read it, adding <code>self.buttons[row][col].SetFocus()</code> after
+<code>SetLabel()</code> can help.</p>
+<h2 id="dialogs">Dialogs</h2>
+<div class="sourceCode" id="cb9"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> show_winner(<span class="va">self</span>):</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>        winner <span class="op">=</span> <span class="ss">f&quot;Player </span><span class="sc">{</span><span class="va">self</span><span class="sc">.</span>current_player<span class="sc">}</span><span class="ss"> wins!&quot;</span></span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>        dlg <span class="op">=</span> wx.MessageDialog(<span class="va">self</span>, winner, <span class="st">&quot;Winner!&quot;</span>, wx.OK)</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>        dlg.ShowModal()</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        dlg.Destroy()</span></code></pre></div>
+<p><code>wx.MessageDialog</code> is wxPython’s message box. Its
+arguments are the parent window, the message, the title, and the
+buttons. <code>ShowModal()</code> shows it and waits until it is
+closed.</p>
+<p><code>dlg.Destroy()</code> frees the dialog when you are done with
+it. In wxPython, you should always destroy a dialog after using it. Qt
+cleans up message boxes on its own.</p>
+<div class="sourceCode" id="cb10"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> ask_play_again(<span class="va">self</span>, title, message):</span>
+<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>        dlg <span class="op">=</span> wx.MessageDialog(<span class="va">self</span>, message, title, wx.YES_NO <span class="op">|</span> wx.ICON_QUESTION)</span>
+<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        result <span class="op">=</span> dlg.ShowModal()</span>
+<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>        dlg.Destroy()</span>
+<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> result <span class="op">==</span> wx.ID_YES</span></code></pre></div>
+<p><code>wx.YES_NO | wx.ICON_QUESTION</code> combines two options with
+the <code>|</code> symbol: Yes and No buttons, and a question icon.
+<code>ShowModal()</code> returns which button was pressed, and the
+method compares it with <code>wx.ID_YES</code>.</p>
+<p>Notice that it saves the result <em>before</em> destroying the
+dialog. After <code>Destroy()</code>, you should not use the dialog
+anymore.</p>
+<p>The draw message uses <code>\n</code> to put a line break in the
+message, so <code>It's a draw!</code> and
+<code>Better luck next time!</code> are on separate lines. Screen
+readers read both lines.</p>
+<h2 id="resetting-the-board">Resetting the Board</h2>
+<div class="sourceCode" id="cb11"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> reset_board(<span class="va">self</span>):</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>        <span class="cf">if</span> <span class="kw">not</span> <span class="va">self</span>.ask_play_again(<span class="st">&quot;Restart Game?&quot;</span>, <span class="st">&quot;Do you want to play again?&quot;</span>):</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>            <span class="va">self</span>.Destroy()</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>        <span class="cf">for</span> row <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>            <span class="cf">for</span> col <span class="kw">in</span> <span class="bu">range</span>(<span class="dv">3</span>):</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>                <span class="va">self</span>.buttons[row][col].SetLabel(<span class="st">&quot; &quot;</span>)</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.board <span class="op">=</span> [<span class="st">&quot; &quot;</span>] <span class="op">*</span> <span class="dv">9</span></span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.current_player <span class="op">=</span> <span class="st">&quot;X&quot;</span></span></code></pre></div>
+<p>If the players do not want to play again, <code>self.Destroy()</code>
+closes the window. When the last window is closed, the program ends.</p>
+<p>Look carefully at what happens next. There is no <code>return</code>
+after <code>self.Destroy()</code>, so the method keeps going and clears
+all the buttons on the window that is closing. wxPython waits a moment
+before really destroying a frame, so this usually causes no error, but
+it is not what was meant. Adding <code>return</code> right after
+<code>self.Destroy()</code> makes the intent clear.</p>
+<h2 id="starting-the-program">Starting the Program</h2>
+<div class="sourceCode" id="cb12"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="cf">if</span> <span class="va">__name__</span> <span class="op">==</span> <span class="st">&quot;__main__&quot;</span>:</span>
+<span id="cb12-2"><a href="#cb12-2" aria-hidden="true" tabindex="-1"></a>    <span class="co"># Start the application and display the Tic Tac Toe game window.</span></span>
+<span id="cb12-3"><a href="#cb12-3" aria-hidden="true" tabindex="-1"></a>    app <span class="op">=</span> wx.App(<span class="va">False</span>)</span>
+<span id="cb12-4"><a href="#cb12-4" aria-hidden="true" tabindex="-1"></a>    frame <span class="op">=</span> TicTacToe()</span>
+<span id="cb12-5"><a href="#cb12-5" aria-hidden="true" tabindex="-1"></a>    frame.Show(<span class="va">True</span>)</span>
+<span id="cb12-6"><a href="#cb12-6" aria-hidden="true" tabindex="-1"></a>    app.MainLoop()</span></code></pre></div>
+<p>This matches the PySide6 version, step for step:</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>PySide6</th>
+<th>wxPython</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Make the application</td>
+<td><code>QApplication(sys.argv)</code></td>
+<td><code>wx.App(False)</code></td>
+</tr>
+<tr>
+<td>Make the window</td>
+<td><code>TicTacToe()</code></td>
+<td><code>TicTacToe()</code></td>
+</tr>
+<tr>
+<td>Show it</td>
+<td><code>window.show()</code></td>
+<td><code>frame.Show(True)</code></td>
+</tr>
+<tr>
+<td>Run the event loop</td>
+<td><code>app.exec()</code></td>
+<td><code>app.MainLoop()</code></td>
+</tr>
+</tbody>
+</table>
+<p>The <code>False</code> passed to <code>wx.App</code> tells wxPython
+not to send printed output to a separate window.</p>
+<h2 id="accessibility-in-wxpython">Accessibility in wxPython</h2>
+<p>wxPython uses the operating system’s own controls. On Windows, a
+<code>wx.Button</code> is a real Windows button, the same kind used in
+Windows itself. Screen readers have supported these controls for
+decades, which is a big strength.</p>
+<p>The accessible name of a native button comes from its label. So in
+this program, the empty buttons have a label of a single space, and the
+screen reader has nothing to say but “button.” Unlike the PySide6
+version, there is no description either. A player who cannot see the
+board has no way to tell the squares apart until they are taken.</p>
+<p>The simplest fix is to put the square number in the label, the same
+way the console games show empty squares:</p>
+<div class="sourceCode" id="cb13"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a>button <span class="op">=</span> wx.Button(panel, label<span class="op">=</span><span class="bu">str</span>(i), size<span class="op">=</span>(<span class="dv">100</span>, <span class="dv">100</span>))</span></code></pre></div>
+<p>Then, when a square is taken, <code>SetLabel()</code> replaces the
+number with <code>X</code> or <code>O</code>. To check whether a square
+is empty, use <code>self.board</code>, not the label. This one change
+makes the game playable by ear, and it helps sighted players, too.</p>
+<p>A larger font also helps players with low vision. You can set one on
+each button:</p>
+<div class="sourceCode" id="cb14"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a>button.SetFont(wx.Font(<span class="dv">20</span>, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_BOLD))</span></code></pre></div>
+<h2 id="pyside6-or-wxpython">PySide6 or wxPython?</h2>
+<p>Both are good choices for accessible programs. Here are some
+differences:</p>
+<ul>
+<li>PySide6 draws its own widgets and connects them to accessibility
+systems. It has methods like <code>setAccessibleName()</code> that let
+you control exactly what a screen reader says.</li>
+<li>wxPython uses the operating system’s own controls, so they behave
+just like other programs on that system. You control what is read mostly
+through labels.</li>
+<li>Qt’s naming style is <code>setText()</code>. wxPython’s is
+<code>SetLabel()</code>.</li>
+<li>In Qt you <code>connect()</code> a signal. In wxPython you
+<code>Bind()</code> an event.</li>
+</ul>
+<p>The game logic does not care which you use. If you keep your game
+rules in their own functions, like <code>check_winner()</code>, you can
+switch toolkits later.</p>
+<h2 id="summary">Summary</h2>
+<p>You built the same game with a second toolkit. You learned that:</p>
+<ul>
+<li>In wxPython, a window is a <code>wx.Frame</code>, and controls go on
+a <code>wx.Panel</code>.</li>
+<li>Sizers arrange controls, like Qt’s layouts.</li>
+<li><code>Bind()</code> connects an event, such as
+<code>wx.EVT_BUTTON</code>, to a handler.</li>
+<li>wxPython handlers receive an event object.</li>
+<li>Dialogs are shown with <code>ShowModal()</code> and should be freed
+with <code>Destroy()</code>.</li>
+<li>Keyword arguments, like <code>title="Tic Tac Toe"</code>, label each
+value in a call.</li>
+<li>Native controls get their accessible name from their label, so never
+leave a label blank.</li>
+<li>Code that does not use the toolkit, such as
+<code>check_winner()</code>, can be shared between toolkits.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Put the square number in each button’s label, using <code>i</code>,
+and put it back in <code>reset_board()</code>. Test it with your screen
+reader.</li>
+<li>Add <code>return</code> after <code>self.Destroy()</code> in
+<code>reset_board()</code>.</li>
+<li>Give the buttons a large bold font.</li>
+<li>Add a <code>wx.StaticText</code> under the grid that says whose turn
+it is. Add it to <code>vbox</code> and update it with
+<code>SetLabel()</code> after each move.</li>
+<li>When a player presses a taken square, use a
+<code>wx.MessageDialog</code> or the status text to tell them the square
+is taken.</li>
+<li>Put the game rules (<code>check_winner()</code> and the board) in
+their own module, and import it into both the PySide6 and the wxPython
+versions.</li>
+</ol>

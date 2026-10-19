@@ -1,0 +1,191 @@
+<h1 id="inheritance-the-item-class">Inheritance: The Item Class</h1>
+<p>In the last lesson you wrote the <code>Unit</code> class, which holds
+names, a title, and a description. An item in the cave game, such as the
+little gold box, needs all of that, plus one more thing: a cost, or
+value.</p>
+<p>You could copy all of <code>Unit</code> into a new class and add the
+cost. But there is a better way. In this lesson you will make
+<code>Item</code> <em>inherit</em> from <code>Unit</code>. An item
+automatically gets everything a unit has, and you only write the parts
+that are new.</p>
+<p>Topics covered in this lesson</p>
+<ul>
+<li>Importing a class from another file</li>
+<li>Inheritance: making a class from another class</li>
+<li>Calling the parent’s <code>__init__()</code> with
+<code>super()</code></li>
+<li>Adding new attributes and methods</li>
+<li>Getter methods</li>
+</ul>
+<h2 id="a-note-on-reading-code-with-a-screen-reader">A Note on Reading
+Code with a Screen Reader</h2>
+<p>Python uses indentation, the spaces at the start of a line, to show
+which lines belong together. A line that ends with a colon, such as
+<code>while True:</code> or <code>def main():</code>, starts a block.
+Every line in that block is indented four more spaces than the line with
+the colon.</p>
+<p>Before you start, turn on indentation reporting in your screen reader
+or code editor so you hear how far each line is indented. In NVDA this
+setting is called “Line indentation reporting” and is under Document
+Formatting. JAWS and most code editors have a similar setting. Many
+blind programmers like to hear indentation as tones, but spoken numbers
+work too.</p>
+<p>It also helps to set your screen reader to read all punctuation while
+you are working with code. Punctuation matters in Python. A missing
+colon, quote, or parenthesis is one of the most common errors.</p>
+<p>In this lesson, code you type into a file is shown in code blocks.
+Code you type into the interactive shell starts with three greater-than
+signs, <code>&gt;&gt;&gt;</code>. That is the shell’s prompt. Do not
+type the prompt. Type only what comes after it. The lines with no prompt
+are what Python prints back.</p>
+<h2 id="the-source-code-for-item">The Source Code for Item</h2>
+<p>Type this program and save it as <code>item.py</code> in the
+<code>cave</code> folder, next to <code>unit.py</code>:</p>
+<div class="sourceCode" id="cb1"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co">&quot;&quot;&quot;Item class for Cave game&quot;&quot;&quot;</span></span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unit <span class="im">import</span> Unit</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Item(Unit):</span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>    <span class="co">&quot;&quot;&quot;</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a><span class="co">    This class defines the basic item.</span></span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a><span class="co">    &quot;&quot;&quot;</span></span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, t, d, c):</span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(n, t, d)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cost <span class="op">=</span> c</span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_title(<span class="va">self</span>):</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Return the title for this item&quot;&quot;&quot;</span></span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.title</span></code></pre></div>
+<p>Like <code>unit.py</code>, this file only defines a class. Running it
+does nothing you can hear.</p>
+<h2 id="importing-from-your-own-file">Importing from Your Own File</h2>
+<div class="sourceCode" id="cb2"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> unit <span class="im">import</span> Unit</span></code></pre></div>
+<p>You have imported modules that come with Python, like
+<code>random</code>, and modules you installed, like
+<code>playsound</code>. You can also import from your own files. Every
+<code>.py</code> file is a module. Its name is the file name without
+<code>.py</code>.</p>
+<p>This line says: from the module <code>unit</code>, which is the file
+<code>unit.py</code>, bring in the name <code>Unit</code>. Python looks
+for <code>unit.py</code> in the same folder as the program you are
+running. That is why both files must be in the <code>cave</code>
+folder.</p>
+<h2 id="inheritance">Inheritance</h2>
+<div class="sourceCode" id="cb3"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="kw">class</span> Item(Unit):</span></code></pre></div>
+<p>The name in parentheses after the class name is the class to inherit
+from. This line says that <code>Item</code> is a kind of
+<code>Unit</code>. <code>Unit</code> is called the <em>parent
+class</em>, <em>base class</em>, or <em>superclass</em>.
+<code>Item</code> is the <em>child class</em>, or <em>subclass</em>.</p>
+<p>An <code>Item</code> object has everything a <code>Unit</code> has.
+It has <code>names</code>, <code>title</code>, and
+<code>description</code> attributes, and it has the
+<code>is_name()</code> method, even though none of them are written in
+<code>item.py</code>. They come from <code>Unit</code>.</p>
+<p>A good way to check whether inheritance makes sense is to say “is a.”
+An item <em>is a</em> unit. A room <em>is a</em> unit. A player <em>is
+a</em> unit. All three share the same basic parts, which is why all
+three inherit from <code>Unit</code>.</p>
+<h2 id="the-item-constructor">The Item Constructor</h2>
+<div class="sourceCode" id="cb4"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> <span class="fu">__init__</span>(<span class="va">self</span>, n, t, d, c):</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Constructor&quot;&quot;&quot;</span></span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>        <span class="bu">super</span>().<span class="fu">__init__</span>(n, t, d)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="va">self</span>.cost <span class="op">=</span> c</span></code></pre></div>
+<p>An item’s constructor takes four values: names, title, description,
+and cost. The parameters are named with single letters, <code>n</code>,
+<code>t</code>, <code>d</code>, and <code>c</code>. That keeps the line
+short, but it is hard to know what they mean when you hear them. Names
+like <code>names</code>, <code>title</code>, <code>desc</code>, and
+<code>cost</code> would be clearer, especially by ear.</p>
+<h3 id="super">super()</h3>
+<p><code>super().__init__(n, t, d)</code> calls the
+<code>__init__()</code> method of the parent class, <code>Unit</code>.
+That sets up the names, title, and description, exactly as
+<code>Unit</code> always does. <code>super()</code> means “my parent
+class.”</p>
+<p>Then the next line adds the one thing that is new for items:
+<code>self.cost</code>.</p>
+<p>This is the pattern for every child class. First, let the parent set
+up its part. Then, set up your own part. If you forgot the
+<code>super()</code> line, the item would have a cost but no names,
+title, or description, and calling <code>is_name()</code> would cause an
+error.</p>
+<h2 id="the-get_title-method">The get_title() Method</h2>
+<div class="sourceCode" id="cb5"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>    <span class="kw">def</span> get_title(<span class="va">self</span>):</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>        <span class="co">&quot;&quot;&quot;Return the title for this item&quot;&quot;&quot;</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>        <span class="cf">return</span> <span class="va">self</span>.title</span></code></pre></div>
+<p>This method just returns the item’s title. A method whose only job is
+to return an attribute is called a <em>getter</em>.</p>
+<p>Code outside the class could read <code>item.title</code> directly,
+so why have a getter? Some programmers like getters because they make it
+possible to change how the title is stored later without changing every
+place that uses it. In Python, reading the attribute directly is also
+common and perfectly fine.</p>
+<p>Notice that <code>self.title</code> is used here, but it was not set
+in <code>Item</code>. It was set in <code>Unit.__init__()</code> through
+the <code>super()</code> call. A child class can use all of its parent’s
+attributes.</p>
+<h2 id="trying-item-in-the-shell">Trying Item in the Shell</h2>
+<p>In the <code>cave</code> folder, run:</p>
+<pre><code>python -i item.py</code></pre>
+<p>Now make an item:</p>
+<div class="sourceCode" id="cb7"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin <span class="op">=</span> Item([<span class="st">&quot;coin&quot;</span>, <span class="st">&quot;gold coin&quot;</span>], <span class="st">&quot;a gold coin&quot;</span>, <span class="st">&quot;A shiny gold coin.&quot;</span>, <span class="dv">5</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin.get_title()</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co">&#39;a gold coin&#39;</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin.cost</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a><span class="dv">5</span></span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> coin.is_name(<span class="st">&quot;coin&quot;</span>)</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p><code>is_name()</code> works even though it is not in
+<code>item.py</code>. It came from <code>Unit</code>.</p>
+<p>You can ask Python about the relationship with
+<code>isinstance()</code>, which checks whether an object belongs to a
+class:</p>
+<div class="sourceCode" id="cb8"><pre
+class="sourceCode python"><code class="sourceCode python"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">isinstance</span>(coin, Item)</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="op">&gt;&gt;&gt;</span> <span class="bu">isinstance</span>(coin, Unit)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="va">True</span></span></code></pre></div>
+<p>The coin is an <code>Item</code>, and it is also a <code>Unit</code>,
+because every item is a unit.</p>
+<h2 id="summary">Summary</h2>
+<p>You made a class that builds on another class. You learned that:</p>
+<ul>
+<li>Every <code>.py</code> file is a module, and you can import from
+your own files.</li>
+<li><code>class Item(Unit):</code> makes <code>Item</code> inherit
+everything from <code>Unit</code>.</li>
+<li><code>super().__init__(...)</code> lets the parent class set up its
+part of the object.</li>
+<li>A child class adds its own attributes and methods.</li>
+<li>A getter is a method that returns an attribute.</li>
+<li><code>isinstance()</code> checks what class an object belongs
+to.</li>
+<li>Clear parameter names are easier to understand by ear than single
+letters.</li>
+</ul>
+<h2 id="exercises">Exercises</h2>
+<ol type="1">
+<li>Rename the parameters <code>n</code>, <code>t</code>,
+<code>d</code>, and <code>c</code> to <code>names</code>,
+<code>title</code>, <code>desc</code>, and <code>cost</code>.</li>
+<li>Add a getter called <code>get_cost()</code> that returns the
+cost.</li>
+<li>Add a method called <code>price_tag()</code> that returns a sentence
+such as <code>a gold coin is worth 5 coins.</code></li>
+<li>Remove the <code>super().__init__(n, t, d)</code> line. Make an item
+in the shell and try <code>coin.is_name("coin")</code>. What error do
+you hear? Put the line back.</li>
+<li>Make a new class called <code>Weapon</code> that inherits from
+<code>Item</code> and adds a <code>damage</code> attribute. Does a
+weapon have <code>is_name()</code>? Does it have
+<code>get_title()</code>?</li>
+</ol>
